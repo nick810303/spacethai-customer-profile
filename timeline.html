@@ -100,7 +100,7 @@
   .avw{position:relative;display:inline-block;flex:none}
   .badge{position:absolute;top:-5px;right:-7px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--badge);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--surface);font-family:var(--sans)}
   .row .lane{position:relative;height:var(--row-h);border-top:1px solid var(--border2);background-color:var(--surface2);background-image:linear-gradient(to right,#dedede 1px,transparent 1px),linear-gradient(to right,#efefef 1px,transparent 1px);background-size:var(--hour-w) 100%,calc(var(--hour-w) / 4) 100%}
-  .row.off .lane{background-image:repeating-linear-gradient(135deg,#ececec 0 5px,transparent 5px 11px)}
+  .row.off .lane{background-color:#F5F5F5;background-image:repeating-linear-gradient(45deg,#E6E6E6 0 1px,transparent 1px 5px)}
   .shift{position:absolute;top:0;bottom:0;background-color:var(--surface);background-image:linear-gradient(to right,#e4e4e4 1px,transparent 1px),linear-gradient(to right,#f1f1f1 1px,transparent 1px);background-size:var(--hour-w) 100%,calc(var(--hour-w) / 4) 100%;background-position:var(--shift-off,0) 0;border-left:1px solid var(--border);border-right:1px solid var(--border)}
   .bk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:6px;padding:3px 7px;color:#2C2520;overflow:hidden;white-space:nowrap;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:2px;line-height:1.15;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
   .bk .l1{display:flex;align-items:center;gap:5px;min-width:0}
@@ -114,7 +114,7 @@
   .bk .t{font-family:var(--mono);font-size:10px;opacity:.75}
   .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)} .bk.free{background:var(--d90f)}
   .bk.past{opacity:.55}
-  .buf{position:absolute;top:6px;height:calc(var(--row-h) - 12px);background:rgba(120,100,90,.13);border-radius:0 5px 5px 0}
+  .buf{position:absolute;top:6px;height:calc(var(--row-h) - 12px);background:#E8E8E8;border-radius:6px}
   .blk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:6px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
   .now{position:absolute;top:34px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
   .now::before{content:attr(data-t);position:absolute;top:-22px;left:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:4px}
@@ -141,7 +141,7 @@
   .vbk.d120{background:var(--d120)} .vbk.d90{background:var(--d90)} .vbk.d60{background:var(--d60)} .vbk.trn{background:var(--tr)} .vbk.free{background:var(--d90f)}
   .vbk.past{opacity:.55}
   .vbk.sel{outline:2px solid var(--badge);outline-offset:1px}
-  .vbuf{position:absolute;left:2px;right:2px;background:rgba(120,100,90,.13);border-radius:0 0 5px 5px}
+  .vbuf{position:absolute;left:2px;right:2px;background:#E8E8E8;border-radius:6px}
   .vblk{position:absolute;left:2px;right:2px;border-radius:5px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:9px;display:flex;align-items:flex-start;padding:2px 3px;overflow:hidden;line-height:1.1}
   .vnow{position:absolute;left:0;right:0;height:1px;background:var(--red);z-index:15;pointer-events:none}
   .vnow::before{content:attr(data-t);position:absolute;left:2px;top:-8px;background:var(--red);color:#fff;font-family:var(--mono);font-size:9px;padding:0 4px;border-radius:3px;line-height:15px}
@@ -224,8 +224,8 @@
     <span><i style="background:var(--d90f)"></i>90 分不指定</span>
     <span><i style="background:var(--tr)"></i>培訓新師120分</span>
     <span><i style="background:var(--blk);border:1px solid var(--blk-bdr)"></i>占用</span>
-    <span><i style="background:rgba(120,100,90,.13)"></i>緩衝 15 分</span>
-    <span><i style="background:repeating-linear-gradient(135deg,#ececec 0 3px,transparent 3px 6px)"></i>休</span>
+    <span><i style="background:#E8E8E8"></i>緩衝 15 分</span>
+    <span><i style="background:#F5F5F5 repeating-linear-gradient(45deg,#E0E0E0 0 1px,transparent 1px 4px)"></i>休</span>
     <span><i style="background:var(--surface);border:1px solid var(--border)"></i>開放預約區間</span>
   </div>
 </header>
@@ -242,7 +242,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r64
+   小泰空 顧客檔案系統・時間軸（唯讀）r65
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -296,7 +296,7 @@ const dutyFirst = list => [...list.filter(t=>t.shift), ...list.filter(t=>!t.shif
 let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null, selectedKey=null;
 // 人員篩選（存 localStorage）：hidden = 取消勾選的 staffId；hideOff = 不顯示今日休
 const PREF_KEY='tl_ppl';
-let pref = (()=>{ try{ return Object.assign({hidden:[],hideOff:false}, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch{ return {hidden:[],hideOff:false}; } })();
+let pref = (()=>{ try{ return Object.assign({hidden:[],hideOff:true}, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch{ return {hidden:[],hideOff:true}; } })();
 function savePref(){ try{ localStorage.setItem(PREF_KEY,JSON.stringify(pref)); }catch{} }
 const isShown = t => !pref.hidden.includes(t.staffId) && !(pref.hideOff && !t.shift);
 function renderPpl(){
@@ -388,7 +388,7 @@ function renderHorizontal(){
         if(ev.kind==='block'){ const d=document.createElement('div'); d.className='blk';
           d.style.left=x(s)+'px'; d.style.width=Math.max(6,(e-s)*HOUR_W-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; lane.appendChild(d); return; }
         if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='buf'; buf.title=`清床緩衝 ${BUFFER} 分`;
-          const bw=Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2; buf.style.left=x(ev.e)+'px'; buf.style.width=bw+'px'; lane.appendChild(buf); }
+          const bw=Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-3; buf.style.left=(x(ev.e)-8)+'px'; buf.style.width=(bw+8)+'px'; lane.appendChild(buf); }
         const el=document.createElement('button');
         el.className=bkClass('bk',t,ev,isToday,NOW);
         el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title;
@@ -453,7 +453,7 @@ function renderVertical(){
       if(ev.kind==='block'){ const d=document.createElement('div'); d.className='vblk';
         d.style.top=(y(s)+1)+'px'; d.style.height=Math.max(8,(e-s)*HOUR_H-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; col.appendChild(d); return; }
       if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='vbuf'; buf.title=`清床緩衝 ${BUFFER} 分`;
-        buf.style.top=y(ev.e)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-1)+'px'; col.appendChild(buf); }
+        buf.style.top=(y(ev.e)-8)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-2+8)+'px'; col.appendChild(buf); }
       const el=document.createElement('button');
       el.className=bkClass('vbk',t,ev,isToday,NOW);
       el.style.top=(y(s)+1)+'px'; el.style.height=Math.max(18,(e-s)*HOUR_H-3)+'px'; el.title=ev.title;
