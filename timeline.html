@@ -179,17 +179,21 @@
   /* ── 手機 ── */
   @media (max-width:700px){
     :root{--head-h:52px}
-    .bar{padding:8px 10px;gap:6px 8px;flex-wrap:wrap}
-    .datenav{flex:1 1 100%}
+    .bar{padding:8px 8px;gap:5px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .bar::-webkit-scrollbar{display:none}
+    .datenav{flex:0 0 auto;gap:3px}
+    .datenav .today{padding:0 6px;font-size:11px}
+    .pplbtn{height:28px;padding:0 7px;font-size:12px}
+    .pplbtn .arr{display:none}
     .legend{display:none}
-    .datenav button{width:28px;height:28px}
-    .datenav .d{font-size:14px;padding:0 4px}
+    .datenav button{width:26px;height:28px}
+    .datenav .d{font-size:13px;padding:0 3px}
     .src{display:none}
     .pop{position:fixed;top:calc(var(--head-h) + 2px);left:8px;right:8px;width:auto}
     .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
     .panel.open{transform:none}
     .panel .ctx{border-radius:14px 14px 0 0}
   }
+  @media (max-width:375px){ .datenav .wd{display:none} }
 </style>
 </head>
 <body>
@@ -203,14 +207,14 @@
       <button id="next" aria-label="後一天">›</button>
       <button class="today" id="todayBtn">今天</button>
     </div>
-    <div class="ppl"><button id="brBtn" class="pplbtn"><span class="dot all" id="branchDot"></span><b id="brText" style="font-weight:500">全部據點</b> ▾</button>
+    <div class="ppl"><button id="brBtn" class="pplbtn"><span class="dot all" id="branchDot"></span><b id="brText" style="font-weight:500">全部據點</b><span class="arr"> ▾</span></button>
       <div class="pop brpop" id="brPop">
         <label><input type="radio" name="br" value="all" checked> <span class="dot all"></span>全部據點</label>
         <label><input type="radio" name="br" value="南京三民"> <span class="dot" style="background:var(--nj)"></span>南京三民</label>
         <label><input type="radio" name="br" value="中山"> <span class="dot" style="background:var(--zs)"></span>中山</label>
       </div>
     </div>
-    <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span> ▾</button>
+    <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span><span class="arr"> ▾</span></button>
       <div class="pop" id="pplPop">
         <label class="row1"><input type="checkbox" id="hideOff"> 不顯示當日休人員（預設）</label>
         <div class="acts"><button id="pplAll">全部勾選</button><button id="pplNone">清除勾選</button></div>
@@ -244,7 +248,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r72
+   小泰空 顧客檔案系統・時間軸（唯讀）r73
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -487,7 +491,7 @@ function updateSrc(){
 }
 function renderDate(){
   const [y,m,d]=dateKey.split('-').map(Number);
-  document.getElementById('dateLabel').innerHTML=`<b>${pad(m)}/${pad(d)}</b> 週${WD[new Date(y,m-1,d).getDay()]}`;
+  document.getElementById('dateLabel').innerHTML=`<b>${pad(m)}/${pad(d)}</b><span class="wd"> 週${WD[new Date(y,m-1,d).getDay()]}</span>`;
   document.getElementById('datePick').value=dateKey;
   document.getElementById('todayBtn').textContent = dateKey===todayKey() ? '今天' : '回到今天';
 }
