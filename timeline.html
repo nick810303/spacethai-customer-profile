@@ -36,10 +36,12 @@
   .datenav .d{font-size:15px;padding:0 6px;white-space:nowrap;cursor:pointer}
   .datenav .today{width:auto;padding:0 10px;font-size:12px;white-space:nowrap}
   .datenav input[type=date]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-  .seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:13px;background:var(--surface)}
-  .seg button{padding:5px 11px;color:var(--text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
-  .seg button+button{border-left:1px solid var(--border)}
-  .seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
+  .bsel{position:relative;display:inline-flex;align-items:center}
+  .bsel select{appearance:none;-webkit-appearance:none;height:30px;padding:0 26px 0 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font:inherit;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap}
+  .bsel select:hover{border-color:var(--brand)}
+  .bsel .dot{position:absolute;left:10px;pointer-events:none}
+  .bsel .dot.all{background:linear-gradient(90deg,var(--nj) 50%,var(--zs) 50%)}
+  .bsel::after{content:'▾';position:absolute;right:9px;font-size:12px;color:var(--text-muted);pointer-events:none}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .ppl{position:relative}
   .pplbtn{height:30px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;color:var(--text-muted);white-space:nowrap}
@@ -183,7 +185,7 @@
     .legend{display:none}
     .datenav button{width:28px;height:28px}
     .datenav .d{font-size:14px;padding:0 4px}
-    .seg button{padding:5px 9px;font-size:12px}
+    .bsel select{font-size:12px}
     .src{display:none}
     .pop{position:fixed;top:52px;left:8px;right:8px;width:auto}
     .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
@@ -203,10 +205,12 @@
       <button id="next" aria-label="後一天">›</button>
       <button class="today" id="todayBtn">今天</button>
     </div>
-    <div class="seg" id="branchSeg">
-      <button aria-pressed="true" data-b="all">全部</button>
-      <button aria-pressed="false" data-b="南京三民"><span class="dot" style="background:var(--nj)"></span>南京三民</button>
-      <button aria-pressed="false" data-b="中山"><span class="dot" style="background:var(--zs)"></span>中山</button>
+    <div class="bsel"><span class="dot all" id="branchDot"></span>
+      <select id="branchSel" aria-label="據點">
+        <option value="all">全部據點</option>
+        <option value="南京三民">南京三民</option>
+        <option value="中山">中山</option>
+      </select>
     </div>
     <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span> ▾</button>
       <div class="pop" id="pplPop">
@@ -242,7 +246,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r66
+   小泰空 顧客檔案系統・時間軸（唯讀）r69
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -485,6 +489,7 @@ function renderDate(){
   const [y,m,d]=dateKey.split('-').map(Number);
   document.getElementById('dateLabel').innerHTML=`<b>${pad(m)}/${pad(d)}</b> 週${WD[new Date(y,m-1,d).getDay()]}`;
   document.getElementById('datePick').value=dateKey;
+  document.getElementById('todayBtn').textContent = dateKey===todayKey() ? '今天' : '回到今天';
 }
 
 /* ── 顧客面板（overlay，預設收合） ── */
@@ -566,9 +571,10 @@ document.getElementById('next').onclick=()=>shiftDate(1);
 document.getElementById('todayBtn').onclick=()=>setDate(todayKey());
 document.getElementById('dateLabel').onclick=()=>{ const p=document.getElementById('datePick'); p.showPicker?p.showPicker():p.click(); };
 document.getElementById('datePick').onchange=e=>{ if(e.target.value) setDate(e.target.value); };
-document.getElementById('branchSeg').addEventListener('click',e=>{
-  const btn=e.target.closest('button'); if(!btn) return; filter=btn.dataset.b;
-  [...e.currentTarget.children].forEach(b=>b.setAttribute('aria-pressed',b===btn)); if(data){ board.innerHTML=''; render(); }
+document.getElementById('branchSel').addEventListener('change',e=>{
+  filter=e.target.value; const dot=document.getElementById('branchDot');
+  dot.className='dot'+(filter==='all'?' all':''); dot.style.background=filter==='all'?'':(filter==='中山'?'var(--zs)':'var(--nj)');
+  if(data){ board.innerHTML=''; render(); }
 });
 function fitBoard(){ document.querySelector('.main').style.height=(window.innerHeight-document.querySelector('header').offsetHeight)+'px'; }
 fitBoard(); window.addEventListener('resize',fitBoard);
