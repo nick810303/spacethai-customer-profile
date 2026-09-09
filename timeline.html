@@ -2,120 +2,157 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>小泰空 · 時間軸</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* ── 與顧客檔案系統 style-*.css 同一組 tokens ── */
   :root{
-    --bg:#F4ECE3; --bg2:#EADFD1; --bg3:#F0E7DC; --card:#FCF8F3; --line:#E0D4C4; --line2:#EDE3D6;
-    --ink:#3E2A21; --ink2:#7A6357; --ink3:#A9968A;
-    --clay:#AE6C56; --cocoa:#91563E; --cream:#F8F2EE; --red:#C24D3F; --green:#5C7A50;
+    --brand:#AE6C56; --brand-dark:#91563E; --brand-light:#F8F2EE; --brand-bg:rgba(174,108,86,.07); --brand-bdr:rgba(174,108,86,.22);
+    --gold:#C9A84C; --green:#2a9d5c; --red:#D94F4F;
+    --text:#111; --text-muted:#888; --text-hint:#bbb;
+    --border:#e8e8e8; --border2:#ebebeb; --surface:#fff; --surface2:#f7f7f7; --surface3:#fafafa;
     --nj:#4E5D3E; --zs:#96382E;
-    --d120:#C4857A; --d90:#A8906E; --d60:#D4A882; --tr:#7A9B6A;
+    --d120:#AE6C56; --d90:#C9A84C; --d60:#D9A98A; --tr:#5F9E6E;
+    --blk:#F0EBE7; --blk-bdr:#E3DAD3;
     --mono:'DM Mono',ui-monospace,Menlo,monospace;
-    --sans:'Noto Sans TC',system-ui,-apple-system,sans-serif;
-    --hour-w:112px; --row-h:52px; --name-w:168px; --panel-w:380px; --head-h:106px;
+    --sans:'Noto Sans TC',-apple-system,system-ui,sans-serif;
+    --hour-w:112px; --row-h:52px; --name-w:168px; --panel-w:380px;
+    --hour-h:64px; --col-w:36px; --axis-w:34px;   /* 直屏 */
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
-  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--surface2);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
   /* ── 頂欄 ── */
-  header{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
-  .brand{font-weight:700;font-size:15px}
-  .brand small{font-family:var(--mono);font-weight:400;color:var(--ink3);margin-left:8px;font-size:12px}
+  header{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border)}
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 12px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:15px;margin-right:6px}
+  .brand small{font-family:var(--mono);font-weight:400;color:var(--text-muted);margin-left:8px;font-size:12px}
   body.embedded .brand{display:none}
-  .datenav{display:flex;align-items:center;gap:6px;font-family:var(--mono)}
-  .datenav button{width:30px;height:30px;border:1px solid var(--line);border-radius:6px;color:var(--ink2);background:var(--card)}
-  .datenav button:hover{border-color:var(--cocoa)}
-  .datenav .d{font-size:15px;padding:0 6px;white-space:nowrap}
+  .datenav{display:flex;align-items:center;gap:4px;font-family:var(--mono)}
+  .datenav button{width:30px;height:30px;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);background:var(--surface)}
+  .datenav button:hover{border-color:var(--brand)}
+  .datenav .d{font-size:15px;padding:0 6px;white-space:nowrap;cursor:pointer}
   .datenav .today{width:auto;padding:0 10px;font-size:12px}
   .datenav input[type=date]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-  .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:13px;background:var(--card)}
-  .seg button{padding:5px 12px;color:var(--ink2);display:flex;align-items:center;gap:6px;white-space:nowrap}
-  .seg button+button{border-left:1px solid var(--line)}
-  .seg button[aria-pressed="true"]{background:var(--cocoa);color:var(--cream)}
+  .seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:13px;background:var(--surface)}
+  .seg button{padding:5px 11px;color:var(--text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .seg button+button{border-left:1px solid var(--border)}
+  .seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .spacer{flex:1}
-  .src{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+  .src{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);white-space:nowrap}
   .src .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
   .src.busy .pulse{animation:blink 1s infinite}
   .src.err{color:var(--red)} .src.err .pulse{background:var(--red)}
   @keyframes blink{50%{opacity:.3}}
-  .legend{display:flex;gap:14px;padding:0 16px 10px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
-  .legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-  .legend i{width:14px;height:10px;border-radius:2px;display:inline-block}
-  /* ── 主版面 ── */
-  .main{display:flex;height:calc(100vh - var(--head-h))}
-  .board{position:relative;overflow:auto;flex:1;min-width:0;-webkit-overflow-scrolling:touch}
-  .grid{display:grid;grid-template-columns:var(--name-w) 1fr;min-width:max-content}
+  .legend{display:flex;gap:12px;padding:0 12px 8px;font-size:11px;color:var(--text-muted);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .legend i{width:12px;height:9px;border-radius:2px;display:inline-block}
+  /* ── 主板 ── */
+  .main{position:relative;height:calc(100vh - var(--head-h,98px))}
+  .board{position:relative;overflow:auto;height:100%;-webkit-overflow-scrolling:touch}
+  .msg{padding:60px 20px;text-align:center;color:var(--text-muted);font-size:14px}
+  .msg a{color:var(--brand)}
+  /* ── 橫版（電腦）：老師列 × 時間橫軸 ── */
+  .grid{display:grid;grid-template-columns:var(--name-w) 1fr;min-width:max-content;background:var(--surface)}
   .axis{display:contents}
-  .axis .corner{position:sticky;left:0;top:0;z-index:21;background:var(--bg);border-bottom:1px solid var(--ink);border-right:1px solid var(--line);height:36px;display:flex;align-items:flex-end;padding:0 12px 6px;font-family:var(--mono);font-size:11px;color:var(--ink3)}
-  .axis .hours{position:sticky;top:0;z-index:20;height:36px;border-bottom:1px solid var(--ink);background:var(--bg)}
-  .axis .h{position:absolute;bottom:6px;font-family:var(--mono);font-size:12px;color:var(--ink2);transform:translateX(-50%)}
-  .axis .h::after{content:"";position:absolute;left:50%;bottom:-7px;width:1px;height:6px;background:var(--ink)}
-  .branch-head{grid-column:1/-1;padding:14px 0 6px;background:var(--bg)}
+  .axis .corner{position:sticky;left:0;top:0;z-index:21;background:var(--surface);border-bottom:1px solid var(--border);border-right:1px solid var(--border);height:34px;display:flex;align-items:flex-end;padding:0 12px 6px;font-family:var(--mono);font-size:11px;color:var(--text-hint)}
+  .axis .hours{position:sticky;top:0;z-index:20;height:34px;border-bottom:1px solid var(--border);background:var(--surface)}
+  .axis .h{position:absolute;bottom:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted);transform:translateX(-50%)}
+  .axis .h::after{content:"";position:absolute;left:50%;bottom:-7px;width:1px;height:6px;background:var(--border)}
+  .branch-head{grid-column:1/-1;padding:12px 0 6px;background:var(--surface2)}
   .branch-head .in{position:sticky;left:0;display:inline-flex;align-items:center;gap:10px;padding:0 12px}
-  .branch-head .name{font-weight:700;font-size:14px;padding:1px 8px;border-radius:4px;color:var(--cream)}
-  .branch-head .meta{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .bname{font-weight:700;font-size:13px;padding:1px 8px;border-radius:6px;color:#fff}
+  .branch-head .meta{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
   .row{display:contents}
-  .row .who{position:sticky;left:0;z-index:10;background:var(--bg);height:var(--row-h);border-top:1px solid var(--line);border-right:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 12px}
-  .row .who{white-space:nowrap}
+  .row .who{position:sticky;left:0;z-index:10;background:var(--surface);height:var(--row-h);border-top:1px solid var(--border2);border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 12px;white-space:nowrap}
   .row .who .rail{width:3px;height:28px;border-radius:2px;flex:none}
-  .row .who .zh{flex:none}
-  .row .who .en{min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .row .who .tr+.off{margin-left:6px}
-  .row .who .av{width:28px;height:28px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2);flex:none;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
-  .row .who .av img{width:100%;height:100%;object-fit:cover;display:block}
-  .row.off .who .av{filter:grayscale(1);opacity:.6}
-  .row .who .zh{font-weight:500;font-size:15px}
-  .row .who .en{font-family:var(--mono);font-size:11px;color:var(--ink3)}
-  .row .who .tr{margin-left:auto;font-size:10px;color:var(--tr);border:1px solid var(--tr);padding:0 5px;border-radius:3px}
-  .row .who .off{margin-left:auto;font-size:11px;color:var(--ink3)}
-  .row .lane{position:relative;height:var(--row-h);border-top:1px solid var(--line);background-color:var(--bg3);background-image:linear-gradient(to right,var(--line2) 1px,transparent 1px);background-size:var(--hour-w) 100%}
-  .row.off .lane{background-image:repeating-linear-gradient(135deg,var(--bg2) 0 6px,transparent 6px 12px)}
-  .shift{position:absolute;top:0;bottom:0;background:var(--card);border-left:1px solid var(--line);border-right:1px solid var(--line)}
-  .bk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:4px;padding:4px 8px;color:#fff;overflow:hidden;white-space:nowrap;text-align:left;display:flex;flex-direction:column;justify-content:center;line-height:1.2;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
-  .bk:hover{filter:brightness(.92)}
-  .bk:focus-visible,.bk.sel{outline:2px solid var(--ink);outline-offset:2px}
-  .bk .t{font-family:var(--mono);font-size:10px;opacity:.9}
+  .av{width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);flex:none;overflow:hidden;box-shadow:0 0 0 1px var(--border)}
+  .av img{width:100%;height:100%;object-fit:cover;display:block}
+  .off .av{filter:grayscale(1);opacity:.55}
+  .row .who .zh{font-weight:500;font-size:15px;flex:none}
+  .row .who .en{font-family:var(--mono);font-size:11px;color:var(--text-hint);min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .row .who .tr{margin-left:auto;font-size:10px;color:var(--tr);border:1px solid var(--tr);padding:0 5px;border-radius:4px}
+  .row .who .offlbl{margin-left:auto;font-size:11px;color:var(--text-hint)}
+  .row .who .tr+.offlbl{margin-left:6px}
+  .row .lane{position:relative;height:var(--row-h);border-top:1px solid var(--border2);background-color:var(--surface2);background-image:linear-gradient(to right,var(--border2) 1px,transparent 1px);background-size:var(--hour-w) 100%}
+  .row.off .lane{background-image:repeating-linear-gradient(135deg,#ececec 0 5px,transparent 5px 11px)}
+  .shift{position:absolute;top:0;bottom:0;background:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+  .bk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:6px;padding:4px 8px;color:#fff;overflow:hidden;white-space:nowrap;text-align:left;display:flex;flex-direction:column;justify-content:center;line-height:1.2;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+  .bk:hover{filter:brightness(.93)}
+  .bk:focus-visible,.bk.sel{outline:2px solid var(--text);outline-offset:2px}
+  .bk .t{font-family:var(--mono);font-size:10px;opacity:.92}
   .bk .c{font-size:12px;font-weight:500}
   .bk .c .id{font-family:var(--mono);font-weight:400;opacity:.85;margin-left:4px;font-size:10px}
   .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)}
-  .bk.past{opacity:.55}
-  .buf{position:absolute;top:7px;height:calc(var(--row-h) - 14px);background:repeating-linear-gradient(135deg,rgba(62,42,33,.10) 0 3px,transparent 3px 6px);border-radius:0 3px 3px 0}
-  .blk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:4px;background:var(--bg2);border:1px solid var(--line);color:var(--ink2);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
-  .now{position:absolute;top:36px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
-  .now::before{content:attr(data-t);position:absolute;top:-22px;left:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:3px}
-  .msg{padding:60px 20px;text-align:center;color:var(--ink2);font-size:14px}
-  .msg a{color:var(--cocoa)}
-  /* ── 右側顧客面板 ── */
-  .panel{width:var(--panel-w);flex:none;border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;overflow:hidden}
-  .panel .ctx{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--bg3)}
-  .panel .ctx button{width:26px;height:26px;border-radius:6px;color:var(--ink2);flex:none} .panel .ctx button:hover{background:var(--bg2)}
-  .panel .body{padding:18px;overflow:auto;flex:1}
-  .panel .empty{color:var(--ink3);font-size:13px;text-align:center;padding:60px 20px}
-  .cnum{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .bk.past{opacity:.5}
+  .buf{position:absolute;top:7px;height:calc(var(--row-h) - 14px);background:repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0 3px,transparent 3px 6px);border-radius:0 3px 3px 0}
+  .blk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:6px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
+  .now{position:absolute;top:34px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
+  .now::before{content:attr(data-t);position:absolute;top:-22px;left:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:4px}
+  /* ── 直版（手機）：時間縱軸 × 老師欄 ── */
+  .vgrid{display:grid;grid-template-columns:var(--axis-w) repeat(var(--ncol),minmax(var(--col-w),1fr));min-width:100%;background:var(--surface)}
+  .vhead{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 2px 5px;gap:3px;min-height:64px;justify-content:flex-end}
+  .vhead.corner{align-items:flex-start;justify-content:flex-end;padding-left:4px;font-family:var(--mono);font-size:10px;color:var(--text-hint)}
+  .vhead .av{width:28px;height:28px}
+  .vhead .zh{font-size:12px;font-weight:500;line-height:1.1}
+  .vhead .tr{font-size:9px;color:var(--tr);line-height:1}
+  .vhead .band{height:3px;width:100%;border-radius:2px}
+  .vhead.bstart{border-left:1px solid var(--border)}
+  .vaxis{position:relative;border-right:1px solid var(--border);background:var(--surface);position:sticky;left:0;z-index:10}
+  .vaxis .h{position:absolute;right:4px;transform:translateY(-50%);font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+  .vcol{position:relative;background-color:var(--surface2);background-image:linear-gradient(to bottom,var(--border2) 1px,transparent 1px);background-size:100% var(--hour-h);border-right:1px solid var(--border2)}
+  .vcol.bstart{border-left:1px solid var(--border)}
+  .vshift{position:absolute;left:0;right:0;background:var(--surface)}
+  .vbk{position:absolute;left:2px;right:2px;border-radius:6px;padding:4px 4px;color:#fff;overflow:hidden;text-align:left;display:flex;flex-direction:column;gap:1px;line-height:1.15;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+  .vbk .t{font-family:var(--mono);font-size:9px;opacity:.92;white-space:nowrap}
+  .vbk .c{font-size:11px;font-weight:500;word-break:break-all;overflow:hidden}
+  .vbk .id{font-family:var(--mono);font-size:9px;opacity:.85}
+  .vbk.d120{background:var(--d120)} .vbk.d90{background:var(--d90)} .vbk.d60{background:var(--d60)} .vbk.trn{background:var(--tr)}
+  .vbk.past{opacity:.5}
+  .vbk.sel{outline:2px solid var(--text);outline-offset:1px}
+  .vbuf{position:absolute;left:2px;right:2px;background:repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0 3px,transparent 3px 6px);border-radius:0 0 4px 4px}
+  .vblk{position:absolute;left:2px;right:2px;border-radius:5px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:9px;display:flex;align-items:flex-start;padding:2px 3px;overflow:hidden;line-height:1.1}
+  .vnow{position:absolute;left:0;right:0;height:1px;background:var(--red);z-index:15;pointer-events:none}
+  .vnow::before{content:attr(data-t);position:absolute;left:2px;top:-8px;background:var(--red);color:#fff;font-family:var(--mono);font-size:9px;padding:0 4px;border-radius:3px;line-height:15px}
+  .voff{grid-column:1/-1;padding:8px 10px 14px;font-size:11px;color:var(--text-hint);background:var(--surface2);border-top:1px solid var(--border)}
+  /* ── 顧客面板（overlay，預設收合） ── */
+  .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;width:var(--panel-w);max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(0,0,0,.10);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
+  .panel.open{transform:none;visibility:visible}
+  .panel .ctx{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--text-muted);background:var(--brand-light)}
+  .panel .ctx button{width:28px;height:28px;border-radius:8px;color:var(--text-muted);flex:none;font-size:16px} .panel .ctx button:hover{background:var(--surface2)}
+  .panel .body{padding:16px;overflow:auto;flex:1}
+  .panel .empty{color:var(--text-hint);font-size:13px;text-align:center;padding:60px 20px}
+  .scrim{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.18);display:none}
+  .scrim.on{display:block}
+  .cnum{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
   .cname{font-size:20px;font-weight:700;margin:2px 0 6px}
   .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .tag{font-size:11px;padding:1px 8px;border-radius:10px;background:var(--bg2);color:var(--ink2)}
-  .kv{display:grid;grid-template-columns:72px 1fr;gap:8px 12px;font-size:13px;margin:12px 0}
-  .kv dt{color:var(--ink3);font-size:12px;padding-top:1px} .kv dd{margin:0;word-break:break-all} .kv .mono{font-family:var(--mono)}
-  .stats{display:flex;gap:18px;font-size:12px;color:var(--ink2);padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
-  .stats b{display:block;font-family:var(--mono);font-size:18px;color:var(--ink);font-weight:500}
-  .note{margin:12px 0;font-size:13px;color:var(--ink2);background:var(--bg3);border-radius:6px;padding:10px 12px;white-space:pre-wrap}
-  h4{margin:16px 0 6px;font-size:12px;color:var(--ink3);font-weight:500;letter-spacing:.04em}
-  .rec{display:grid;grid-template-columns:auto 1fr auto;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line2)}
-  .rec .d{font-family:var(--mono);color:var(--ink2)} .rec .p{color:var(--ink3);font-size:12px;white-space:nowrap}
-  .go{display:inline-block;margin-top:16px;font-size:13px;color:var(--cocoa);border-bottom:1px solid var(--cocoa);text-decoration:none;padding-bottom:1px;cursor:pointer}
-  .anon .cname{font-weight:500} .anon p{color:var(--ink3);font-size:13px}
-  .calerr{margin:0 16px 8px;font-size:12px;color:var(--red)}
-  @media (max-width:900px){
-    :root{--hour-w:84px;--name-w:120px;--head-h:62px}
-    .row .who .en,.legend{display:none}
-    .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;transform:translateX(100%);transition:transform .2s;max-width:100vw;width:min(100vw,var(--panel-w))}
-    .panel.open{transform:none;box-shadow:-8px 0 24px rgba(62,42,33,.18)}
+  .tag{font-size:11px;padding:1px 8px;border-radius:10px;background:var(--brand-bg);color:var(--brand-dark);border:1px solid var(--brand-bdr)}
+  .kv{display:grid;grid-template-columns:64px 1fr;gap:8px 12px;font-size:13px;margin:12px 0}
+  .kv dt{color:var(--text-muted);font-size:12px;padding-top:1px} .kv dd{margin:0;word-break:break-all} .kv .mono{font-family:var(--mono)}
+  .stats{display:flex;gap:18px;font-size:11px;color:var(--text-muted);padding:12px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2)}
+  .stats b{display:block;font-family:var(--mono);font-size:18px;color:var(--text);font-weight:500}
+  .note{margin:12px 0;font-size:13px;color:#7A4E1F;background:#FDF8EE;border:1px solid #E8C99B;border-radius:8px;padding:10px 12px;white-space:pre-wrap}
+  h4{margin:16px 0 6px;font-size:12px;color:var(--text-muted);font-weight:500;letter-spacing:.04em}
+  .rec{display:grid;grid-template-columns:auto 1fr auto;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border2)}
+  .rec .d{font-family:var(--mono);color:var(--text-muted)} .rec .p{color:var(--text-hint);font-size:12px;white-space:nowrap}
+  .go{display:inline-block;margin-top:16px;padding:8px 14px;border-radius:8px;background:var(--brand);color:#fff;font-size:13px;text-decoration:none;cursor:pointer}
+  .anon .cname{font-weight:500} .anon p{color:var(--text-muted);font-size:13px}
+  /* ── 手機 ── */
+  @media (max-width:700px){
+    :root{--head-h:52px}
+    .bar{padding:8px 10px;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .bar::-webkit-scrollbar{display:none}
+    .legend{display:none}
+    .datenav button{width:28px;height:28px}
+    .datenav .d{font-size:14px;padding:0 4px}
+    .seg button{padding:5px 9px;font-size:12px}
+    .src{display:none}
+    .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
+    .panel.open{transform:none}
+    .panel .ctx{border-radius:14px 14px 0 0}
   }
 </style>
 </head>
@@ -143,65 +180,61 @@
     <span><i style="background:var(--d90)"></i>90 分</span>
     <span><i style="background:var(--d60)"></i>60 分</span>
     <span><i style="background:var(--tr)"></i>培訓新師</span>
-    <span><i style="background:var(--bg2);border:1px solid var(--line)"></i>占用（休假／BB／拍攝…）</span>
-    <span><i style="background:repeating-linear-gradient(135deg,var(--bg2) 0 3px,transparent 3px 6px)"></i>排休</span>
-    <span><i style="background:var(--card);border:1px solid var(--line)"></i>上班區間</span>
+    <span><i style="background:var(--blk);border:1px solid var(--blk-bdr)"></i>占用（休假／BB／拍攝…）</span>
+    <span><i style="background:repeating-linear-gradient(135deg,#ececec 0 3px,transparent 3px 6px)"></i>排休</span>
+    <span><i style="background:var(--surface);border:1px solid var(--border)"></i>上班區間</span>
   </div>
 </header>
 
 <div class="main">
-  <div class="board" id="board">
-    <div class="grid" id="grid"><div class="msg">載入中…</div></div>
-    <div class="now" id="now" style="display:none"></div>
-  </div>
-  <aside class="panel" id="panel">
-    <div class="ctx"><span id="ctxText">點選預約以檢視顧客檔案</span><button id="pClose" aria-label="關閉">✕</button></div>
-    <div class="body" id="pBody"><div class="empty">尚未選取預約</div></div>
-  </aside>
+  <div class="board" id="board"><div class="msg">載入中…</div></div>
 </div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel">
+  <div class="ctx"><span id="ctxText"></span><button id="pClose" aria-label="關閉">✕</button></div>
+  <div class="body" id="pBody"></div>
+</aside>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）
+   小泰空 顧客檔案系統・時間軸（唯讀）r58
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
+   版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
    ═══════════════════════════════════════════════════════════════ */
 const SB_URL = 'https://lyphciitrhfomquorhfm.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
 const OPEN = 11, CLOSE = 25;           // 11:00 – 01:00
 let BUFFER = 15;
-const HOUR_W = window.innerWidth < 900 ? 84 : 112;
-const BRANCHES = [ { name:'南京三民', color:'var(--nj)' }, { name:'中山', color:'var(--zs)' } ];
+const BRANCHES = [ { name:'南京三民', color:'var(--nj)', hex:'#4E5D3E' }, { name:'中山', color:'var(--zs)', hex:'#96382E' } ];
 const EMBEDDED = window.self !== window.top;
 if (EMBEDDED) document.body.classList.add('embedded');
+const isMobile = () => window.innerWidth <= 700;
 
 const sb = supabase.createClient(SB_URL, SB_ANON);   // 與主系統同 storage key → 共用登入
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ── 工具 ── */
 const pad = n => String(n).padStart(2,'0');
-const x = h => (h - OPEN) * HOUR_W;
 const fmt = h => `${pad(Math.floor(h)%24)}:${pad(Math.round((h%1)*60))}`;
 const minToH = m => m/60;
 function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
 function nowH(){ const d=new Date(); return d.getHours()+d.getMinutes()/60; }
 const WD=['日','一','二','三','四','五','六'];
-// ISO(+08:00) → 相對於 dateKey 當日 00:00 的小時數（隔日 00:30 → 24.5）
 function isoToH(iso, dateKey){
   const [y,m,d]=dateKey.split('-').map(Number);
-  const base=new Date(y,m-1,d,0,0,0).getTime();
-  return (Date.parse(iso)-base)/3600000;
+  return (Date.parse(iso)-new Date(y,m-1,d,0,0,0).getTime())/3600000;
 }
+const avatarHtml = (t,zh) => `<span class="av">${t.avatar?`<img src="${esc(t.avatar)}" alt="" loading="lazy" data-z="${esc(zh)}" onerror="this.replaceWith(this.dataset.z)">`:esc(zh)}</span>`;
+const blockLabel = (ev,t,zh) => (ev.title.replace(t.name,'').replace(zh,'').trim()||ev.title);
+const durOf = ev => ev.duration || Math.round((ev.e-ev.s)*60);
 
 /* ── 狀態 ── */
-let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null;
+let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null, selectedKey=null;
 
 /* ── 載入 ── */
-async function getToken(){
-  const { data:{ session } } = await sb.auth.getSession();
-  return session?.access_token || null;
-}
+async function getToken(){ const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
 async function loadTimeline(dk){
   const token = await getToken();
   if(!token) throw Object.assign(new Error('noauth'),{noauth:true});
@@ -211,45 +244,49 @@ async function loadTimeline(dk){
   if(!r.ok) throw new Error(`timeline ${r.status}`);
   const j = await r.json();
   if(j.buffer) BUFFER = j.buffer;
-  // 事件 → 畫面座標
   j.teachers.forEach(t=>{
-    t.events = (t.events||[]).map(ev=>{
-      const s=isoToH(ev.start,dk), e=isoToH(ev.end,dk);
-      return { ...ev, s, e };
-    }).filter(ev=>{
-      if(ev.allDay) return false;                       // 整天型（休假）不畫，排休由排班表決定
-      if(ev.kind==='block' && (ev.e-ev.s)>=20) return false; // 24 小時型占用同上
-      return ev.e > OPEN && ev.s < CLOSE;               // 完全在營業軸外的不畫
+    t.events = (t.events||[]).map(ev=>({ ...ev, s:isoToH(ev.start,dk), e:isoToH(ev.end,dk) })).filter(ev=>{
+      if(ev.allDay) return false;                              // 整天型（休假）不畫，排休由排班表決定
+      if(ev.kind==='block' && (ev.e-ev.s)>=20) return false;   // 24 小時型占用同上
+      return ev.e > OPEN && ev.s < CLOSE;
     });
   });
   return j;
 }
 
 /* ── 渲染 ── */
-const grid=document.getElementById('grid');
-function showMsg(html){ grid.innerHTML=`<div class="msg">${html}</div>`; document.getElementById('now').style.display='none'; }
-function render(){
-  grid.innerHTML='';
+const board=document.getElementById('board');
+function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
+function render(){ isMobile()?renderVertical():renderHorizontal(); }
+function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
+function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, t.isTrainee?'trn':`d${durOf(ev)}`, (isToday&&ev.e<NOW)?'past':'', selectedKey===ev.start+t.staffId?'sel':''].join(' '); }
+function attachClick(el,ev,t){ el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); selectedKey=ev.start+t.staffId; openCustomer(ev,t); }); }
+
+/* 橫版 */
+function renderHorizontal(){
+  const HOUR_W=112;
+  const x = h => (h - OPEN) * HOUR_W;
+  const grid=document.createElement('div'); grid.className='grid';
   const totalW=(CLOSE-OPEN)*HOUR_W;
   const axis=document.createElement('div'); axis.className='axis';
   axis.innerHTML=`<div class="corner">分店 / 老師</div><div class="hours" style="width:${totalW}px">
     ${Array.from({length:CLOSE-OPEN+1},(_,i)=>`<span class="h" style="left:${i*HOUR_W}px">${pad((OPEN+i)%24)}:00</span>`).join('')}</div>`;
   grid.appendChild(axis);
   const isToday = dateKey===todayKey(), NOW=nowH();
-  BRANCHES.filter(br=>filter==='all'||br.name===filter).forEach(br=>{
+  visibleBranches().forEach(br=>{
     const list=data.teachers.filter(t=>t.branch===br.name);
     const onDuty=list.filter(t=>t.shift).length;
     const cnt=list.reduce((n,t)=>n+t.events.filter(e=>e.kind==='booking').length,0);
     const head=document.createElement('div'); head.className='branch-head';
-    head.innerHTML=`<div class="in"><span class="name" style="background:${br.color}">${br.name}</span><span class="meta">${onDuty} 位上班 · ${cnt} 筆預約</span></div>`;
+    head.innerHTML=`<div class="in"><span class="bname" style="background:${br.color}">${br.name}</span><span class="meta">${onDuty} 位上班 · ${cnt} 筆預約</span></div>`;
     grid.appendChild(head);
     list.forEach(t=>{
       const [zh,en]=t.name.split(' ');
       const row=document.createElement('div'); row.className='row'+(t.shift?'':' off');
       const who=document.createElement('div'); who.className='who';
-      who.innerHTML=`<span class="rail" style="background:${t.isTrainee?'var(--tr)':br.color}"></span><span class="av">${t.avatar?`<img src="${esc(t.avatar)}" alt="" loading="lazy" data-z="${esc(zh)}" onerror="this.replaceWith(this.dataset.z)">`:esc(zh)}</span>
+      who.innerHTML=`<span class="rail" style="background:${t.isTrainee?'var(--tr)':br.color}"></span>${avatarHtml(t,zh)}
         <span class="zh">${esc(zh)}</span><span class="en">${esc(en||'')}</span>
-        ${t.isTrainee?'<span class="tr">培訓</span>':''}${t.shift?'':'<span class="off">排休</span>'}`;
+        ${t.isTrainee?'<span class="tr">培訓</span>':''}${t.shift?'':'<span class="offlbl">排休</span>'}`;
       const lane=document.createElement('div'); lane.className='lane'; lane.style.width=totalW+'px';
       if(t.shift){ const sh=document.createElement('div'); sh.className='shift';
         const s=Math.max(OPEN,minToH(t.shift.fromMin)), e=Math.min(CLOSE,minToH(t.shift.toMin-BUFFER));
@@ -257,26 +294,87 @@ function render(){
       t.events.forEach(ev=>{
         const s=Math.max(OPEN,ev.s), e=Math.min(CLOSE,ev.e);
         if(ev.kind==='block'){ const d=document.createElement('div'); d.className='blk';
-          const label=ev.title.replace(t.name,'').replace(zh,'').trim()||ev.title;   // 「澈 Che BBE」→「BBE」
-          d.style.left=x(s)+'px'; d.style.width=Math.max(6,(e-s)*HOUR_W-2)+'px'; d.textContent=label; d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; lane.appendChild(d); return; }
+          d.style.left=x(s)+'px'; d.style.width=Math.max(6,(e-s)*HOUR_W-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; lane.appendChild(d); return; }
         if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='buf';
           buf.style.left=x(ev.e)+'px'; buf.style.width=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2)+'px'; lane.appendChild(buf); }
         const el=document.createElement('button');
-        const dur = ev.duration || Math.round((ev.e-ev.s)*60);
-        el.className=['bk', t.isTrainee?'trn':`d${dur}`, (isToday&&ev.e<NOW)?'past':''].join(' ');
-        el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px';
-        el.title=ev.title;
-        el.innerHTML=`<span class="t">${fmt(ev.s)}–${fmt(ev.e)} · ${dur}</span>
+        el.className=bkClass('bk',t,ev,isToday,NOW);
+        el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title;
+        el.innerHTML=`<span class="t">${fmt(ev.s)}–${fmt(ev.e)} · ${durOf(ev)}</span>
           <span class="c">${esc(ev.displayName)}${ev.customerNum?`<span class="id">#${ev.customerNum}</span>`:''}</span>`;
-        el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); openCustomer(ev,t); });
+        attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
         lane.appendChild(el);
       });
       row.append(who,lane); grid.appendChild(row);
     });
   });
-  const now=document.getElementById('now');
-  if(isToday && NOW>=OPEN && NOW<=CLOSE){ now.style.display=''; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); }
-  else now.style.display='none';
+  const keepX=board.scrollLeft, keepY=board.scrollTop, first=!board.querySelector('.grid,.vgrid');
+  board.innerHTML=''; board.appendChild(grid);
+  if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='now'; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); board.appendChild(now); }
+  if(first){ if(isToday) board.scrollLeft=Math.max(0,x(nowH())-220); } else { board.scrollLeft=keepX; board.scrollTop=keepY; }
+  updateSrc();
+}
+
+/* 直版（手機）：只列「有上班」的老師成欄；排休老師列在最下方一行 */
+function renderVertical(){
+  const HOUR_H=64;
+  const y = h => (h - OPEN) * HOUR_H;
+  const isToday = dateKey===todayKey(), NOW=nowH();
+  const cols=[]; const offs=[];
+  visibleBranches().forEach(br=>{
+    const list=data.teachers.filter(t=>t.branch===br.name);
+    list.forEach((t,i)=>{ if(t.shift||t.events.some(e=>e.kind==='booking')) cols.push({t,br,first:cols.length && cols[cols.length-1].br!==br}); else offs.push({t,br}); });
+  });
+  const totalH=(CLOSE-OPEN)*HOUR_H;
+  const grid=document.createElement('div'); grid.className='vgrid'; grid.style.setProperty('--ncol',Math.max(1,cols.length));
+  // 表頭
+  const corner=document.createElement('div'); corner.className='vhead corner'; corner.textContent='時間'; grid.appendChild(corner);
+  cols.forEach(({t,br,first})=>{
+    const [zh]=t.name.split(' ');
+    const h=document.createElement('div'); h.className='vhead'+(first?' bstart':'');
+    h.innerHTML=`${avatarHtml(t,zh)}<span class="zh">${esc(zh)}</span>${t.isTrainee?'<span class="tr">培訓</span>':''}<span class="band" style="background:${t.isTrainee?'var(--tr)':br.color}"></span>`;
+    h.title=`${t.name} · ${br.name}`;
+    grid.appendChild(h);
+  });
+  // 時間軸
+  const ax=document.createElement('div'); ax.className='vaxis'; ax.style.height=totalH+'px';
+  ax.innerHTML=Array.from({length:CLOSE-OPEN+1},(_,i)=>`<span class="h" style="top:${i*HOUR_H}px">${pad((OPEN+i)%24)}</span>`).join('');
+  grid.appendChild(ax);
+  // 各欄
+  cols.forEach(({t,br,first})=>{
+    const [zh]=t.name.split(' ');
+    const col=document.createElement('div'); col.className='vcol'+(first?' bstart':''); col.style.height=totalH+'px';
+    if(t.shift){ const sh=document.createElement('div'); sh.className='vshift';
+      const s=Math.max(OPEN,minToH(t.shift.fromMin)), e=Math.min(CLOSE,minToH(t.shift.toMin-BUFFER));
+      if(e>s){ sh.style.top=y(s)+'px'; sh.style.height=(y(e)-y(s))+'px'; col.appendChild(sh); } }
+    t.events.forEach(ev=>{
+      const s=Math.max(OPEN,ev.s), e=Math.min(CLOSE,ev.e);
+      if(ev.kind==='block'){ const d=document.createElement('div'); d.className='vblk';
+        d.style.top=(y(s)+1)+'px'; d.style.height=Math.max(8,(e-s)*HOUR_H-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; col.appendChild(d); return; }
+      if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='vbuf';
+        buf.style.top=y(ev.e)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-1)+'px'; col.appendChild(buf); }
+      const el=document.createElement('button');
+      el.className=bkClass('vbk',t,ev,isToday,NOW);
+      el.style.top=(y(s)+1)+'px'; el.style.height=Math.max(18,(e-s)*HOUR_H-3)+'px'; el.title=ev.title;
+      el.innerHTML=`<span class="t">${fmt(ev.s)}</span><span class="c">${esc(ev.displayName)}</span>${ev.customerNum?`<span class="id">#${ev.customerNum}</span>`:''}`;
+      attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
+      col.appendChild(el);
+    });
+    grid.appendChild(col);
+  });
+  if(offs.length){ const o=document.createElement('div'); o.className='voff';
+    o.textContent='排休：'+offs.map(({t})=>t.name.split(' ')[0]).join('、'); grid.appendChild(o); }
+  if(!cols.length){ const o=document.createElement('div'); o.className='voff'; o.textContent='本日無人上班'; grid.appendChild(o); }
+  const keepY=board.scrollTop, first=!board.querySelector('.grid,.vgrid');
+  board.innerHTML=''; board.appendChild(grid);
+  if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='vnow';
+    // 表頭高度＝第一個 vhead 的實際高度
+    const headH=grid.querySelector('.vhead').offsetHeight;
+    now.style.top=(headH+y(NOW))+'px'; now.dataset.t=fmt(NOW); grid.style.position='relative'; grid.appendChild(now); }
+  if(first){ if(isToday) board.scrollTop=Math.max(0,y(nowH())-120); } else board.scrollTop=keepY;
+  updateSrc();
+}
+function updateSrc(){
   const ft=new Date(data.fetchedAt);
   const src=document.getElementById('src'); src.classList.remove('busy','err');
   document.getElementById('srcText').textContent=`行事曆 · ${pad(ft.getHours())}:${pad(ft.getMinutes())}:${pad(ft.getSeconds())} 更新`;
@@ -288,30 +386,27 @@ function renderDate(){
   document.getElementById('datePick').value=dateKey;
 }
 
-/* ── 右側：顧客檔案面板 ── */
-const panel=document.getElementById('panel');
+/* ── 顧客面板（overlay，預設收合） ── */
+const panel=document.getElementById('panel'), scrim=document.getElementById('scrim');
 async function openCustomer(ev,t){
   const [zh]=t.name.split(' ');
   const [y,m,d]=dateKey.split('-');
-  const dur = ev.duration || Math.round((ev.e-ev.s)*60);
-  document.getElementById('ctxText').textContent=`${m}/${d} ${fmt(ev.s)}–${fmt(ev.e)} · ${zh} · ${dur} 分`;
+  document.getElementById('ctxText').textContent=`${m}/${d} ${fmt(ev.s)}–${fmt(ev.e)} · ${zh} · ${durOf(ev)} 分`;
   const body=document.getElementById('pBody');
-  panel.classList.add('open');
+  panel.classList.add('open'); scrim.classList.add('on');
   if(!ev.customerNum){
-    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div>
-      <p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
+    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div><p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
     return;
   }
   body.innerHTML=`<div class="empty">載入 #${ev.customerNum}…</div>`;
-  const num=ev.customerNum;
+  const num=ev.customerNum, myKey=selectedKey;
   const [{data:c},{data:recs}] = await Promise.all([
     sb.from('customers').select('num,name,display,phone,tags,note,birthday,country').eq('num',num).maybeSingle(),
     sb.from('records').select('date,store,staff_name_legacy,duration,plan,is_draft').eq('customer_num',num).eq('is_draft',false).order('date',{ascending:false}).limit(400),
   ]);
-  if(selectedEl && selectedEl.title!==ev.title) return;   // 使用者已點別筆
+  if(selectedKey!==myKey) return;
   if(!c){
-    body.innerHTML=`<div class="anon"><div class="cnum">顧客編號 #${num}</div><div class="cname">${esc(ev.displayName)}</div>
-      <p>顧客檔案系統尚無此編號的資料。</p></div>`;
+    body.innerHTML=`<div class="anon"><div class="cnum">顧客編號 #${num}</div><div class="cname">${esc(ev.displayName)}</div><p>顧客檔案系統尚無此編號的資料。</p></div>`;
     return;
   }
   const rs=recs||[];
@@ -343,18 +438,17 @@ function openFullProfile(num){
   if(EMBEDDED){ window.parent.postMessage({ type:'spacethai:open-customer', num }, location.origin); }
   else { location.href = `./?num=${num}`; }
 }
-function closePanel(){ panel.classList.remove('open'); if(selectedEl){selectedEl.classList.remove('sel');selectedEl=null;}
-  document.getElementById('ctxText').textContent='點選預約以檢視顧客檔案'; document.getElementById('pBody').innerHTML='<div class="empty">尚未選取預約</div>'; }
+function closePanel(){ panel.classList.remove('open'); scrim.classList.remove('on'); if(selectedEl){selectedEl.classList.remove('sel');selectedEl=null;} selectedKey=null; }
 document.getElementById('pClose').onclick=closePanel;
+scrim.onclick=closePanel;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePanel(); });
 
-/* ── 日期 / 分店 ── */
-let loading=false;
+/* ── 日期 / 分店 / 載入 ── */
 async function load(){
   const src=document.getElementById('src'); src.classList.add('busy'); src.classList.remove('err');
   document.getElementById('srcText').textContent='行事曆 · 更新中';
   renderDate();
-  try{ data=await loadTimeline(dateKey); lastOk=Date.now(); render(); }
+  try{ const d=await loadTimeline(dateKey); data=d; lastOk=Date.now(); render(); }
   catch(e){
     src.classList.remove('busy'); src.classList.add('err');
     if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'':'<br><a href="./">前往登入 →</a>'}`); return; }
@@ -364,7 +458,7 @@ async function load(){
     if(data && data.date===dateKey) render(); else showMsg('行事曆無回應，請稍後再試。');
   }
 }
-function setDate(dk){ dateKey=dk; closePanel(); load(); }
+function setDate(dk){ dateKey=dk; closePanel(); board.innerHTML=''; load(); }
 function shiftDate(n){ const [y,m,d]=dateKey.split('-').map(Number); const dt=new Date(y,m-1,d+n); setDate(`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`); }
 document.getElementById('prev').onclick=()=>shiftDate(-1);
 document.getElementById('next').onclick=()=>shiftDate(1);
@@ -373,10 +467,14 @@ document.getElementById('dateLabel').onclick=()=>{ const p=document.getElementBy
 document.getElementById('datePick').onchange=e=>{ if(e.target.value) setDate(e.target.value); };
 document.getElementById('branchSeg').addEventListener('click',e=>{
   const btn=e.target.closest('button'); if(!btn) return; filter=btn.dataset.b;
-  [...e.currentTarget.children].forEach(b=>b.setAttribute('aria-pressed',b===btn)); if(data) render();
+  [...e.currentTarget.children].forEach(b=>b.setAttribute('aria-pressed',b===btn)); if(data){ board.innerHTML=''; render(); }
 });
+function fitBoard(){ document.querySelector('.main').style.height=(window.innerHeight-document.querySelector('header').offsetHeight)+'px'; }
+fitBoard(); window.addEventListener('resize',fitBoard);
+let lastMode=isMobile();
+window.addEventListener('resize',()=>{ const m=isMobile(); if(m!==lastMode){ lastMode=m; if(data){ board.innerHTML=''; render(); } } });
 
-load().then(()=>{ if(dateKey===todayKey()) document.getElementById('board').scrollLeft=Math.max(0,x(nowH())-220); });
+load();
 setInterval(()=>{ if(!document.hidden) load(); }, 60000);   // 每分鐘即時重抓
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && lastOk && Date.now()-lastOk>60000) load(); });
 </script>
