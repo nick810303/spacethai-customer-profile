@@ -181,13 +181,15 @@
   /* ── 手機 ── */
   @media (max-width:700px){
     :root{--head-h:52px}
-    .bar{padding:8px 10px;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .bar::-webkit-scrollbar{display:none}
+    .bar{padding:8px 10px;gap:6px 8px;flex-wrap:wrap}
+    .datenav{flex:1 1 100%}
+    .datenav .today{margin-left:auto}
     .legend{display:none}
     .datenav button{width:28px;height:28px}
     .datenav .d{font-size:14px;padding:0 4px}
     .bsel select{font-size:12px}
     .src{display:none}
-    .pop{position:fixed;top:52px;left:8px;right:8px;width:auto}
+    .pop{position:fixed;top:calc(var(--head-h) + 2px);left:8px;right:8px;width:auto}
     .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
     .panel.open{transform:none}
     .panel .ctx{border-radius:14px 14px 0 0}
@@ -246,7 +248,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r69
+   小泰空 顧客檔案系統・時間軸（唯讀）r70
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -576,7 +578,7 @@ document.getElementById('branchSel').addEventListener('change',e=>{
   dot.className='dot'+(filter==='all'?' all':''); dot.style.background=filter==='all'?'':(filter==='中山'?'var(--zs)':'var(--nj)');
   if(data){ board.innerHTML=''; render(); }
 });
-function fitBoard(){ document.querySelector('.main').style.height=(window.innerHeight-document.querySelector('header').offsetHeight)+'px'; }
+function fitBoard(){ const hh=document.querySelector('header').offsetHeight; document.documentElement.style.setProperty('--head-h',hh+'px'); document.querySelector('.main').style.height=(window.innerHeight-hh)+'px'; }
 fitBoard(); window.addEventListener('resize',fitBoard);
 let lastMode=isMobile();
 let rzT=null;
