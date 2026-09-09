@@ -36,12 +36,10 @@
   .datenav .d{font-size:15px;padding:0 6px;white-space:nowrap;cursor:pointer}
   .datenav .today{width:auto;padding:0 10px;font-size:12px;white-space:nowrap}
   .datenav input[type=date]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-  .bsel{position:relative;display:inline-flex;align-items:center}
-  .bsel select{appearance:none;-webkit-appearance:none;height:30px;padding:0 26px 0 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font:inherit;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap}
-  .bsel select:hover{border-color:var(--brand)}
-  .bsel .dot{position:absolute;left:10px;pointer-events:none}
-  .bsel .dot.all{background:linear-gradient(90deg,var(--nj) 50%,var(--zs) 50%)}
-  .bsel::after{content:'▾';position:absolute;right:9px;font-size:12px;color:var(--text-muted);pointer-events:none}
+  .dot.all{background:linear-gradient(90deg,var(--nj) 50%,var(--zs) 50%)}
+  .pplbtn .dot{margin-right:5px;vertical-align:0}
+  .pop.brpop{width:180px}
+  .pop.brpop label input{accent-color:var(--brand)}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
   .ppl{position:relative}
   .pplbtn{height:30px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;color:var(--text-muted);white-space:nowrap}
@@ -187,7 +185,6 @@
     .legend{display:none}
     .datenav button{width:28px;height:28px}
     .datenav .d{font-size:14px;padding:0 4px}
-    .bsel select{font-size:12px}
     .src{display:none}
     .pop{position:fixed;top:calc(var(--head-h) + 2px);left:8px;right:8px;width:auto}
     .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
@@ -207,16 +204,16 @@
       <button id="next" aria-label="後一天">›</button>
       <button class="today" id="todayBtn">今天</button>
     </div>
-    <div class="bsel"><span class="dot all" id="branchDot"></span>
-      <select id="branchSel" aria-label="據點">
-        <option value="all">全部據點</option>
-        <option value="南京三民">南京三民</option>
-        <option value="中山">中山</option>
-      </select>
+    <div class="ppl"><button id="brBtn" class="pplbtn"><span class="dot all" id="branchDot"></span><b id="brText" style="font-weight:500">全部據點</b> ▾</button>
+      <div class="pop brpop" id="brPop">
+        <label><input type="radio" name="br" value="all" checked> <span class="dot all"></span>全部據點</label>
+        <label><input type="radio" name="br" value="南京三民"> <span class="dot" style="background:var(--nj)"></span>南京三民</label>
+        <label><input type="radio" name="br" value="中山"> <span class="dot" style="background:var(--zs)"></span>中山</label>
+      </div>
     </div>
     <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span> ▾</button>
       <div class="pop" id="pplPop">
-        <label class="row1"><input type="checkbox" id="hideOff"> 不顯示當日休人員</label>
+        <label class="row1"><input type="checkbox" id="hideOff"> 不顯示當日休人員（預設）</label>
         <div class="acts"><button id="pplAll">全部勾選</button><button id="pplNone">清除勾選</button></div>
         <div id="pplList"></div>
       </div></div>
@@ -248,7 +245,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r70
+   小泰空 顧客檔案系統・時間軸（唯讀）r71
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -316,9 +313,11 @@ function renderPpl(){
   document.getElementById('pplCount').textContent=`${shown}/${all}`;
   document.getElementById('pplBtn').classList.toggle('act', shown!==all);
 }
-document.getElementById('pplBtn').onclick=e=>{ e.stopPropagation(); document.getElementById('pplPop').classList.toggle('open'); };
+document.getElementById('pplBtn').onclick=e=>{ e.stopPropagation(); document.getElementById('brPop').classList.remove('open'); document.getElementById('pplPop').classList.toggle('open'); };
 document.getElementById('pplPop').onclick=e=>e.stopPropagation();
-document.addEventListener('click',()=>document.getElementById('pplPop').classList.remove('open'));
+document.addEventListener('click',()=>{ document.getElementById('pplPop').classList.remove('open'); document.getElementById('brPop').classList.remove('open'); });
+document.getElementById('brBtn').onclick=e=>{ e.stopPropagation(); document.getElementById('pplPop').classList.remove('open'); document.getElementById('brPop').classList.toggle('open'); };
+document.getElementById('brPop').onclick=e=>e.stopPropagation();
 document.getElementById('hideOff').onchange=e=>{ pref.hideOff=e.target.checked; savePref(); renderPpl(); board.innerHTML=''; render(); };
 document.getElementById('pplAll').onclick=()=>{ pref.hidden=[]; savePref(); renderPpl(); board.innerHTML=''; render(); };
 document.getElementById('pplNone').onclick=()=>{ pref.hidden=data.teachers.map(t=>t.staffId); savePref(); renderPpl(); board.innerHTML=''; render(); };
@@ -573,9 +572,12 @@ document.getElementById('next').onclick=()=>shiftDate(1);
 document.getElementById('todayBtn').onclick=()=>setDate(todayKey());
 document.getElementById('dateLabel').onclick=()=>{ const p=document.getElementById('datePick'); p.showPicker?p.showPicker():p.click(); };
 document.getElementById('datePick').onchange=e=>{ if(e.target.value) setDate(e.target.value); };
-document.getElementById('branchSel').addEventListener('change',e=>{
+document.getElementById('brPop').addEventListener('change',e=>{
   filter=e.target.value; const dot=document.getElementById('branchDot');
   dot.className='dot'+(filter==='all'?' all':''); dot.style.background=filter==='all'?'':(filter==='中山'?'var(--zs)':'var(--nj)');
+  document.getElementById('brText').textContent=filter==='all'?'全部據點':filter;
+  document.getElementById('brBtn').classList.toggle('act',filter!=='all');
+  document.getElementById('brPop').classList.remove('open');
   if(data){ board.innerHTML=''; render(); }
 });
 function fitBoard(){ const hh=document.querySelector('header').offsetHeight; document.documentElement.style.setProperty('--head-h',hh+'px'); document.querySelector('.main').style.height=(window.innerHeight-hh)+'px'; }
