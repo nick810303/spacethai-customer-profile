@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小泰空 · 時間軸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4ECE3; --bg2:#EADFD1; --bg3:#F0E7DC; --card:#FCF8F3; --line:#E0D4C4; --line2:#EDE3D6;
+    --ink:#3E2A21; --ink2:#7A6357; --ink3:#A9968A;
+    --clay:#AE6C56; --cocoa:#91563E; --cream:#F8F2EE; --red:#C24D3F; --green:#5C7A50;
+    --nj:#4E5D3E; --zs:#96382E;
+    --d120:#C4857A; --d90:#A8906E; --d60:#D4A882; --tr:#7A9B6A;
+    --mono:'DM Mono',ui-monospace,Menlo,monospace;
+    --sans:'Noto Sans TC',system-ui,-apple-system,sans-serif;
+    --hour-w:112px; --row-h:52px; --name-w:168px; --panel-w:380px; --head-h:106px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  /* ── 頂欄 ── */
+  header{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:15px}
+  .brand small{font-family:var(--mono);font-weight:400;color:var(--ink3);margin-left:8px;font-size:12px}
+  body.embedded .brand{display:none}
+  .datenav{display:flex;align-items:center;gap:6px;font-family:var(--mono)}
+  .datenav button{width:30px;height:30px;border:1px solid var(--line);border-radius:6px;color:var(--ink2);background:var(--card)}
+  .datenav button:hover{border-color:var(--cocoa)}
+  .datenav .d{font-size:15px;padding:0 6px;white-space:nowrap}
+  .datenav .today{width:auto;padding:0 10px;font-size:12px}
+  .datenav input[type=date]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+  .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:13px;background:var(--card)}
+  .seg button{padding:5px 12px;color:var(--ink2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button[aria-pressed="true"]{background:var(--cocoa);color:var(--cream)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .spacer{flex:1}
+  .src{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+  .src .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .src.busy .pulse{animation:blink 1s infinite}
+  .src.err{color:var(--red)} .src.err .pulse{background:var(--red)}
+  @keyframes blink{50%{opacity:.3}}
+  .legend{display:flex;gap:14px;padding:0 16px 10px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .legend i{width:14px;height:10px;border-radius:2px;display:inline-block}
+  /* ── 主版面 ── */
+  .main{display:flex;height:calc(100vh - var(--head-h))}
+  .board{position:relative;overflow:auto;flex:1;min-width:0;-webkit-overflow-scrolling:touch}
+  .grid{display:grid;grid-template-columns:var(--name-w) 1fr;min-width:max-content}
+  .axis{display:contents}
+  .axis .corner{position:sticky;left:0;top:0;z-index:21;background:var(--bg);border-bottom:1px solid var(--ink);border-right:1px solid var(--line);height:36px;display:flex;align-items:flex-end;padding:0 12px 6px;font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .axis .hours{position:sticky;top:0;z-index:20;height:36px;border-bottom:1px solid var(--ink);background:var(--bg)}
+  .axis .h{position:absolute;bottom:6px;font-family:var(--mono);font-size:12px;color:var(--ink2);transform:translateX(-50%)}
+  .axis .h::after{content:"";position:absolute;left:50%;bottom:-7px;width:1px;height:6px;background:var(--ink)}
+  .branch-head{grid-column:1/-1;padding:14px 0 6px;background:var(--bg)}
+  .branch-head .in{position:sticky;left:0;display:inline-flex;align-items:center;gap:10px;padding:0 12px}
+  .branch-head .name{font-weight:700;font-size:14px;padding:1px 8px;border-radius:4px;color:var(--cream)}
+  .branch-head .meta{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .row{display:contents}
+  .row .who{position:sticky;left:0;z-index:10;background:var(--bg);height:var(--row-h);border-top:1px solid var(--line);border-right:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 12px}
+  .row .who{white-space:nowrap}
+  .row .who .rail{width:3px;height:28px;border-radius:2px;flex:none}
+  .row .who .zh{flex:none}
+  .row .who .en{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .row .who .tr+.off{margin-left:6px}
+  .row .who .av{width:28px;height:28px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2);flex:none;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+  .row .who .av img{width:100%;height:100%;object-fit:cover;display:block}
+  .row.off .who .av{filter:grayscale(1);opacity:.6}
+  .row .who .zh{font-weight:500;font-size:15px}
+  .row .who .en{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+  .row .who .tr{margin-left:auto;font-size:10px;color:var(--tr);border:1px solid var(--tr);padding:0 5px;border-radius:3px}
+  .row .who .off{margin-left:auto;font-size:11px;color:var(--ink3)}
+  .row .lane{position:relative;height:var(--row-h);border-top:1px solid var(--line);background-color:var(--bg3);background-image:linear-gradient(to right,var(--line2) 1px,transparent 1px);background-size:var(--hour-w) 100%}
+  .row.off .lane{background-image:repeating-linear-gradient(135deg,var(--bg2) 0 6px,transparent 6px 12px)}
+  .shift{position:absolute;top:0;bottom:0;background:var(--card);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  .bk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:4px;padding:4px 8px;color:#fff;overflow:hidden;white-space:nowrap;text-align:left;display:flex;flex-direction:column;justify-content:center;line-height:1.2;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+  .bk:hover{filter:brightness(.92)}
+  .bk:focus-visible,.bk.sel{outline:2px solid var(--ink);outline-offset:2px}
+  .bk .t{font-family:var(--mono);font-size:10px;opacity:.9}
+  .bk .c{font-size:12px;font-weight:500}
+  .bk .c .id{font-family:var(--mono);font-weight:400;opacity:.85;margin-left:4px;font-size:10px}
+  .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)}
+  .bk.past{opacity:.55}
+  .buf{position:absolute;top:7px;height:calc(var(--row-h) - 14px);background:repeating-linear-gradient(135deg,rgba(62,42,33,.10) 0 3px,transparent 3px 6px);border-radius:0 3px 3px 0}
+  .blk{position:absolute;top:7px;height:calc(var(--row-h) - 14px);border-radius:4px;background:var(--bg2);border:1px solid var(--line);color:var(--ink2);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
+  .now{position:absolute;top:36px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
+  .now::before{content:attr(data-t);position:absolute;top:-22px;left:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:3px}
+  .msg{padding:60px 20px;text-align:center;color:var(--ink2);font-size:14px}
+  .msg a{color:var(--cocoa)}
+  /* ── 右側顧客面板 ── */
+  .panel{width:var(--panel-w);flex:none;border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;overflow:hidden}
+  .panel .ctx{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--bg3)}
+  .panel .ctx button{width:26px;height:26px;border-radius:6px;color:var(--ink2);flex:none} .panel .ctx button:hover{background:var(--bg2)}
+  .panel .body{padding:18px;overflow:auto;flex:1}
+  .panel .empty{color:var(--ink3);font-size:13px;text-align:center;padding:60px 20px}
+  .cnum{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+  .cname{font-size:20px;font-weight:700;margin:2px 0 6px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tag{font-size:11px;padding:1px 8px;border-radius:10px;background:var(--bg2);color:var(--ink2)}
+  .kv{display:grid;grid-template-columns:72px 1fr;gap:8px 12px;font-size:13px;margin:12px 0}
+  .kv dt{color:var(--ink3);font-size:12px;padding-top:1px} .kv dd{margin:0;word-break:break-all} .kv .mono{font-family:var(--mono)}
+  .stats{display:flex;gap:18px;font-size:12px;color:var(--ink2);padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+  .stats b{display:block;font-family:var(--mono);font-size:18px;color:var(--ink);font-weight:500}
+  .note{margin:12px 0;font-size:13px;color:var(--ink2);background:var(--bg3);border-radius:6px;padding:10px 12px;white-space:pre-wrap}
+  h4{margin:16px 0 6px;font-size:12px;color:var(--ink3);font-weight:500;letter-spacing:.04em}
+  .rec{display:grid;grid-template-columns:auto 1fr auto;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line2)}
+  .rec .d{font-family:var(--mono);color:var(--ink2)} .rec .p{color:var(--ink3);font-size:12px;white-space:nowrap}
+  .go{display:inline-block;margin-top:16px;font-size:13px;color:var(--cocoa);border-bottom:1px solid var(--cocoa);text-decoration:none;padding-bottom:1px;cursor:pointer}
+  .anon .cname{font-weight:500} .anon p{color:var(--ink3);font-size:13px}
+  .calerr{margin:0 16px 8px;font-size:12px;color:var(--red)}
+  @media (max-width:900px){
+    :root{--hour-w:84px;--name-w:120px;--head-h:62px}
+    .row .who .en,.legend{display:none}
+    .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;transform:translateX(100%);transition:transform .2s;max-width:100vw;width:min(100vw,var(--panel-w))}
+    .panel.open{transform:none;box-shadow:-8px 0 24px rgba(62,42,33,.18)}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">小泰空 <small>時間軸</small></div>
+    <div class="datenav">
+      <button id="prev" aria-label="前一天">‹</button>
+      <span class="d" id="dateLabel" title="點選日期"></span>
+      <input type="date" id="datePick">
+      <button id="next" aria-label="後一天">›</button>
+      <button class="today" id="todayBtn">今天</button>
+    </div>
+    <div class="seg" id="branchSeg">
+      <button aria-pressed="true" data-b="all">全部</button>
+      <button aria-pressed="false" data-b="南京三民"><span class="dot" style="background:var(--nj)"></span>南京三民</button>
+      <button aria-pressed="false" data-b="中山"><span class="dot" style="background:var(--zs)"></span>中山</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="src busy" id="src"><span class="pulse"></span><span id="srcText">行事曆 · 載入中</span></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--d120)"></i>120 分</span>
+    <span><i style="background:var(--d90)"></i>90 分</span>
+    <span><i style="background:var(--d60)"></i>60 分</span>
+    <span><i style="background:var(--tr)"></i>培訓新師</span>
+    <span><i style="background:var(--bg2);border:1px solid var(--line)"></i>占用（休假／BB／拍攝…）</span>
+    <span><i style="background:repeating-linear-gradient(135deg,var(--bg2) 0 3px,transparent 3px 6px)"></i>排休</span>
+    <span><i style="background:var(--card);border:1px solid var(--line)"></i>上班區間</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="board" id="board">
+    <div class="grid" id="grid"><div class="msg">載入中…</div></div>
+    <div class="now" id="now" style="display:none"></div>
+  </div>
+  <aside class="panel" id="panel">
+    <div class="ctx"><span id="ctxText">點選預約以檢視顧客檔案</span><button id="pClose" aria-label="關閉">✕</button></div>
+    <div class="body" id="pBody"><div class="empty">尚未選取預約</div></div>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   小泰空 顧客檔案系統・時間軸（唯讀）
+   資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
+   顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
+   ═══════════════════════════════════════════════════════════════ */
+const SB_URL = 'https://lyphciitrhfomquorhfm.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
+const OPEN = 11, CLOSE = 25;           // 11:00 – 01:00
+let BUFFER = 15;
+const HOUR_W = window.innerWidth < 900 ? 84 : 112;
+const BRANCHES = [ { name:'南京三民', color:'var(--nj)' }, { name:'中山', color:'var(--zs)' } ];
+const EMBEDDED = window.self !== window.top;
+if (EMBEDDED) document.body.classList.add('embedded');
+
+const sb = supabase.createClient(SB_URL, SB_ANON);   // 與主系統同 storage key → 共用登入
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ── 工具 ── */
+const pad = n => String(n).padStart(2,'0');
+const x = h => (h - OPEN) * HOUR_W;
+const fmt = h => `${pad(Math.floor(h)%24)}:${pad(Math.round((h%1)*60))}`;
+const minToH = m => m/60;
+function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function nowH(){ const d=new Date(); return d.getHours()+d.getMinutes()/60; }
+const WD=['日','一','二','三','四','五','六'];
+// ISO(+08:00) → 相對於 dateKey 當日 00:00 的小時數（隔日 00:30 → 24.5）
+function isoToH(iso, dateKey){
+  const [y,m,d]=dateKey.split('-').map(Number);
+  const base=new Date(y,m-1,d,0,0,0).getTime();
+  return (Date.parse(iso)-base)/3600000;
+}
+
+/* ── 狀態 ── */
+let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null;
+
+/* ── 載入 ── */
+async function getToken(){
+  const { data:{ session } } = await sb.auth.getSession();
+  return session?.access_token || null;
+}
+async function loadTimeline(dk){
+  const token = await getToken();
+  if(!token) throw Object.assign(new Error('noauth'),{noauth:true});
+  const r = await fetch(`${SB_URL}/functions/v1/timeline?date=${dk}`, { headers:{ Authorization:`Bearer ${token}`, apikey: SB_ANON } });
+  if(r.status===401) throw Object.assign(new Error('noauth'),{noauth:true});
+  if(r.status===403) throw Object.assign(new Error('forbidden'),{forbidden:true});
+  if(!r.ok) throw new Error(`timeline ${r.status}`);
+  const j = await r.json();
+  if(j.buffer) BUFFER = j.buffer;
+  // 事件 → 畫面座標
+  j.teachers.forEach(t=>{
+    t.events = (t.events||[]).map(ev=>{
+      const s=isoToH(ev.start,dk), e=isoToH(ev.end,dk);
+      return { ...ev, s, e };
+    }).filter(ev=>{
+      if(ev.allDay) return false;                       // 整天型（休假）不畫，排休由排班表決定
+      if(ev.kind==='block' && (ev.e-ev.s)>=20) return false; // 24 小時型占用同上
+      return ev.e > OPEN && ev.s < CLOSE;               // 完全在營業軸外的不畫
+    });
+  });
+  return j;
+}
+
+/* ── 渲染 ── */
+const grid=document.getElementById('grid');
+function showMsg(html){ grid.innerHTML=`<div class="msg">${html}</div>`; document.getElementById('now').style.display='none'; }
+function render(){
+  grid.innerHTML='';
+  const totalW=(CLOSE-OPEN)*HOUR_W;
+  const axis=document.createElement('div'); axis.className='axis';
+  axis.innerHTML=`<div class="corner">分店 / 老師</div><div class="hours" style="width:${totalW}px">
+    ${Array.from({length:CLOSE-OPEN+1},(_,i)=>`<span class="h" style="left:${i*HOUR_W}px">${pad((OPEN+i)%24)}:00</span>`).join('')}</div>`;
+  grid.appendChild(axis);
+  const isToday = dateKey===todayKey(), NOW=nowH();
+  BRANCHES.filter(br=>filter==='all'||br.name===filter).forEach(br=>{
+    const list=data.teachers.filter(t=>t.branch===br.name);
+    const onDuty=list.filter(t=>t.shift).length;
+    const cnt=list.reduce((n,t)=>n+t.events.filter(e=>e.kind==='booking').length,0);
+    const head=document.createElement('div'); head.className='branch-head';
+    head.innerHTML=`<div class="in"><span class="name" style="background:${br.color}">${br.name}</span><span class="meta">${onDuty} 位上班 · ${cnt} 筆預約</span></div>`;
+    grid.appendChild(head);
+    list.forEach(t=>{
+      const [zh,en]=t.name.split(' ');
+      const row=document.createElement('div'); row.className='row'+(t.shift?'':' off');
+      const who=document.createElement('div'); who.className='who';
+      who.innerHTML=`<span class="rail" style="background:${t.isTrainee?'var(--tr)':br.color}"></span><span class="av">${t.avatar?`<img src="${esc(t.avatar)}" alt="" loading="lazy" data-z="${esc(zh)}" onerror="this.replaceWith(this.dataset.z)">`:esc(zh)}</span>
+        <span class="zh">${esc(zh)}</span><span class="en">${esc(en||'')}</span>
+        ${t.isTrainee?'<span class="tr">培訓</span>':''}${t.shift?'':'<span class="off">排休</span>'}`;
+      const lane=document.createElement('div'); lane.className='lane'; lane.style.width=totalW+'px';
+      if(t.shift){ const sh=document.createElement('div'); sh.className='shift';
+        const s=Math.max(OPEN,minToH(t.shift.fromMin)), e=Math.min(CLOSE,minToH(t.shift.toMin-BUFFER));
+        if(e>s){ sh.style.left=x(s)+'px'; sh.style.width=(x(e)-x(s))+'px'; lane.appendChild(sh); } }
+      t.events.forEach(ev=>{
+        const s=Math.max(OPEN,ev.s), e=Math.min(CLOSE,ev.e);
+        if(ev.kind==='block'){ const d=document.createElement('div'); d.className='blk';
+          const label=ev.title.replace(t.name,'').replace(zh,'').trim()||ev.title;   // 「澈 Che BBE」→「BBE」
+          d.style.left=x(s)+'px'; d.style.width=Math.max(6,(e-s)*HOUR_W-2)+'px'; d.textContent=label; d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; lane.appendChild(d); return; }
+        if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='buf';
+          buf.style.left=x(ev.e)+'px'; buf.style.width=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2)+'px'; lane.appendChild(buf); }
+        const el=document.createElement('button');
+        const dur = ev.duration || Math.round((ev.e-ev.s)*60);
+        el.className=['bk', t.isTrainee?'trn':`d${dur}`, (isToday&&ev.e<NOW)?'past':''].join(' ');
+        el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px';
+        el.title=ev.title;
+        el.innerHTML=`<span class="t">${fmt(ev.s)}–${fmt(ev.e)} · ${dur}</span>
+          <span class="c">${esc(ev.displayName)}${ev.customerNum?`<span class="id">#${ev.customerNum}</span>`:''}</span>`;
+        el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); openCustomer(ev,t); });
+        lane.appendChild(el);
+      });
+      row.append(who,lane); grid.appendChild(row);
+    });
+  });
+  const now=document.getElementById('now');
+  if(isToday && NOW>=OPEN && NOW<=CLOSE){ now.style.display=''; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); }
+  else now.style.display='none';
+  const ft=new Date(data.fetchedAt);
+  const src=document.getElementById('src'); src.classList.remove('busy','err');
+  document.getElementById('srcText').textContent=`行事曆 · ${pad(ft.getHours())}:${pad(ft.getMinutes())}:${pad(ft.getSeconds())} 更新`;
+  if(data.calendarErrors?.length){ src.classList.add('err'); document.getElementById('srcText').textContent=`行事曆部分無回應（${data.calendarErrors.join('、')}）`; }
+}
+function renderDate(){
+  const [y,m,d]=dateKey.split('-').map(Number);
+  document.getElementById('dateLabel').innerHTML=`<b>${pad(m)}/${pad(d)}</b> 週${WD[new Date(y,m-1,d).getDay()]}`;
+  document.getElementById('datePick').value=dateKey;
+}
+
+/* ── 右側：顧客檔案面板 ── */
+const panel=document.getElementById('panel');
+async function openCustomer(ev,t){
+  const [zh]=t.name.split(' ');
+  const [y,m,d]=dateKey.split('-');
+  const dur = ev.duration || Math.round((ev.e-ev.s)*60);
+  document.getElementById('ctxText').textContent=`${m}/${d} ${fmt(ev.s)}–${fmt(ev.e)} · ${zh} · ${dur} 分`;
+  const body=document.getElementById('pBody');
+  panel.classList.add('open');
+  if(!ev.customerNum){
+    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div>
+      <p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
+    return;
+  }
+  body.innerHTML=`<div class="empty">載入 #${ev.customerNum}…</div>`;
+  const num=ev.customerNum;
+  const [{data:c},{data:recs}] = await Promise.all([
+    sb.from('customers').select('num,name,display,phone,tags,note,birthday,country').eq('num',num).maybeSingle(),
+    sb.from('records').select('date,store,staff_name_legacy,duration,plan,is_draft').eq('customer_num',num).eq('is_draft',false).order('date',{ascending:false}).limit(400),
+  ]);
+  if(selectedEl && selectedEl.title!==ev.title) return;   // 使用者已點別筆
+  if(!c){
+    body.innerHTML=`<div class="anon"><div class="cnum">顧客編號 #${num}</div><div class="cname">${esc(ev.displayName)}</div>
+      <p>顧客檔案系統尚無此編號的資料。</p></div>`;
+    return;
+  }
+  const rs=recs||[];
+  const freq={}; rs.forEach(r=>{ if(r.staff_name_legacy) freq[r.staff_name_legacy]=(freq[r.staff_name_legacy]||0)+1; });
+  const fav=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  const mmdd=s=>s?s.slice(5).replace('-','/'):'—';
+  body.innerHTML=`
+    <div class="cnum">顧客編號 #${c.num}</div>
+    <div class="cname">${esc(c.name)}</div>
+    <div class="tags">${(c.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>
+    <dl class="kv">
+      <dt>電話</dt><dd class="mono">${esc(c.phone||'—')}</dd>
+      ${c.display&&c.display!==c.name?`<dt>顯示名</dt><dd>${esc(c.display)}</dd>`:''}
+      ${c.birthday?`<dt>生日</dt><dd class="mono">${esc(c.birthday)}</dd>`:''}
+      ${c.country?`<dt>國籍</dt><dd>${esc(c.country)}</dd>`:''}
+    </dl>
+    <div class="stats">
+      <span><b>${rs.length}</b>來店次數</span>
+      <span><b>${mmdd(rs[0]?.date)}</b>上次來店</span>
+      <span><b>${esc(fav)}</b>常指定</span>
+    </div>
+    ${c.note?`<div class="note">${esc(c.note)}</div>`:''}
+    <h4>最近服務紀錄</h4>
+    ${rs.slice(0,8).map(r=>`<div class="rec"><span class="d">${mmdd(r.date)}</span><span>${esc(r.store||'')} · ${esc(r.staff_name_legacy||'')}</span><span class="p">${r.duration||''} 分</span></div>`).join('')||'<div class="empty" style="padding:16px">尚無紀錄</div>'}
+    <a class="go" id="goFull">開啟完整顧客檔案 →</a>`;
+  document.getElementById('goFull').onclick=()=>openFullProfile(c.num);
+}
+function openFullProfile(num){
+  if(EMBEDDED){ window.parent.postMessage({ type:'spacethai:open-customer', num }, location.origin); }
+  else { location.href = `./?num=${num}`; }
+}
+function closePanel(){ panel.classList.remove('open'); if(selectedEl){selectedEl.classList.remove('sel');selectedEl=null;}
+  document.getElementById('ctxText').textContent='點選預約以檢視顧客檔案'; document.getElementById('pBody').innerHTML='<div class="empty">尚未選取預約</div>'; }
+document.getElementById('pClose').onclick=closePanel;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePanel(); });
+
+/* ── 日期 / 分店 ── */
+let loading=false;
+async function load(){
+  const src=document.getElementById('src'); src.classList.add('busy'); src.classList.remove('err');
+  document.getElementById('srcText').textContent='行事曆 · 更新中';
+  renderDate();
+  try{ data=await loadTimeline(dateKey); lastOk=Date.now(); render(); }
+  catch(e){
+    src.classList.remove('busy'); src.classList.add('err');
+    if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'':'<br><a href="./">前往登入 →</a>'}`); return; }
+    if(e.forbidden){ document.getElementById('srcText').textContent='無權限'; showMsg('時間軸目前僅開放管理員使用。'); return; }
+    const t=lastOk?new Date(lastOk):null;
+    document.getElementById('srcText').textContent=t?`行事曆無回應 · 顯示 ${pad(t.getHours())}:${pad(t.getMinutes())} 資料`:'行事曆無回應';
+    if(data && data.date===dateKey) render(); else showMsg('行事曆無回應，請稍後再試。');
+  }
+}
+function setDate(dk){ dateKey=dk; closePanel(); load(); }
+function shiftDate(n){ const [y,m,d]=dateKey.split('-').map(Number); const dt=new Date(y,m-1,d+n); setDate(`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`); }
+document.getElementById('prev').onclick=()=>shiftDate(-1);
+document.getElementById('next').onclick=()=>shiftDate(1);
+document.getElementById('todayBtn').onclick=()=>setDate(todayKey());
+document.getElementById('dateLabel').onclick=()=>{ const p=document.getElementById('datePick'); p.showPicker?p.showPicker():p.click(); };
+document.getElementById('datePick').onchange=e=>{ if(e.target.value) setDate(e.target.value); };
+document.getElementById('branchSeg').addEventListener('click',e=>{
+  const btn=e.target.closest('button'); if(!btn) return; filter=btn.dataset.b;
+  [...e.currentTarget.children].forEach(b=>b.setAttribute('aria-pressed',b===btn)); if(data) render();
+});
+
+load().then(()=>{ if(dateKey===todayKey()) document.getElementById('board').scrollLeft=Math.max(0,x(nowH())-220); });
+setInterval(()=>{ if(!document.hidden) load(); }, 60000);   // 每分鐘即時重抓
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && lastOk && Date.now()-lastOk>60000) load(); });
+</script>
+</body>
+</html>
