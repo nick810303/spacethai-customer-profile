@@ -18,7 +18,7 @@
     --blk:#F0EBE7; --blk-bdr:#E3DAD3;
     --mono:'DM Mono',ui-monospace,Menlo,monospace;
     --sans:'Noto Sans TC',-apple-system,system-ui,sans-serif;
-    --hour-w:112px; --row-h:62px; --name-w:190px; --panel-w:380px;
+    --hour-w:112px; --row-h:54px; --name-w:190px; --panel-w:380px;
     --hour-h:64px; --col-w:36px; --axis-w:34px;   /* 直屏 */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -40,7 +40,20 @@
   .seg button{padding:5px 11px;color:var(--text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
   .seg button+button{border-left:1px solid var(--border)}
   .seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
-  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .ppl{position:relative}
+  .pplbtn{height:30px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;color:var(--text-muted);white-space:nowrap}
+  .pplbtn.act{border-color:var(--brand);color:var(--brand-dark)}
+  .pplbtn span{font-family:var(--mono);font-size:11px}
+  .pop{display:none;position:absolute;top:36px;left:0;z-index:50;width:260px;max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px 10px;font-size:13px}
+  .pop.open{display:block}
+  .pop label{display:flex;align-items:center;gap:8px;padding:5px 2px;cursor:pointer}
+  .pop .row1{border-bottom:1px solid var(--border2);padding-bottom:8px;margin-bottom:6px;font-weight:500}
+  .pop .acts{display:flex;gap:6px;margin-bottom:6px}
+  .pop .acts button{flex:1;height:26px;border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);background:var(--surface2)}
+  .pop .grp{font-size:11px;color:#fff;padding:1px 7px;border-radius:5px;display:inline-block;margin:8px 0 2px;font-weight:700}
+  .pop .av{width:22px;height:22px;font-size:10px}
+  .pop .off{color:var(--text-hint)}
   .spacer{flex:1}
   .src{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);white-space:nowrap}
   .src .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
@@ -67,9 +80,9 @@
   .bname{font-weight:700;font-size:13px;padding:1px 8px;border-radius:6px;color:#fff}
   .branch-head .meta{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
   .beds{display:inline-flex;align-items:center;gap:3px;margin-left:4px}
-  .beds svg{width:18px;height:14px;display:block}
+  .beds svg{width:16px;height:16px;display:block}
   .beds .on{color:var(--red)} .beds .offb{color:#cfcfcf}
-  .beds .bl{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-left:4px}
+  .beds .bl{font-size:11px;color:var(--text-muted);margin-right:3px}
   .row{display:contents}
   .row .who{position:sticky;left:0;z-index:10;background:var(--surface);height:var(--row-h);border-top:1px solid var(--border2);border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 12px;white-space:nowrap}
   .row .who .rail{width:3px;height:28px;border-radius:2px;flex:none}
@@ -86,12 +99,12 @@
   .row .lane{position:relative;height:var(--row-h);border-top:1px solid var(--border2);background-color:var(--surface2);background-image:linear-gradient(to right,var(--border2) 1px,transparent 1px);background-size:var(--hour-w) 100%}
   .row.off .lane{background-image:repeating-linear-gradient(135deg,#ececec 0 5px,transparent 5px 11px)}
   .shift{position:absolute;top:0;bottom:0;background:var(--surface);border-left:1px solid var(--border);border-right:1px solid var(--border)}
-  .bk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:7px;padding:0 8px 0 0;color:#fff;overflow:hidden;white-space:nowrap;text-align:left;display:flex;align-items:stretch;gap:7px;line-height:1.2;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
-  .bk .dur{flex:none;width:40px;margin:4px 0 4px 4px;border-radius:5px;background:rgba(255,255,255,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-  .bk .dur b{font-family:var(--mono);font-size:15px;font-weight:500} .bk .dur i{font-style:normal;font-size:9px;opacity:.9;margin-top:2px}
-  .bk .info{display:flex;flex-direction:column;justify-content:center;min-width:0;gap:2px}
-  .bk .nm{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis}
-  .bk .num{font-family:var(--mono);font-size:10px;font-weight:500;background:rgba(0,0,0,.22);padding:0 5px;border-radius:4px;margin-left:5px;vertical-align:1px}
+  .bk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:6px;padding:3px 7px;color:#fff;overflow:hidden;white-space:nowrap;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:2px;line-height:1.15;transition:filter .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+  .bk .l1{display:flex;align-items:center;gap:5px;min-width:0}
+  .bk .num{font-family:var(--mono);font-size:12px;font-weight:700;background:rgba(0,0,0,.26);padding:0 5px;border-radius:4px;flex:none;line-height:16px}
+  .bk .nm{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .bk .l2{display:flex;align-items:center;gap:5px}
+  .bk .dur{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.24);padding:0 4px;border-radius:3px;line-height:13px;flex:none}
   .bk:hover{filter:brightness(.93)}
   .bk:focus-visible,.bk.sel{outline:2px solid var(--text);outline-offset:2px}
   .bk .t{font-family:var(--mono);font-size:10px;opacity:.9}
@@ -120,7 +133,7 @@
   .vbk .vdur{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.22);border-radius:3px;padding:1px 3px;align-self:flex-start;line-height:1.2;white-space:nowrap}
   .vbk .t{font-family:var(--mono);font-size:9px;opacity:.9;white-space:nowrap}
   .vbk .c{font-size:11px;font-weight:700;word-break:break-all;overflow:hidden}
-  .vbk .id{font-family:var(--mono);font-size:9px;font-weight:500;background:rgba(0,0,0,.22);border-radius:3px;padding:0 3px;align-self:flex-start}
+  .vbk .id{font-family:var(--mono);font-size:10px;font-weight:700;background:rgba(0,0,0,.26);border-radius:3px;padding:0 3px;align-self:flex-start}
   .vbk.d120{background:var(--d120)} .vbk.d90{background:var(--d90)} .vbk.d60{background:var(--d60)} .vbk.trn{background:var(--tr)}
   .vbk.past{opacity:.5}
   .vbk.sel{outline:2px solid var(--text);outline-offset:1px}
@@ -135,7 +148,7 @@
   .vsum::-webkit-scrollbar{display:none}
   .vsum .b{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
   .vsum .bname{font-size:11px;padding:0 6px}
-  .vsum .beds svg{width:15px;height:12px}
+  .vsum .beds svg{width:14px;height:14px}
   /* ── 顧客面板（overlay，預設收合） ── */
   .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;width:var(--panel-w);max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(0,0,0,.10);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
   .panel.open{transform:none;visibility:visible}
@@ -168,6 +181,7 @@
     .datenav .d{font-size:14px;padding:0 4px}
     .seg button{padding:5px 9px;font-size:12px}
     .src{display:none}
+    .pop{position:fixed;top:52px;left:8px;right:8px;width:auto}
     .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:14px 14px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);transform:translateY(102%)}
     .panel.open{transform:none}
     .panel .ctx{border-radius:14px 14px 0 0}
@@ -190,6 +204,12 @@
       <button aria-pressed="false" data-b="南京三民"><span class="dot" style="background:var(--nj)"></span>南京三民</button>
       <button aria-pressed="false" data-b="中山"><span class="dot" style="background:var(--zs)"></span>中山</button>
     </div>
+    <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span> ▾</button>
+      <div class="pop" id="pplPop">
+        <label class="row1"><input type="checkbox" id="hideOff"> 不顯示今日休人員</label>
+        <div class="acts"><button id="pplAll">全部勾選</button><button id="pplNone">清除勾選</button></div>
+        <div id="pplList"></div>
+      </div></div>
     <div class="spacer"></div>
     <div class="src busy" id="src"><span class="pulse"></span><span id="srcText">行事曆 · 載入中</span></div>
   </div>
@@ -216,7 +236,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r59
+   小泰空 顧客檔案系統・時間軸（唯讀）r60
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -248,7 +268,8 @@ const avatarHtml = (t,zh) => `<span class="av">${t.avatar?`<img src="${esc(t.ava
 const blockLabel = (ev,t,zh) => (ev.title.replace(t.name,'').replace(zh,'').trim()||ev.title);
 const durOf = ev => ev.duration || Math.round((ev.e-ev.s)*60);
 const bookingCount = t => t.events.filter(e=>e.kind==='booking').length;
-const BED_SVG = '<svg viewBox="0 0 24 18" fill="currentColor" aria-hidden="true"><path d="M2 3a1 1 0 0 1 2 0v6h6V6a2 2 0 0 1 2-2h7a3 3 0 0 1 3 3v4h0v5a1 1 0 0 1-2 0v-2H4v2a1 1 0 0 1-2 0V3z"/></svg>';
+// 正面（腳端看過去）的床：床頭板＋枕頭＋床墊＋床腳
+const BED_SVG = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="3" y="1" width="14" height="7" rx="2"/><rect x="1.5" y="7.5" width="17" height="8.5" rx="1.8"/><rect x="6" y="3.2" width="8" height="3.2" rx="1.6" fill="#fff" opacity=".85"/><rect x="2.5" y="16" width="2.2" height="3"/><rect x="15.3" y="16" width="2.2" height="3"/></svg>';
 // 目前此刻（含 15 分緩衝）該分店被占用的床數 = 正在服務中的預約數（只有「今天」才算）
 function bedsNow(list,isToday,NOW){
   if(!isToday) return null;
@@ -256,13 +277,36 @@ function bedsNow(list,isToday,NOW){
 }
 function bedsHtml(used){
   const n=used==null?0:Math.min(5,used);
-  return `<span class="beds" title="目前占用床位">${Array.from({length:5},(_,i)=>`<span class="${used!=null&&i<n?'on':'offb'}">${BED_SVG}</span>`).join('')}<span class="bl">${used==null?'—':`${n}/5`}</span></span>`;
+  return `<span class="beds" title="${used==null?'非今日，不顯示即時床位':`目前占用 ${n} 張`}"><span class="bl">實時床位</span>${Array.from({length:5},(_,i)=>`<span class="${used!=null&&i<n?'on':'offb'}">${BED_SVG}</span>`).join('')}</span>`;
 }
 // 分店內排序：今天有上班的在前，休的在後（保持原順序）
 const dutyFirst = list => [...list.filter(t=>t.shift), ...list.filter(t=>!t.shift)];
 
 /* ── 狀態 ── */
 let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null, selectedKey=null;
+// 人員篩選（存 localStorage）：hidden = 取消勾選的 staffId；hideOff = 不顯示今日休
+const PREF_KEY='tl_ppl';
+let pref = (()=>{ try{ return Object.assign({hidden:[],hideOff:false}, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch{ return {hidden:[],hideOff:false}; } })();
+function savePref(){ try{ localStorage.setItem(PREF_KEY,JSON.stringify(pref)); }catch{} }
+const isShown = t => !pref.hidden.includes(t.staffId) && !(pref.hideOff && !t.shift);
+function renderPpl(){
+  if(!data) return;
+  const list=document.getElementById('pplList');
+  list.innerHTML=BRANCHES.map(br=>`<div class="grp" style="background:${br.color}">${br.name}</div>`+data.teachers.filter(t=>t.branch===br.name).map(t=>{ const zh=t.name.split(' ')[0];
+    return `<label class="${t.shift?'':'off'}"><input type="checkbox" data-id="${t.staffId}" ${pref.hidden.includes(t.staffId)?'':'checked'}>${avatarHtml(t,zh)}<span>${esc(t.name)}</span>${t.shift?'':'<span style="margin-left:auto;font-size:11px">休</span>'}</label>`; }).join('')).join('');
+  document.getElementById('hideOff').checked=pref.hideOff;
+  const shown=data.teachers.filter(isShown).length, all=data.teachers.length;
+  document.getElementById('pplCount').textContent=`${shown}/${all}`;
+  document.getElementById('pplBtn').classList.toggle('act', shown!==all);
+}
+document.getElementById('pplBtn').onclick=e=>{ e.stopPropagation(); document.getElementById('pplPop').classList.toggle('open'); };
+document.getElementById('pplPop').onclick=e=>e.stopPropagation();
+document.addEventListener('click',()=>document.getElementById('pplPop').classList.remove('open'));
+document.getElementById('hideOff').onchange=e=>{ pref.hideOff=e.target.checked; savePref(); renderPpl(); board.innerHTML=''; render(); };
+document.getElementById('pplAll').onclick=()=>{ pref.hidden=[]; savePref(); renderPpl(); board.innerHTML=''; render(); };
+document.getElementById('pplNone').onclick=()=>{ pref.hidden=data.teachers.map(t=>t.staffId); savePref(); renderPpl(); board.innerHTML=''; render(); };
+document.getElementById('pplList').onchange=e=>{ const id=e.target.dataset.id; if(!id) return;
+  pref.hidden=e.target.checked?pref.hidden.filter(x=>x!==id):[...pref.hidden,id]; savePref(); renderPpl(); board.innerHTML=''; render(); };
 
 /* ── 載入 ── */
 async function getToken(){ const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
@@ -305,11 +349,12 @@ function renderHorizontal(){
   grid.appendChild(axis);
   const isToday = dateKey===todayKey(), NOW=nowH();
   visibleBranches().forEach(br=>{
-    const list=dutyFirst(data.teachers.filter(t=>t.branch===br.name));
-    const onDuty=list.filter(t=>t.shift).length;
-    const cnt=list.reduce((n,t)=>n+bookingCount(t),0);
+    const all=data.teachers.filter(t=>t.branch===br.name);
+    const list=dutyFirst(all.filter(isShown));
+    const onDuty=all.filter(t=>t.shift).length;
+    const cnt=all.reduce((n,t)=>n+bookingCount(t),0);
     const head=document.createElement('div'); head.className='branch-head';
-    head.innerHTML=`<div class="in"><span class="bname" style="background:${br.color}">${br.name}</span>${bedsHtml(bedsNow(list,isToday,NOW))}<span class="meta">${onDuty} 位上班 · ${cnt} 筆預約</span></div>`;
+    head.innerHTML=`<div class="in"><span class="bname" style="background:${br.color}">${br.name}</span>${bedsHtml(bedsNow(all,isToday,NOW))}<span class="meta">${onDuty} 位上班 · ${cnt} 筆預約${list.length<all.length?` · 顯示 ${list.length}/${all.length} 人`:''}</span></div>`;
     grid.appendChild(head);
     list.forEach(t=>{
       const [zh,en]=t.name.split(' ');
@@ -331,8 +376,8 @@ function renderHorizontal(){
         const el=document.createElement('button');
         el.className=bkClass('bk',t,ev,isToday,NOW);
         el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title;
-        el.innerHTML=`<span class="dur"><b>${durOf(ev)}</b><i>分鐘</i></span><span class="info"><span class="t">${fmt(ev.s)}–${fmt(ev.e)}</span>
-          <span class="nm">${esc(ev.displayName)}${ev.customerNum?`<span class="num">#${ev.customerNum}</span>`:''}</span></span>`;
+        el.innerHTML=`<span class="l1">${ev.customerNum?`<span class="num">#${ev.customerNum}</span>`:''}<span class="nm">${esc(ev.displayName)}</span></span>
+          <span class="l2"><span class="t">${fmt(ev.s)}–${fmt(ev.e)}</span><span class="dur">${durOf(ev)} 分</span></span>`;
         attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
         lane.appendChild(el);
       });
@@ -354,7 +399,8 @@ function renderVertical(){
   const cols=[]; const offs=[];
   visibleBranches().forEach(br=>{
     const list=data.teachers.filter(t=>t.branch===br.name);
-    list.forEach((t,i)=>{ if(t.shift||t.events.some(e=>e.kind==='booking')) cols.push({t,br,first:cols.length && cols[cols.length-1].br!==br}); else offs.push({t,br}); });
+    list.forEach((t,i)=>{ if(!t.shift && !t.events.some(e=>e.kind==='booking')){ if(isShown(t)) offs.push({t,br}); return; }
+      if(isShown(t)) cols.push({t,br,first:cols.length && cols[cols.length-1].br!==br}); });
   });
   const totalH=(CLOSE-OPEN)*HOUR_H;
   const grid=document.createElement('div'); grid.className='vgrid'; grid.style.setProperty('--ncol',Math.max(1,cols.length));
@@ -483,7 +529,7 @@ async function load(){
   const src=document.getElementById('src'); src.classList.add('busy'); src.classList.remove('err');
   document.getElementById('srcText').textContent='行事曆 · 更新中';
   renderDate();
-  try{ const d=await loadTimeline(dateKey); data=d; lastOk=Date.now(); render(); }
+  try{ const d=await loadTimeline(dateKey); data=d; lastOk=Date.now(); renderPpl(); render(); }
   catch(e){
     src.classList.remove('busy'); src.classList.add('err');
     if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'':'<br><a href="./">前往登入 →</a>'}`); return; }
