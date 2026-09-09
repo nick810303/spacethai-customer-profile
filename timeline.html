@@ -239,7 +239,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r62
+   小泰空 顧客檔案系統・時間軸（唯讀）r63
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -349,7 +349,7 @@ function renderHorizontal(){
   // 自適應：讓 11:00–01:00（14 小時）盡量塞進目前寬度；最小 56px/小時（不夠時橫向捲動）
   const nameW = board.clientWidth < 1100 ? 150 : 190;
   document.documentElement.style.setProperty('--name-w', nameW+'px');
-  const HOUR_W = Math.max(56, Math.floor((board.clientWidth - nameW - 2) / (CLOSE-OPEN)));
+  const HOUR_W = Math.max(56, Math.floor((board.clientWidth - nameW - 18) / (CLOSE-OPEN)));
   document.documentElement.style.setProperty('--hour-w', HOUR_W+'px');
   const compact = HOUR_W < 80;   // 窄：預約條只留編號＋姓名一行
   const x = h => (h - OPEN) * HOUR_W;
@@ -401,7 +401,8 @@ function renderHorizontal(){
   const keepX=board.scrollLeft, keepY=board.scrollTop, first=!board.querySelector('.grid,.vgrid');
   board.innerHTML=''; board.appendChild(grid);
   if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='now'; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); board.appendChild(now); }
-  if(first){ if(isToday) board.scrollLeft=Math.max(0,x(nowH())-220); } else { board.scrollLeft=keepX; board.scrollTop=keepY; }
+  const fits = nameW+totalW <= board.clientWidth+2;
+  if(first){ if(isToday && !fits) board.scrollLeft=Math.max(0,x(nowH())-220); } else { board.scrollLeft=fits?0:keepX; board.scrollTop=keepY; }
   updateSrc();
 }
 
