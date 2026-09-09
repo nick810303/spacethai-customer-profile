@@ -14,7 +14,7 @@
     --text:#111; --text-muted:#888; --text-hint:#bbb;
     --border:#e8e8e8; --border2:#ebebeb; --surface:#fff; --surface2:#f7f7f7; --surface3:#fafafa;
     --nj:#4E5D3E; --zs:#96382E;
-    --d120:#CCB4B3; --d90:#D2C3B4; --d60:#EAD6C5; --tr:#C1D3B5; --badge:#DF4B3C;
+    --d120:#CFB3B3; --d90:#D1C2B3; --d60:#EAD6C5; --d90f:#EBE4C5; --tr:#C0D3B5; --badge:#DF4B3C;
     --blk:#F0EBE7; --blk-bdr:#E3DAD3;
     --mono:'DM Mono',ui-monospace,Menlo,monospace;
     --sans:'Noto Sans TC',-apple-system,system-ui,sans-serif;
@@ -104,13 +104,14 @@
   .bk .num{font-family:var(--mono);font-size:12px;font-weight:700;background:rgba(0,0,0,.10);padding:0 5px;border-radius:4px;flex:none;line-height:16px}
   .bk .nm{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .bk .l2{display:flex;align-items:center;gap:5px}
+  .bk.one{padding:3px 5px} .bk.one .l1{gap:4px} .bk.one .num{font-size:11px;padding:0 4px}
   .bk .dur{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.6);padding:0 4px;border-radius:3px;line-height:13px;flex:none}
   .bk:hover{filter:brightness(.93)}
   .bk:focus-visible,.bk.sel{outline:2px solid var(--badge);outline-offset:2px}
   .bk .t{font-family:var(--mono);font-size:10px;opacity:.75}
-  .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)}
+  .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)} .bk.free{background:var(--d90f)}
   .bk.past{opacity:.55}
-  .buf{position:absolute;top:6px;height:calc(var(--row-h) - 12px);background:repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0 3px,transparent 3px 6px);border-radius:0 3px 3px 0}
+  .buf{position:absolute;top:6px;height:calc(var(--row-h) - 12px);background:radial-gradient(circle,rgba(120,90,70,.28) 1px,transparent 1.4px) 0 0/5px 5px,rgba(174,108,86,.06);border-left:1px dashed rgba(120,90,70,.45);border-radius:0 4px 4px 0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#8C7B72;letter-spacing:.05em}
   .blk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:6px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
   .now{position:absolute;top:34px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
   .now::before{content:attr(data-t);position:absolute;top:-22px;left:-22px;background:var(--red);color:#fff;font-family:var(--mono);font-size:11px;padding:1px 5px;border-radius:4px}
@@ -134,10 +135,10 @@
   .vbk .t{font-family:var(--mono);font-size:9px;opacity:.75;white-space:nowrap}
   .vbk .c{font-size:11px;font-weight:700;word-break:break-all;overflow:hidden}
   .vbk .id{font-family:var(--mono);font-size:10px;font-weight:700;background:rgba(0,0,0,.10);border-radius:3px;padding:0 3px;align-self:flex-start}
-  .vbk.d120{background:var(--d120)} .vbk.d90{background:var(--d90)} .vbk.d60{background:var(--d60)} .vbk.trn{background:var(--tr)}
+  .vbk.d120{background:var(--d120)} .vbk.d90{background:var(--d90)} .vbk.d60{background:var(--d60)} .vbk.trn{background:var(--tr)} .vbk.free{background:var(--d90f)}
   .vbk.past{opacity:.55}
   .vbk.sel{outline:2px solid var(--badge);outline-offset:1px}
-  .vbuf{position:absolute;left:2px;right:2px;background:repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0 3px,transparent 3px 6px);border-radius:0 0 4px 4px}
+  .vbuf{position:absolute;left:2px;right:2px;background:radial-gradient(circle,rgba(120,90,70,.28) 1px,transparent 1.4px) 0 0/5px 5px,rgba(174,108,86,.06);border-top:1px dashed rgba(120,90,70,.45);border-radius:0 0 4px 4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8C7B72}
   .vblk{position:absolute;left:2px;right:2px;border-radius:5px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:9px;display:flex;align-items:flex-start;padding:2px 3px;overflow:hidden;line-height:1.1}
   .vnow{position:absolute;left:0;right:0;height:1px;background:var(--red);z-index:15;pointer-events:none}
   .vnow::before{content:attr(data-t);position:absolute;left:2px;top:-8px;background:var(--red);color:#fff;font-family:var(--mono);font-size:9px;padding:0 4px;border-radius:3px;line-height:15px}
@@ -206,7 +207,7 @@
     </div>
     <div class="ppl"><button id="pplBtn" class="pplbtn">人員 <span id="pplCount"></span> ▾</button>
       <div class="pop" id="pplPop">
-        <label class="row1"><input type="checkbox" id="hideOff"> 不顯示今日休人員</label>
+        <label class="row1"><input type="checkbox" id="hideOff"> 不顯示當日休人員</label>
         <div class="acts"><button id="pplAll">全部勾選</button><button id="pplNone">清除勾選</button></div>
         <div id="pplList"></div>
       </div></div>
@@ -217,8 +218,10 @@
     <span><i style="background:var(--d120)"></i>120 分</span>
     <span><i style="background:var(--d90)"></i>90 分</span>
     <span><i style="background:var(--d60)"></i>60 分</span>
+    <span><i style="background:var(--d90f)"></i>90 分不指定</span>
     <span><i style="background:var(--tr)"></i>培訓新師120分</span>
     <span><i style="background:var(--blk);border:1px solid var(--blk-bdr)"></i>占用</span>
+    <span><i style="background:radial-gradient(circle,rgba(120,90,70,.35) 1px,transparent 1.4px) 0 0/4px 4px,rgba(174,108,86,.06);border-left:1px dashed #8C7B72"></i>緩衝 15 分</span>
     <span><i style="background:repeating-linear-gradient(135deg,#ececec 0 3px,transparent 3px 6px)"></i>休</span>
     <span><i style="background:var(--surface);border:1px solid var(--border)"></i>開放預約區間</span>
   </div>
@@ -236,7 +239,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r61
+   小泰空 顧客檔案系統・時間軸（唯讀）r62
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -337,12 +340,18 @@ const board=document.getElementById('board');
 function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
 function render(){ isMobile()?renderVertical():renderHorizontal(); }
 function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
-function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, t.isTrainee?'trn':`d${durOf(ev)}`, (isToday&&ev.e<NOW)?'past':'', selectedKey===ev.start+t.staffId?'sel':''].join(' '); }
+const isFree = ev => /不指定/.test(ev.title||'');
+function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, t.isTrainee?'trn':(isFree(ev)?'free':`d${durOf(ev)}`), (isToday&&ev.e<NOW)?'past':'', selectedKey===ev.start+t.staffId?'sel':''].join(' '); }
 function attachClick(el,ev,t){ el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); selectedKey=ev.start+t.staffId; openCustomer(ev,t); }); }
 
 /* 橫版 */
 function renderHorizontal(){
-  const HOUR_W=112;
+  // 自適應：讓 11:00–01:00（14 小時）盡量塞進目前寬度；最小 56px/小時（不夠時橫向捲動）
+  const nameW = board.clientWidth < 1100 ? 150 : 190;
+  document.documentElement.style.setProperty('--name-w', nameW+'px');
+  const HOUR_W = Math.max(56, Math.floor((board.clientWidth - nameW - 2) / (CLOSE-OPEN)));
+  document.documentElement.style.setProperty('--hour-w', HOUR_W+'px');
+  const compact = HOUR_W < 80;   // 窄：預約條只留編號＋姓名一行
   const x = h => (h - OPEN) * HOUR_W;
   const grid=document.createElement('div'); grid.className='grid';
   const totalW=(CLOSE-OPEN)*HOUR_W;
@@ -374,13 +383,15 @@ function renderHorizontal(){
         const s=Math.max(OPEN,ev.s), e=Math.min(CLOSE,ev.e);
         if(ev.kind==='block'){ const d=document.createElement('div'); d.className='blk';
           d.style.left=x(s)+'px'; d.style.width=Math.max(6,(e-s)*HOUR_W-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; lane.appendChild(d); return; }
-        if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='buf';
-          buf.style.left=x(ev.e)+'px'; buf.style.width=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2)+'px'; lane.appendChild(buf); }
+        if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='buf'; buf.title=`清床緩衝 ${BUFFER} 分`;
+          const bw=Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2; buf.style.left=x(ev.e)+'px'; buf.style.width=bw+'px'; if(bw>=18) buf.textContent='緩'; lane.appendChild(buf); }
         const el=document.createElement('button');
         el.className=bkClass('bk',t,ev,isToday,NOW);
         el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title;
-        el.innerHTML=`<span class="l1">${ev.customerNum?`<span class="num">#${ev.customerNum}</span>`:''}<span class="nm">${esc(ev.displayName)}</span></span>
-          <span class="l2"><span class="t">${fmt(ev.s)}–${fmt(ev.e)}</span><span class="dur">${durOf(ev)} 分</span></span>`;
+        const w=(e-s)*HOUR_W-3;
+        el.innerHTML=`<span class="l1">${ev.customerNum?`<span class="num">#${ev.customerNum}</span>`:''}${(w>=70||!ev.customerNum)?`<span class="nm">${esc(ev.displayName)}</span>`:''}</span>
+          ${w>=95?`<span class="l2"><span class="t">${compact?fmt(ev.s):`${fmt(ev.s)}–${fmt(ev.e)}`}</span><span class="dur">${durOf(ev)} 分</span></span>`:''}`;
+        if(w<95) el.classList.add('one');
         attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
         lane.appendChild(el);
       });
@@ -435,8 +446,8 @@ function renderVertical(){
       const s=Math.max(OPEN,ev.s), e=Math.min(CLOSE,ev.e);
       if(ev.kind==='block'){ const d=document.createElement('div'); d.className='vblk';
         d.style.top=(y(s)+1)+'px'; d.style.height=Math.max(8,(e-s)*HOUR_H-2)+'px'; d.textContent=blockLabel(ev,t,zh); d.title=`${fmt(ev.s)}–${fmt(ev.e)} ${ev.title}`; col.appendChild(d); return; }
-      if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='vbuf';
-        buf.style.top=y(ev.e)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-1)+'px'; col.appendChild(buf); }
+      if(ev.e<CLOSE){ const buf=document.createElement('div'); buf.className='vbuf'; buf.title=`清床緩衝 ${BUFFER} 分`;
+        buf.style.top=y(ev.e)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-1)+'px'; buf.textContent='緩衝'; col.appendChild(buf); }
       const el=document.createElement('button');
       el.className=bkClass('vbk',t,ev,isToday,NOW);
       el.style.top=(y(s)+1)+'px'; el.style.height=Math.max(18,(e-s)*HOUR_H-3)+'px'; el.title=ev.title;
@@ -556,7 +567,9 @@ document.getElementById('branchSeg').addEventListener('click',e=>{
 function fitBoard(){ document.querySelector('.main').style.height=(window.innerHeight-document.querySelector('header').offsetHeight)+'px'; }
 fitBoard(); window.addEventListener('resize',fitBoard);
 let lastMode=isMobile();
-window.addEventListener('resize',()=>{ const m=isMobile(); if(m!==lastMode){ lastMode=m; if(data){ board.innerHTML=''; render(); } } });
+let rzT=null;
+window.addEventListener('resize',()=>{ const m=isMobile(); if(m!==lastMode){ lastMode=m; if(data){ board.innerHTML=''; render(); } return; }
+  if(!m){ clearTimeout(rzT); rzT=setTimeout(()=>{ if(data) render(); },150); } });
 
 load();
 setInterval(()=>{ if(!document.hidden) load(); }, 60000);   // 每分鐘即時重抓
