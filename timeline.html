@@ -276,7 +276,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r76
+   小泰空 顧客檔案系統・時間軸（唯讀）r77
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -290,7 +290,13 @@ const EMBEDDED = window.self !== window.top;
 if (EMBEDDED) document.body.classList.add('embedded');
 const isMobile = () => window.innerWidth <= 700;
 
-const sb = supabase.createClient(SB_URL, SB_ANON);   // 與主系統同 storage key → 共用登入
+// 登入：嵌在主系統內時「不」建立自己的 auth client（兩個 client 同時刷新 refresh token 會互相踢掉登入），
+// 改為每次直接讀主系統寫在 localStorage 的 session；單獨開啟時才自己管 session。
+const AUTH_KEY = 'sb-lyphciitrhfomquorhfm-auth-token';
+function storedToken(){ try{ const j=JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); return j?.access_token||null; }catch{ return null; } }
+const sb = EMBEDDED ? null : supabase.createClient(SB_URL, SB_ANON);
+async function rest(path){ const token=await getToken(); if(!token) throw Object.assign(new Error('noauth'),{noauth:true});
+  const r=await fetch(`${SB_URL}/rest/v1/${path}`,{ headers:{ apikey:SB_ANON, Authorization:`Bearer ${token}` } }); if(!r.ok) throw new Error(`rest ${r.status}`); return r.json(); }
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ── 工具 ── */
@@ -354,7 +360,9 @@ function bedsHtml(used){
 const dutyFirst = list => [...list.filter(t=>t.shift), ...list.filter(t=>!t.shift)];
 
 /* ── 狀態 ── */
-let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null, selectedKey=null;
+let dateKey = todayKey(), filter='all', data=null, selectedEl=null, lastOk=null, selectedKey=null, noauthWait=false;
+// 主系統登入／刷新 token 後（localStorage 變動）自動重試
+window.addEventListener('storage', e=>{ if(e.key===AUTH_KEY && noauthWait && storedToken()){ noauthWait=false; load(); } });
 // 人員篩選（存 localStorage）：hidden = 取消勾選的 staffId；hideOff = 不顯示今日休
 const PREF_KEY='tl_ppl';
 let pref = (()=>{ try{ return Object.assign({hidden:[],hideOff:true}, JSON.parse(localStorage.getItem(PREF_KEY)||'{}')); }catch{ return {hidden:[],hideOff:true}; } })();
@@ -383,12 +391,12 @@ document.getElementById('pplList').onchange=e=>{ const id=e.target.dataset.id; i
   pref.hidden=e.target.checked?pref.hidden.filter(x=>x!==id):[...pref.hidden,id]; savePref(); renderPpl(); board.innerHTML=''; render(); };
 
 /* ── 載入 ── */
-async function getToken(){ const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
-async function loadTimeline(dk){
+async function getToken(){ if(EMBEDDED) return storedToken(); const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
+async function loadTimeline(dk, retry=true){
   const token = await getToken();
-  if(!token) throw Object.assign(new Error('noauth'),{noauth:true});
+  if(!token){ if(retry){ await new Promise(r=>setTimeout(r,1500)); return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }
   const r = await fetch(`${SB_URL}/functions/v1/timeline?date=${dk}`, { headers:{ Authorization:`Bearer ${token}`, apikey: SB_ANON } });
-  if(r.status===401) throw Object.assign(new Error('noauth'),{noauth:true});
+  if(r.status===401){ if(retry){ await new Promise(r=>setTimeout(r,2000)); return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }  // 主系統可能正在刷新 token
   if(r.status===403) throw Object.assign(new Error('forbidden'),{forbidden:true});
   if(!r.ok) throw new Error(`timeline ${r.status}`);
   const j = await r.json();
@@ -565,10 +573,11 @@ async function openCustomer(ev,t){
   }
   body.innerHTML=`<div class="empty">載入 #${ev.customerNum}…</div>`;
   const num=ev.customerNum, myKey=selectedKey;
-  const [{data:c},{data:recs}] = await Promise.all([
-    sb.from('customers').select('num,name,display,phone,tags,note,birthday,country').eq('num',num).maybeSingle(),
-    sb.from('records').select('date,store,staff_name_legacy,duration,plan,is_draft').eq('customer_num',num).eq('is_draft',false).order('date',{ascending:false}).limit(400),
-  ]);
+  const [cs,recs] = await Promise.all([
+    rest(`customers?select=num,name,display,phone,tags,note,birthday,country&num=eq.${num}&limit=1`),
+    rest(`records?select=date,store,staff_name_legacy,duration,plan,is_draft&customer_num=eq.${num}&is_draft=eq.false&order=date.desc&limit=400`),
+  ]).catch(()=>[[],[]]);
+  const c=cs[0]||null;
   if(selectedKey!==myKey) return;
   if(!c){
     body.innerHTML=`<div class="anon"><div class="cnum">顧客編號 #${num}</div><div class="cname">${esc(ev.displayName)}</div><p>顧客檔案系統尚無此編號的資料。</p></div>`;
@@ -616,7 +625,7 @@ async function load(){
   try{ const d=await loadTimeline(dateKey); data=d; lastOk=Date.now(); renderPpl(); render(); }
   catch(e){
     src.classList.remove('busy'); src.classList.add('err');
-    if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'':'<br><a href="./">前往登入 →</a>'}`); return; }
+    if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'<br><a href="#" onclick="load();return false">重試</a>':'<br><a href="./">前往登入 →</a>'}`); noauthWait=true; return; }
     if(e.forbidden){ document.getElementById('srcText').textContent='無權限'; showMsg('時間軸目前僅開放管理員使用。'); return; }
     const t=lastOk?new Date(lastOk):null;
     document.getElementById('srcText').textContent=t?`行事曆無回應 · 顯示 ${pad(t.getHours())}:${pad(t.getMinutes())} 資料`:'行事曆無回應';
