@@ -178,7 +178,9 @@
   .vsum::-webkit-scrollbar{display:none}
   .vsum .b{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
   .vsum .bname{font-size:11px;padding:0 6px}
-  .vsum .beds svg{width:14px;height:14px}
+  .vsum .beds svg{width:13px;height:13px}
+  .vsum{padding:5px 8px} .vsum .b{gap:4px} .vsum .bwrap{margin-right:6px} .vsum .beds{gap:2px;margin-left:0}
+  .vsum .cap.mini{margin-left:3px;padding:2px 5px 2px 3px;gap:4px} .vsum .cap.mini .bar{width:44px}
   /* ── 顧客面板（overlay，預設收合） ── */
   .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;width:var(--panel-w);max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(0,0,0,.10);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
   .panel.open{transform:none;visibility:visible}
@@ -274,7 +276,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r75
+   小泰空 顧客檔案系統・時間軸（唯讀）r76
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
