@@ -87,31 +87,44 @@
   .beds .on{color:var(--red)} .beds .offb{color:#cfcfcf}
   .beds .bl{font-size:11px;color:var(--text-muted);margin-right:3px}
   /* ── 量能儀表（紅天／綠天／黃金天） ── */
-  .cap{--c:#DF4B3C;--c2:#F08A7E;display:inline-flex;align-items:center;gap:8px;margin-left:14px;padding:4px 10px 4px 6px;border-radius:10px;background:var(--surface);border:1px solid var(--border);white-space:nowrap;cursor:default}
+  .cap{--c:#DF4B3C;--c2:#F08A7E;display:inline-flex;align-items:center;gap:8px;margin-left:14px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .cap.green{--c:#4E9A57;--c2:#8CCB92} .cap.gold{--c:#D9A32B;--c2:#F5D06A}
-  .cap.gold{background:linear-gradient(90deg,#FFF8E3,var(--surface) 70%);border-color:#EED9A0}
   .cap .pill{font-size:12px;font-weight:700;color:#fff;background:var(--c);padding:1px 8px;border-radius:6px;letter-spacing:.5px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
   .cap.gold .pill{background:linear-gradient(90deg,#E2AA2C,#F2C85B);text-shadow:0 1px 0 rgba(0,0,0,.15)}
-  .cap .bar{position:relative;width:118px;height:12px;border-radius:6px;background:#ECECEC;overflow:visible;flex:none}
-  .cap .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--c),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45);transition:width .5s ease}
-  .cap.gold .bar .fill{background:linear-gradient(90deg,#E2AA2C,#F7D774 60%,#FFF1B8);box-shadow:0 0 6px rgba(226,170,44,.55),inset 0 1px 0 rgba(255,255,255,.6)}
-  .cap .bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:#999;border-radius:1px}
-  .cap .bar .tick.gold{background:#C9962A}
-  .cap .bar .tick::after{content:attr(data-l);position:absolute;top:-13px;left:50%;transform:translateX(-50%);font:600 9px var(--mono);color:#999}
-  .cap .bar .tick.gold::after{color:#C9962A}
-  .cap .bar .ghost{position:absolute;top:-2px;bottom:-2px;width:0;border-left:2px dashed #7d7d7d;opacity:.7}
+  .cap .lbl{font-size:11px;color:var(--text-muted);margin-left:2px}
+  .cap .bar{position:relative;width:110px;height:5px;border-radius:3px;background:#E6E6E6;flex:none;margin:0 2px}
+  .cap .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--c),var(--c2));transition:width .5s ease}
+  .cap.gold .bar .fill{background:linear-gradient(90deg,#E2AA2C,#F7D774 60%,#FFE79A);box-shadow:0 0 5px rgba(226,170,44,.5)}
+  .cap .bar .tick{position:absolute;top:-2px;bottom:-2px;width:1px;background:#C4C4C4}
+  .cap .bar .tick.gold{background:#D9B15A}
+  .cap .bar .tick::after{content:attr(data-l);position:absolute;top:-11px;left:50%;transform:translateX(-50%);font:400 8px var(--mono);color:#B5B5B5}
+  .cap .bar .tick.gold::after{color:#C9A24A}
+  .cap .bar .ghost{position:absolute;top:-3px;bottom:-3px;width:0;border-left:1px dashed #8a8a8a;opacity:.8}
   .cap .val{font-family:var(--mono);font-size:13px;color:var(--text);line-height:1}
   .cap .val b{font-size:15px;font-weight:700}
   .cap .val small{font-size:11px;color:var(--text-muted)}
-  .cap .ppl{display:inline-flex;gap:2px;align-items:center;font-size:12px;letter-spacing:-1px;color:#D0D0D0;position:static}
-  .cap .ppl i{font-style:normal;color:var(--c)}
-  .cap .ppl em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:0;margin-left:4px}
+  .cap .ppl{display:inline-flex;gap:1px;align-items:center;position:static}
+  .cap .ppl svg{width:13px;height:15px;display:block;color:var(--c)}
+  .cap .ppl svg.need{color:#D6D6D6}
   .cap .tag{font-size:10px;color:var(--text-muted);border:1px solid var(--border);padding:0 5px;border-radius:4px;font-family:var(--mono)}
   .cap .delta{font-family:var(--mono);font-size:11px;color:var(--red)}
-  .cap.mini{margin-left:6px;padding:2px 6px 2px 4px;gap:5px}
-  .cap.mini .bar{width:56px;height:8px} .cap.mini .bar .tick::after{display:none}
-  .cap.mini .pill{font-size:10px;padding:0 5px} .cap.mini .val{font-size:11px} .cap.mini .val b{font-size:12px}
-  .cap.mini .ppl,.cap.mini .tag,.cap.mini .delta{display:none}
+  .cap.mini{margin-left:6px;gap:4px}
+  .cap.mini .pill{font-size:10px;padding:0 6px}
+  .cap.mini .lbl,.cap.mini .bar,.cap.mini .val,.cap.mini .ppl,.cap.mini .tag,.cap.mini .delta{display:none}
+  /* 量能說明框 */
+  .cappop{display:none;position:fixed;z-index:60;width:300px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:12px 14px;font-size:12px;line-height:1.55;color:var(--text)}
+  .cappop.open{display:block}
+  .cappop h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
+  .cappop .meter{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
+  .cappop .meter .cap{margin:0;cursor:default;gap:6px} .cappop .meter .cap .pill{display:none}
+  .cappop .meter .cap .bar{width:120px}
+  .cappop .row{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);padding:2px 0}
+  .cappop .row b{color:var(--text);font-weight:600}
+  .cappop hr{border:0;border-top:1px solid var(--border2);margin:8px 0}
+  .cappop p{margin:4px 0;color:var(--text-muted)}
+  .cappop p b{color:var(--text)}
+  .cappop .g{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+  .cappop .cutl{color:var(--red)}
   .row{display:contents}
   .row .who{position:sticky;left:0;z-index:10;background:var(--surface);height:var(--row-h);border-top:1px solid var(--border2);border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 12px;white-space:nowrap}
   .row .who .rail{width:3px;height:28px;border-radius:2px;flex:none}
@@ -264,6 +277,7 @@
   </div>
 </header>
 
+<div class="cappop" id="capPop"></div>
 <div class="main">
   <div class="board" id="board"><div class="msg">載入中…</div></div>
 </div>
@@ -276,7 +290,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r77
+   小泰空 顧客檔案系統・時間軸（唯讀）r78
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -327,33 +341,73 @@ function bedsNow(list,isToday,NOW){
 }
 // 量能儀表：計畫 vs 實績（過去日＝已記錄的實績；今天＝即時實績；未來＝計畫）
 const GRADE_LBL={red:'紅天',green:'綠天',gold:'黃金天'};
-function capHtml(brName, mini){
-  const cap=data.capacity; if(!cap||!cap.branches[brName]) return '';
+const PERSON_SVG='<svg viewBox="0 0 12 14" fill="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2.6"/><path d="M1 13.5c0-3.4 2.1-5.6 5-5.6s5 2.2 5 5.6z"/></svg>';
+function capState(brName){
+  const cap=data.capacity; if(!cap||!cap.branches[brName]) return null;
   const c=cap.branches[brName], th=cap.thresholds, today=todayKey();
   const future=dateKey>today, past=dateKey<today;
   const cur = future ? c.plan : (past && c.stored.actual ? c.stored.actual : c.actual);
-  const tag = future ? '計畫' : past ? (c.stored.actual?'實績':'實績*') : '實時';
+  const tag = future ? '計畫' : past ? (c.stored.actual?'實績':'實績*') : '';
   const need = cap.isHoliday ? th.nHoliday : th.nWeekday;
-  const MAX=45, pct=v=>Math.min(100,v/MAX*100);
   const dH=Math.round((cur.hours-c.plan.hours)*100)/100, dN=cur.headcount-c.plan.headcount;
   const diff=(!future && (dH!==0||dN!==0));
   const cuts=c.teachers.filter(t=>t.cut.length).map(t=>`${t.name.split(' ')[0]}（${t.cut.join('、')}）`);
-  const maxN=Math.max(th.nGold,cur.headcount,c.plan.headcount);
-  const dots=Array.from({length:maxN},(_,i)=>i<cur.headcount?'<i>●</i>':'●').join('');
-  const tip=[`${brName}・${tag}：${cur.hours} 小時／${cur.headcount} 人 → ${GRADE_LBL[cur.grade]}`,
-    `計畫：${c.plan.hours} 小時／${c.plan.headcount} 人（${GRADE_LBL[c.plan.grade]}）`,
-    cuts.length?`掐頭去尾／臨時休：${cuts.join('；')}`:'',
-    `門檻：達標 ≥${th.hoursOk}h 且 ≥${need} 人（${cap.isHoliday?'假日類':'平日'}）；黃金 ≥${th.hoursGold}h 且 ≥${th.nGold} 人`].filter(Boolean).join('\n');
-  return `<span class="cap ${cur.grade}${mini?' mini':''}" title="${tip.replace(/"/g,'&quot;')}">
-    <span class="pill">${GRADE_LBL[cur.grade]}</span>
-    <span class="bar"><i class="fill" style="width:${pct(cur.hours)}%"></i><b class="tick" data-l="${th.hoursOk}" style="left:${pct(th.hoursOk)}%"></b><b class="tick gold" data-l="${th.hoursGold}" style="left:${pct(th.hoursGold)}%"></b>${diff?`<i class="ghost" style="left:${pct(c.plan.hours)}%"></i>`:''}</span>
-    <span class="val"><b>${cur.hours}</b><small>h</small>${mini?`<small> ${cur.headcount}人</small>`:''}</span>
-    <span class="ppl">${dots}<em>${cur.headcount}/${need}人</em></span>
-    ${diff?`<span class="delta">${dH>0?'+':''}${dH}h${dN?` ${dN>0?'+':''}${dN}人`:''}</span>`:''}
-    <span class="tag">${tag}</span></span>`;
+  return { c, th, cur, tag, need, dH, dN, diff, cuts, isHoliday:cap.isHoliday, holidayName:cap.holidayName, future, past };
 }
+function capMeter(st, cls){
+  const MAX=45, pct=v=>Math.min(100,v/MAX*100); const {cur,c,th,need,diff}=st;
+  const n=cur.headcount, icons=Array.from({length:Math.max(n,need)},(_,i)=>`${i<n?PERSON_SVG:PERSON_SVG.replace('<svg','<svg class="need"')}`).join('');
+  return `<span class="cap ${cur.grade}${cls||''}">
+    <span class="pill">${GRADE_LBL[cur.grade]}</span><span class="lbl">量能</span>
+    <span class="bar"><i class="fill" style="width:${pct(cur.hours)}%"></i><b class="tick" data-l="${th.hoursOk}" style="left:${pct(th.hoursOk)}%"></b><b class="tick gold" data-l="${th.hoursGold}" style="left:${pct(th.hoursGold)}%"></b>${diff?`<i class="ghost" style="left:${pct(c.plan.hours)}%"></i>`:''}</span>
+    <span class="val"><b>${cur.hours}</b><small>h</small></span>
+    <span class="ppl" title="今日上班 ${n} 人（門檻 ${need} 人）">${icons}</span>
+    ${diff?`<span class="delta">${st.dH>0?'+':''}${st.dH}h${st.dN?` ${st.dN>0?'+':''}${st.dN}人`:''}</span>`:''}
+    ${st.tag?`<span class="tag">${st.tag}</span>`:''}</span>`;
+}
+function capHtml(brName, mini){
+  const st=capState(brName); if(!st) return '';
+  return capMeter(st, mini?' mini':'').replace('<span class="cap ', `<span data-br="${brName}" class="cap `);
+}
+// 說明框：電腦 hover／點擊、手機點擊
+let capPopBr=null;
+function capPopHtml(brName){
+  const st=capState(brName); if(!st) return '';
+  const {c,th,cur,need,cuts,tag}=st;
+  const dayType = st.isHoliday ? `假日類${st.holidayName?`（${st.holidayName}）`:''}` : '平日';
+  return `<h4>${brName}・${GRADE_LBL[cur.grade]}${tag?`<span class="tag" style="font-size:10px;border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text-muted);font-weight:400">${tag}</span>`:''}</h4>
+    <div class="meter">${capMeter(st,'')}</div>
+    <div class="row"><span>${tag||'目前'}量能</span><b>${cur.hours} 小時・${cur.headcount} 人</b></div>
+    ${st.future?'':`<div class="row"><span>班表計畫</span><b>${c.plan.hours} 小時・${c.plan.headcount} 人（${GRADE_LBL[c.plan.grade]}）</b></div>`}
+    ${cuts.length?`<div class="row cutl"><span>掐頭去尾／臨時休</span><b class="cutl">${cuts.join('；')}</b></div>`:''}
+    <div class="row"><span>日型</span><b>${dayType}，需 ${need} 人</b></div>
+    <hr>
+    <p><b>量能</b>＝當天所有上班老師的排班時數加總（每人「到 − 從」）。「到」是最後可接受預約的開始時間，所以它衡量的是<b>供給端準備了多少火力</b>，不是客人現在還能約到的時段。</p>
+    <p><span class="g" style="background:#DF4B3C"></span><b>紅天</b>：量能 &lt; ${th.hoursOk}h，或人數不足（平日 &lt; ${th.nWeekday}、假日 &lt; ${th.nHoliday}）→ 供給吃緊，要補班。</p>
+    <p><span class="g" style="background:#4E9A57"></span><b>綠天</b>：量能 ≥ ${th.hoursOk}h 且人數達標 → 守得住。</p>
+    <p><span class="g" style="background:#D9A32B"></span><b>黃金天</b>：量能 ≥ ${th.hoursGold}h 且 ≥ ${th.nGold} 人 → 火力全開，適合導流。</p>
+    <p>實績＝班表區間扣掉開頭／結尾被標為休、病假等的占用（中間的占用與公務不算），打烊後自動記錄。</p>`;
+}
+function openCapPop(el){
+  const br=el.dataset.br; const pop=document.getElementById('capPop');
+  pop.innerHTML=capPopHtml(br); pop.classList.add('open'); capPopBr=br;
+  const r=el.getBoundingClientRect(), W=pop.offsetWidth, H=pop.offsetHeight;
+  let left=Math.min(Math.max(8,r.left), window.innerWidth-W-8);
+  let top=r.bottom+6; if(top+H>window.innerHeight-8) top=Math.max(8,r.top-H-6);
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function closeCapPop(){ document.getElementById('capPop').classList.remove('open'); capPopBr=null; }
+document.addEventListener('click',e=>{
+  const el=e.target.closest('.cap[data-br]');
+  if(el){ e.stopPropagation(); if(capPopBr===el.dataset.br) closeCapPop(); else openCapPop(el); return; }
+  if(!e.target.closest('#capPop')) closeCapPop();
+});
+document.addEventListener('mouseover',e=>{ if(isMobile()) return; const el=e.target.closest('.cap[data-br]'); if(el && capPopBr!==el.dataset.br) openCapPop(el); });
+document.addEventListener('mouseout',e=>{ if(isMobile()) return; const el=e.target.closest('.cap[data-br]'); if(el && !e.relatedTarget?.closest?.('#capPop,.cap[data-br]')) closeCapPop(); });
+document.addEventListener('mouseout',e=>{ if(isMobile()) return; if(e.target.closest?.('#capPop') && !e.relatedTarget?.closest?.('#capPop,.cap[data-br]')) closeCapPop(); });
 function bedsHtml(used){
-  const n=used==null?0:Math.min(5,used);
+  if(used==null) return '';
+  const n=Math.min(5,used);
   return `<span class="beds" title="${used==null?'非今日，不顯示即時床位':`目前占用 ${n} 張`}"><span class="bl">實時床位</span>${Array.from({length:5},(_,i)=>`<span class="${used!=null&&i<n?'on':'offb'}">${BED_SVG}</span>`).join('')}</span>`;
 }
 // 分店內排序：今天有上班的在前，休的在後（保持原順序）
@@ -431,7 +485,7 @@ function renderHorizontal(){
   const grid=document.createElement('div'); grid.className='grid';
   const totalW=(CLOSE-OPEN)*HOUR_W;
   const axis=document.createElement('div'); axis.className='axis';
-  axis.innerHTML=`<div class="corner">分店 / 老師</div><div class="hours" style="width:${totalW}px">
+  axis.innerHTML=`<div class="corner">據點 / 老師</div><div class="hours" style="width:${totalW}px">
     ${Array.from({length:CLOSE-OPEN+1},(_,i)=>`<span class="h" style="left:${i*HOUR_W}px">${pad((OPEN+i)%24)}:00</span>`).join('')}</div>`;
   grid.appendChild(axis);
   const isToday = dateKey===todayKey(), NOW=nowH();
@@ -632,7 +686,7 @@ async function load(){
     if(data && data.date===dateKey) render(); else showMsg('行事曆無回應，請稍後再試。');
   }
 }
-function setDate(dk){ dateKey=dk; closePanel(); board.innerHTML=''; load(); }
+function setDate(dk){ dateKey=dk; closePanel(); closeCapPop(); board.innerHTML=''; load(); }
 function shiftDate(n){ const [y,m,d]=dateKey.split('-').map(Number); const dt=new Date(y,m-1,d+n); setDate(`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`); }
 document.getElementById('prev').onclick=()=>shiftDate(-1);
 document.getElementById('next').onclick=()=>shiftDate(1);
