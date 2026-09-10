@@ -174,7 +174,7 @@
   .voff{grid-column:1/-1;padding:10px 10px 16px;font-size:12px;color:var(--text-muted);background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .voff .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 2px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text)}
   .voff .chip .av{width:20px;height:20px;font-size:10px}
-  .vsum{position:sticky;top:0;z-index:21;display:flex;gap:10px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border);font-size:11px;overflow-x:auto;scrollbar-width:none}
+  .vsum{position:sticky;top:0;z-index:21;display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border);font-size:11px;overflow-x:auto;scrollbar-width:none}
   .vsum::-webkit-scrollbar{display:none}
   .vsum .b{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
   .vsum .bname{font-size:11px;padding:0 6px}
@@ -274,7 +274,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r74
+   小泰空 顧客檔案系統・時間軸（唯讀）r75
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -339,7 +339,7 @@ function capHtml(brName, mini){
   return `<span class="cap ${cur.grade}${mini?' mini':''}" title="${tip.replace(/"/g,'&quot;')}">
     <span class="pill">${GRADE_LBL[cur.grade]}</span>
     <span class="bar"><i class="fill" style="width:${pct(cur.hours)}%"></i><b class="tick" data-l="${th.hoursOk}" style="left:${pct(th.hoursOk)}%"></b><b class="tick gold" data-l="${th.hoursGold}" style="left:${pct(th.hoursGold)}%"></b>${diff?`<i class="ghost" style="left:${pct(c.plan.hours)}%"></i>`:''}</span>
-    <span class="val"><b>${cur.hours}</b><small>h</small></span>
+    <span class="val"><b>${cur.hours}</b><small>h</small>${mini?`<small> ${cur.headcount}人</small>`:''}</span>
     <span class="ppl">${dots}<em>${cur.headcount}/${need}人</em></span>
     ${diff?`<span class="delta">${dH>0?'+':''}${dH}h${dN?` ${dN>0?'+':''}${dN}人`:''}</span>`:''}
     <span class="tag">${tag}</span></span>`;
