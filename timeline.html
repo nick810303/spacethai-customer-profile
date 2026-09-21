@@ -82,15 +82,42 @@
   .bwrap{position:relative;display:inline-block;margin-right:8px}
   .bwrap .badge{top:-8px;right:-10px}
   .vsum .bwrap .badge{min-width:16px;height:16px;line-height:16px;font-size:10px;top:-7px;right:-9px}
-  .beds{display:inline-flex;align-items:center;gap:3px;margin-left:2px}
-  .beds svg{width:16px;height:16px;display:block}
-  .beds .on{color:var(--red)} .beds .offb{color:#cfcfcf}
-  .beds .bl{font-size:11px;color:var(--text-muted);margin-right:3px}
+  /* ── r81 據點名牌：像素階梯角、兩店等寬、文字置中；分店色像素圖釘 ── */
+  .np{--bc:#4E5D3E;box-sizing:border-box;width:124px;display:flex;align-items:center;gap:8px;height:26px;padding:0 11px 0 3px;background:var(--bc);color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.30);clip-path:polygon(0 4px,2px 4px,2px 2px,4px 2px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 2px,calc(100% - 2px) 2px,calc(100% - 2px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 2px) calc(100% - 4px),calc(100% - 2px) calc(100% - 2px),calc(100% - 4px) calc(100% - 2px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 2px),2px calc(100% - 2px),2px calc(100% - 4px),0 calc(100% - 4px))}
+  .np .ic{width:20px;height:20px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px))}
+  .np .ic svg{display:block;animation:pinhop 3.2s steps(1) infinite}
+  .np .nm{flex:1;font-family:'DotGothic16',sans-serif;font-size:15px;line-height:1;text-align:center;letter-spacing:3px;margin-right:-3px;white-space:nowrap;text-shadow:1px 1px 0 rgba(0,0,0,.35)}
+  @keyframes pinhop{0%{transform:none}84%{transform:translateY(-2px)}90%{transform:translateY(-1px)}94%{transform:none}}
+  /* ── r81 實時床位：方形區塊（跟本日量能同高 30px）＋左上角 live 綠燈＋r80 床縮 12px ── */
+  .bd,.cap .qblk{height:30px;box-sizing:border-box;flex:none}
+  .bd{position:relative;display:inline-flex;align-items:center;gap:7px;cursor:default;border:1px solid #CFC6BF;border-radius:3px;padding:0 9px 0 7px;background:rgba(255,255,255,.6)}
+  .bd .ql,.cap .qblk .ql{font-family:'DotGothic16',sans-serif;font-size:10px;line-height:11px;color:#8a7a70;display:inline-flex;flex-direction:column;align-items:center;letter-spacing:1px;font-weight:400}
+  .bd .sep,.cap .qblk .sep{width:1px;align-self:stretch;margin:5px 0;background:#DDD4CD;flex:none}
+  .bd .row5{display:inline-flex;gap:1px;align-items:center}
+  .bd .row5>span{display:block} .bd .row5 svg{width:12px;height:12px;display:block}
+  .bd .row5 .on{color:var(--red)} .bd .row5 .off{color:#D6D0CB}
+  .bd .lv{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#2a9d5c;box-shadow:0 0 0 1.5px var(--surface2);animation:lvb 1.6s ease-in-out infinite}
+  .bd .lv::after{content:"";position:absolute;inset:0;border-radius:50%;animation:lvr 1.6s ease-out infinite}
+  @keyframes lvb{0%,100%{opacity:1}50%{opacity:.3}}
+  @keyframes lvr{0%{box-shadow:0 0 0 0 rgba(42,157,92,.5)}70%,100%{box-shadow:0 0 0 4px rgba(42,157,92,0)}}
+  @media (prefers-reduced-motion:reduce){.bd .lv,.bd .lv::after,.np .ic svg{animation:none}}
   /* ── 量能儀表（紅天／綠天／黃金天） ── */
-  .cap{--c:#C0392B;display:inline-flex;align-items:center;gap:8px;margin-left:14px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .cap.wg{--c:#5DCAA5} .cap.hg{--c:#1A5C35} .cap.gold{--c:#E8960A}
+  .cap{--c:#C0392B;--gl:rgba(255,170,150,.9);display:inline-flex;align-items:center;gap:8px;margin-left:0;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .cap.wg{--c:#5DCAA5;--gl:rgba(255,255,255,.95)} .cap.hg{--c:#1A5C35;--gl:rgba(143,224,192,.9)} .cap.gold{--c:#E8960A;--gl:rgba(255,226,122,.95)}
   /* r80：像素 pill（22px 圓圈動畫，可溢出）→「本日／量能」方框 → 像素血條（canvas）→ 時數。顏色依《小泰空新制說明 v16》 */
-  .cap .pill{display:inline-flex;align-items:center;gap:6px;border-radius:14px;padding:2px 11px 2px 2px;font-size:12px;font-weight:700;color:#fff;background:var(--c);letter-spacing:.3px}
+  .cap .pill{display:inline-flex;align-items:center;gap:6px;border-radius:14px;padding:2px 10px 2px 2px;font-size:12px;font-weight:700;color:#fff;background:var(--c);letter-spacing:.3px;flex:none}
+  /* r81：狀態字＝LED 發光點陣字，同一格輪播「前三字」⇄「後四字」（桌面／手機同一顆） */
+  .cap .ptx{display:inline-grid;justify-items:center;height:16px;overflow:hidden;line-height:16px;min-width:4.6em;font-family:'DotGothic16',sans-serif;font-weight:400;font-size:12px;letter-spacing:1px;text-shadow:0 0 2px var(--gl),0 0 6px var(--gl)}
+  .cap .ptx b{display:block;grid-area:1/1;font-weight:400;animation:txrot 4s steps(1) infinite}
+  @keyframes txrot{0%{transform:none;opacity:1}46%{transform:translateY(-3px);opacity:.6}50%,100%{transform:translateY(16px);opacity:0}}
+  @media (prefers-reduced-motion:reduce){.cap .ptx b{animation:none}.cap .ptx .p2{display:none}}
+  /* r81：本日量能長方形區塊＝標題 │ 血條＋時數 │ 大頭照＋人數 */
+  .cap .qblk{display:inline-flex;align-items:center;gap:9px;border:1px solid #CFC6BF;border-radius:3px;padding:0 10px 0 7px;background:rgba(255,255,255,.6)}
+  .cap .qblk .hpn{min-width:0}
+  .cap .qblk .ppl{padding-left:6px}
+  .cap .pnum{font-family:'DotGothic16',sans-serif;font-size:20px;line-height:1;font-weight:400;margin-left:-3px}
+  .cap .pnum small{font-size:11px;margin-left:2px;color:var(--text-muted)}
+  .cap .pnum.r{color:#8E2A1F} .cap .pnum.g{color:#1E7050} .cap .pnum.y{color:#B87400}
   .cap.wg .pill{color:#0F4D33}
   .cap .pic{width:22px;height:22px;border-radius:50%;background:#fff;position:relative;flex:none}
   .cap .pic svg{position:absolute;left:-2px;top:-2px;overflow:visible;pointer-events:none}
@@ -110,8 +137,8 @@
   .cap .tag{font-size:10px;color:var(--text-muted);border:1px solid var(--border);padding:0 5px;border-radius:4px;font-family:var(--mono)}
   .cap .delta{font-family:var(--mono);font-size:11px;color:var(--red)}
   .cap.mini{margin-left:6px;gap:4px}
-  .cap.mini .pill{padding:2px}
-  .cap.mini .ptx,.cap.mini .qbox,.cap.mini .hpc,.cap.mini .ppl,.cap.mini .tag,.cap.mini .delta{display:none}
+  .cap.mini .qblk{border:0;padding:0;background:none;gap:0;height:auto}
+  .cap.mini .ql,.cap.mini .sep,.cap.mini .hpc,.cap.mini .ppl,.cap.mini .pnum,.cap.mini .tag,.cap.mini .delta{display:none}
   .cap.mini .hpn{font-size:13px;min-width:0}
   /* 量能說明框 */
   .cappop{display:none;position:fixed;z-index:60;width:300px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:12px 14px;font-size:12px;line-height:1.55;color:var(--text)}
@@ -119,7 +146,7 @@
   .cappop h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
   .cappop .meter{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
   .cappop .meter .cap{margin:0;cursor:default;gap:6px} .cappop .meter .cap .pill{display:none}
-  .cappop .meter .cap .ppl,.cappop .meter .cap .tag,.cappop .meter .cap .delta{display:none}
+  .cappop .meter .cap .ppl,.cappop .meter .cap .pnum,.cappop .meter .cap .sep2,.cappop .meter .cap .tag,.cappop .meter .cap .delta{display:none}
   .cappop .row{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);padding:2px 0}
   .cappop .row b{color:var(--text);font-weight:600}
   .cappop hr{border:0;border-top:1px solid var(--border2);margin:8px 0}
@@ -213,9 +240,10 @@
   .vsum::-webkit-scrollbar{display:none}
   .vsum .b{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
   .vsum .bname{font-size:11px;padding:0 6px}
-  .vsum .beds svg{width:13px;height:13px}
-  .vsum{padding:5px 8px} .vsum .b{gap:4px} .vsum .bwrap{margin-right:6px} .vsum .beds{gap:2px;margin-left:0}
-  .vsum .cap.mini{margin-left:3px;padding:2px 5px 2px 3px;gap:4px} .vsum .cap.mini .pill{padding:2px}
+  .vsum{padding:5px 8px} .vsum .b{gap:4px} .vsum .bwrap{margin-right:15px}
+  .vsum .np{width:88px;height:20px;padding:0 7px 0 2px;gap:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.30)} .vsum .np .ic{width:16px;height:16px} .vsum .np .nm{font-size:12px}
+  .vsum .bd{height:22px;padding:0 6px;gap:5px} .vsum .bd .ql,.vsum .bd .sep{display:none} .vsum .bd .lv{box-shadow:0 0 0 1.5px var(--surface)}
+  .vsum .cap.mini{margin-left:3px;padding:2px 5px 2px 3px;gap:4px}
   /* ── 顧客面板（overlay，預設收合） ── */
   .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;width:var(--panel-w);max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(0,0,0,.10);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
   .panel.open{transform:none;visibility:visible}
@@ -313,7 +341,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r80
+   小泰空 顧客檔案系統・時間軸（唯讀）r81
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -357,6 +385,14 @@ const durLabel = ev => `${durOf(ev)} 分${isFree(ev)?'不指定':''}`;
 const bookingCount = t => t.events.filter(e=>e.kind==='booking').length;
 // 正面（腳端看過去）的床：床頭板＋枕頭＋床墊＋床腳
 const BED_SVG = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="3" y="1" width="14" height="7" rx="2"/><rect x="1.5" y="7.5" width="17" height="8.5" rx="1.8"/><rect x="6" y="3.2" width="8" height="3.2" rx="1.6" fill="#fff" opacity=".85"/><rect x="2.5" y="16" width="2.2" height="3"/><rect x="15.3" y="16" width="2.2" height="3"/></svg>';
+// r81 據點名牌：分店色像素地圖圖釘（字元圖 → 1:1 像素 SVG）
+function pxArt(rows,pal){const W=rows[0].length;let s='';
+  rows.forEach((r,y)=>{let x=0;while(x<W){const c=r[x];if(c==='.'){x++;continue;}let j=x;while(j+1<W&&r[j+1]===c)j++;s+=`<rect x="${x}" y="${y}" width="${j-x+1}" height="1" fill="${pal[c]}"/>`;x=j+1;}});
+  return `<svg width="${W}" height="${rows.length}" viewBox="0 0 ${W} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${s}</svg>`;}
+const hexMix=(hex,a,to)=>{const n=parseInt(hex.slice(1),16),f=v=>Math.round(v+(to-v)*a);return '#'+[n>>16,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,'0')).join('');};
+const PIN=["..kkkkk..",".kLPPPPk.","kLPPwPPPk","kPPwwwPPk","kPPPwPPPk","kPPPPPPDk",".kPPPPDk.",".kPPPPDk.","..kPPDk..","...kDk...","....k....","..sssss.."];
+const pinSvg=(hex,mini)=>pxArt(mini?PIN.slice(0,11):PIN,{k:'#2B211C',P:hex,L:hexMix(hex,.45,255),D:hexMix(hex,.3,0),w:'#fff',s:'#D8CFC8'});
+const nameplate=(br,cnt,mini)=>`<span class="bwrap"><span class="np" style="--bc:${br.hex}"><span class="ic">${pinSvg(br.hex,mini)}</span><span class="nm">${br.name}</span></span>${cnt?`<span class="badge" title="今日預約總數">${cnt}</span>`:''}</span>`;
 // 目前此刻（含 15 分緩衝）該分店被占用的床數 = 正在服務中的預約數（只有「今天」才算）
 function bedsNow(list,isToday,NOW){
   if(!isToday) return null;
@@ -533,7 +569,8 @@ function capAvatars(st){
   if(rest>0) html+=`<span class="cav more" style="z-index:${z--}">+${rest}</span>`;
   for(let i=n;i<st.need;i++) html+=`<span class="cav need" style="z-index:${z--}"></span>`;
   const names=ppl.map(t=>t.name.split(' ')[0]).join('、');
-  return `<span class="ppl" title="上班 ${n} 人${names?`：${names}`:''}（門檻 ${st.need} 人）">${html}<span class="pcnt">${n}人</span></span>`;
+  const pc = st.cur.grade==='gold' ? 'y' : n>=st.need ? 'g' : 'r';
+  return `<span class="ppl" title="上班 ${n} 人${names?`：${names}`:''}（門檻 ${st.need} 人）">${html}</span><span class="pnum ${pc}" title="上班 ${n} 人（門檻 ${st.need} 人）">${n}<small>人</small></span>`;
 }
 function capState(brName){
   const cap=data.capacity; if(!cap||!cap.branches[brName]) return null;
@@ -547,14 +584,17 @@ function capState(brName){
   const cuts=c.teachers.filter(t=>t.cut.length).map(t=>`${t.name.split(' ')[0]}（${t.cut.join('、')}）`);
   return { c, th, cur, tag, need, dH, dN, diff, cuts, isHoliday:cap.isHoliday, holidayName:cap.holidayName, future, past, brName };
 }
+// r81 狀態字輪播：「平日紅」⇄「虧損警報」每 2 秒一換；負 delay 對齊全域時鐘，每分鐘重繪不會跳回開頭
+function ptxHtml(t){const [a,b]=t.split('・'),d=(performance.now()/1000)%4;
+  return `<span class="ptx"><b class="p1" style="animation-delay:-${d.toFixed(2)}s">${a}</b><b class="p2" style="animation-delay:-${((d+2)%4).toFixed(2)}s">${b}</b></span>`;}
 function capMeter(st, cls){
   const {cur,c,th,diff}=st; const K=CAPK[capKind(st)];
   return `<span class="cap ${K.cls}${cls||''}" data-hpv="${cur.hours}" data-ok="${th.hoursOk}" data-gold="${th.hoursGold}" data-plan="${diff?c.plan.hours:''}" data-key="${dateKey}|${st.brName}" data-off="${Math.max(0,BRANCHES.findIndex(b=>b.name===st.brName))*0.7}">
-    <span class="pill" title="${K.t}"><span class="pic">${pxIcon(K.sp)}</span><span class="ptx">${K.t}</span></span>
-    <span class="qbox"><span>本日</span><span>量能</span></span>
+    <span class="pill" title="${K.t}"><span class="pic">${pxIcon(K.sp)}</span>${ptxHtml(K.t)}</span>
+    <span class="qblk"><span class="ql"><span>本日</span><span>量能</span></span><i class="sep"></i>
     <canvas class="hpc" aria-label="量能 ${cur.hours} 小時"></canvas>
-    <span class="hpn">${Number(cur.hours).toFixed(2)}<small>h</small></span>
-    ${capAvatars(st)}
+    <span class="hpn">${Number(cur.hours).toFixed(2)}<small>h</small></span><i class="sep sep2"></i>
+    ${capAvatars(st)}</span>
     ${diff?`<span class="delta">${st.dH>0?'+':''}${st.dH}h${st.dN?` ${st.dN>0?'+':''}${st.dN}人`:''}</span>`:''}
     ${st.tag?`<span class="tag">${st.tag}</span>`:''}</span>`;
 }
@@ -601,7 +641,7 @@ document.addEventListener('mouseout',e=>{ if(isMobile()) return; if(e.target.clo
 function bedsHtml(used){
   if(used==null) return '';
   const n=Math.min(5,used);
-  return `<span class="beds" title="${used==null?'非今日，不顯示即時床位':`目前占用 ${n} 張`}"><span class="bl">實時床位</span>${Array.from({length:5},(_,i)=>`<span class="${used!=null&&i<n?'on':'offb'}">${BED_SVG}</span>`).join('')}</span>`;
+  return `<span class="bd" title="實時床位：目前占用 ${n}／5 張"><span class="lv"></span><span class="ql"><span>實時</span><span>床位</span></span><i class="sep"></i><span class="row5">${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span></span>`;
 }
 // 分店內排序：今天有上班的在前，休的在後（保持原順序）
 const dutyFirst = list => [...list.filter(t=>t.shift), ...list.filter(t=>!t.shift)];
@@ -758,7 +798,7 @@ function renderHorizontal(){
     const onDuty=all.filter(t=>t.shift).length;
     const cnt=all.reduce((n,t)=>n+bookingCount(t),0);
     const head=document.createElement('div'); head.className='branch-head';
-    head.innerHTML=`<div class="in"><span class="bwrap"><span class="bname" style="background:${br.color}">${br.name}</span>${cnt?`<span class="badge" title="今日預約總數">${cnt}</span>`:''}</span>${bedsHtml(bedsNow(all,isToday,NOW))}${capHtml(br.name,false)}</div>`;
+    head.innerHTML=`<div class="in">${nameplate(br,cnt)}${bedsHtml(bedsNow(all,isToday,NOW))}${capHtml(br.name,false)}</div>`;
     grid.appendChild(head);
     list.forEach(t=>{
       const [zh,en]=t.name.split(' ');
@@ -816,7 +856,7 @@ function renderVertical(){
   const sum=document.createElement('div'); sum.className='vsum';
   sum.innerHTML=visibleBranches().map(br=>{ const list=data.teachers.filter(t=>t.branch===br.name);
     const c=list.reduce((n,t)=>n+bookingCount(t),0);
-    return `<span class="b"><span class="bwrap"><span class="bname" style="background:${br.color}">${br.name}</span>${c?`<span class="badge">${c}</span>`:''}</span>${bedsHtml(bedsNow(list,isToday,NOW))}${capHtml(br.name,true)}</span>`; }).join('')
+    return `<span class="b">${nameplate(br,c,true)}${bedsHtml(bedsNow(list,isToday,NOW))}${capHtml(br.name,true)}</span>`; }).join('')
     + (anyHints()?`<span class="hleg">${hintLegendHtml()}</span>`:'');
   // 表頭
   const corner=document.createElement('div'); corner.className='vhead corner'; corner.textContent='時間'; grid.appendChild(corner);
