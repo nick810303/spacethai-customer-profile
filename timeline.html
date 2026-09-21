@@ -153,6 +153,26 @@
   .bk .t{font-family:var(--mono);font-size:10px;opacity:.75}
   .bk.d120{background:var(--d120)} .bk.d90{background:var(--d90)} .bk.d60{background:var(--d60)} .bk.trn{background:var(--tr)} .bk.free{background:var(--d90f)}
   .bk.past{opacity:.55}
+  /* ── 提醒泡泡（r79）：當月2+／本月壽星／同行。框：內框＝方案（橘/粉）、同行單獨＝藍內框、同行＋方案＝方案內框＋藍外框 ── */
+  :root{--h2p:#E8590C;--hbd:#D6336C;--hcp:#1C7ED6}
+  button.hx-2p{box-shadow:inset 0 0 0 2.5px var(--h2p)}
+  button.hx-bd{box-shadow:inset 0 0 0 2.5px var(--hbd)}
+  button.hx-cp{box-shadow:inset 0 0 0 2.5px var(--hcp)}
+  button.hx-cp.hx-2p{box-shadow:inset 0 0 0 2.5px var(--h2p);outline:2.5px solid var(--hcp);outline-offset:1.5px}
+  button.hx-cp.hx-bd{box-shadow:inset 0 0 0 2.5px var(--hbd);outline:2.5px solid var(--hcp);outline-offset:1.5px}
+  .bk.sel,.vbk.sel{outline:2px solid var(--badge)!important}
+  .hbubs{position:absolute;display:flex;gap:3px;z-index:16;pointer-events:none}
+  .vcol .hbubs{flex-direction:column;right:-6px}
+  .hbub{min-width:19px;height:19px;border-radius:10px;color:#fff;font:700 11px/19px var(--sans);display:inline-flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--surface);flex:none}
+  .hbub svg{width:12px;height:12px;display:block}
+  .hbub.h2p{background:var(--h2p)} .hbub.hbd{background:var(--hbd)} .hbub.hcp{background:var(--hcp)}
+  .legend .hbub,.hleg .hbub{min-width:16px;height:16px;line-height:16px;font-size:10px;padding:0 3px;box-shadow:none}
+  .legend .hbub svg,.hleg .hbub svg{width:10px;height:10px}
+  .hleg{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-muted);white-space:nowrap}
+  .hleg span{display:inline-flex;align-items:center;gap:4px}
+  .hdesc{margin:0 0 12px;display:flex;flex-direction:column;gap:6px}
+  .hdesc div{display:flex;align-items:center;gap:8px;font-size:13px}
+  .hdesc small{color:var(--text-hint);font-size:11px}
   .buf{position:absolute;top:6px;height:calc(var(--row-h) - 12px);background:rgba(120,100,90,.13);border-radius:0 5px 5px 0}
   .blk{position:absolute;top:6px;height:calc(var(--row-h) - 12px);border-radius:6px;background:var(--blk);border:1px solid var(--blk-bdr);color:var(--text-muted);font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
   .now{position:absolute;top:34px;bottom:0;width:1px;background:var(--red);z-index:15;pointer-events:none}
@@ -274,6 +294,7 @@
     <span><i style="background:rgba(120,100,90,.13)"></i>緩衝 15 分</span>
     <span><i style="background:#F5F5F5 repeating-linear-gradient(45deg,#E0E0E0 0 1px,transparent 1px 4px)"></i>休</span>
     <span><i style="background:var(--surface);border:1px solid var(--border)"></i>開放預約區間</span>
+    <span id="hintLegend" class="hleg"></span>
   </div>
 </header>
 
@@ -290,7 +311,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r78
+   小泰空 顧客檔案系統・時間軸（唯讀）r79
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -462,15 +483,85 @@ async function loadTimeline(dk, retry=true){
       return ev.e > OPEN && ev.s < CLOSE;
     });
   });
+  try{ await annotateHints(j, dk); }catch(e){ console.warn('hints', e); }
   return j;
 }
+
+/* ── 提醒（r79）── 依紀錄推測，以櫃台確認為準；查詢失敗就不顯示，不影響時間軸本體
+   當月2+ ：非培訓的 120 分預約（老師非培訓、標題無「培訓」、有編號），同月在這筆之前已有 120 分紀錄（或同日時間軸上更早的 120 分）
+   本月壽星：同上條件但本月還沒做過 120 分，且生日在本月（資料：沒做過→用壽星 165 筆；做過→用 2+）。兩者互斥
+   同行   ：同分店、同開始時間、不同老師，且 ①同編號／同名字（同帳號）或 ②過去紀錄互為同行（records.companions） */
+const HINT_SVG={
+  cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.2 2.4-5.5 5.5-5.5s5.5 2.3 5.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.4.3 4 2.2 4 5"/></svg>',
+  bd:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16v-7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M4 15.5c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M12 11V8"/><path d="M12 3.5c.9 1 .9 2.2 0 3-.9-.8-.9-2 0-3z"/></svg>',
+};
+const HINT_LBL={ '2p':'當月2+', bd:'本月壽星', cp:'同行' };
+const hbub = k => `<span class="hbub h${k}">${k==='2p'?'2+':HINT_SVG[k]}</span>`;
+const hintKeys = ev => [ev.cp?'cp':null, ev.plan||null].filter(Boolean);   // 同行在前、方案在後
+const hintCls = ev => hintKeys(ev).map(k=>'hx-'+k).join(' ');
+const hintTitle = ev => ev.hintWhy?.length ? `\n${ev.hintWhy.join('\n')}（推測，以櫃台確認為準）` : '';
+const hmOf = h => { const m=Math.round(h*60); return `${pad(Math.floor(m/60))}:${pad(m%60)}`; };
+const mdOf = d => d.slice(5).replace('-','/');
+async function annotateHints(j, dk){
+  const bks=[];
+  j.teachers.forEach(t=>t.events.forEach(ev=>{ if(ev.kind==='booking') bks.push({ev,t}); }));
+  // 同行候選：同分店＋同開始時間＋不同老師
+  const groups={}; bks.forEach(b=>{ (groups[b.t.branch+'|'+b.ev.start] ||= []).push(b); });
+  const multi=Object.values(groups).filter(g=>new Set(g.map(b=>b.t.staffId)).size>1);
+  const planC=bks.filter(({ev,t})=>!t.isTrainee && !/培訓/.test(ev.title||'') && ev.customerNum && durOf(ev)===120);   // 培訓老師或以培訓價預約的不適用
+  const numsP=[...new Set(planC.map(b=>b.ev.customerNum))];
+  const numsC=[...new Set(multi.flat().map(b=>b.ev.customerNum).filter(Boolean))];
+  const monthStart=`${dk.slice(0,7)}-01`;
+  const [cs,rs,hist]=await Promise.all([
+    numsP.length?rest(`customers?select=num,birthday&num=in.(${numsP.join(',')})`):[],
+    numsP.length?rest(`records?select=customer_num,date,start_time,duration&customer_num=in.(${numsP.join(',')})&duration=eq.120&date=gte.${monthStart}&date=lte.${dk}&is_draft=eq.false&limit=2000`):[],
+    numsC.length>1?rest(`records?select=customer_num,companions&customer_num=in.(${numsC.join(',')})&companions=not.is.null&limit=2000`):[],
+  ]);
+  // 當月2+／本月壽星（互斥，2+ 優先）
+  const bday={}; cs.forEach(c=>{ const m=String(c.birthday||'').match(/^\d{4}[\/-](\d{1,2})[\/-](\d{1,2})$/); if(m) bday[c.num]={m:+m[1],d:+m[2]}; });
+  const mon=+dk.slice(5,7);
+  planC.forEach(({ev})=>{
+    const startHM=hmOf(ev.s-1);   // 同日紀錄需早於本筆 1 小時以上，避免把本筆自己的紀錄算進去
+    const prior=rs.filter(r=>r.customer_num===ev.customerNum && (r.date<dk || (r.date===dk && ev.s<24 && String(r.start_time||'').slice(0,5)<startHM)))
+                  .sort((a,b)=>a.date<b.date?-1:1);
+    const priorTl=planC.find(o=>o.ev!==ev && o.ev.customerNum===ev.customerNum && o.ev.s<ev.s);
+    ev.hintWhy=[];
+    if(prior.length || priorTl){ ev.plan='2p'; ev.hintWhy.push(`當月2+：本月 ${prior.length?prior.map(r=>mdOf(r.date)).join('、'):mdOf(dk)+' '+fmt(priorTl.ev.s)} 已做過 120 分`); }
+    else if(bday[ev.customerNum]?.m===mon){ ev.plan='bd'; ev.hintWhy.push(`本月壽星：生日 ${pad(bday[ev.customerNum].m)}/${pad(bday[ev.customerNum].d)}`); }
+  });
+  // 同行：同組內用 union-find 連起「同帳號」與「過去互為同行」
+  const pairs=new Set(); hist.forEach(r=>(r.companions||[]).forEach(o=>{ pairs.add(r.customer_num+'-'+o); pairs.add(o+'-'+r.customer_num); }));
+  const idKey=ev=>ev.customerNum?'#'+ev.customerNum:'n:'+String(ev.displayName||'').trim().toLowerCase();
+  multi.forEach(g=>{
+    const par=g.map((_,i)=>i); const find=i=>par[i]===i?i:(par[i]=find(par[i]));
+    const why=g.map(()=>new Set());
+    for(let a=0;a<g.length;a++) for(let b=a+1;b<g.length;b++){
+      if(g[a].t.staffId===g[b].t.staffId) continue;
+      const A=g[a].ev, B=g[b].ev;
+      const same = idKey(A)===idKey(B) && idKey(A)!=='n:';
+      const past = A.customerNum && B.customerNum && pairs.has(A.customerNum+'-'+B.customerNum);
+      if(same||past){ par[find(a)]=find(b); const w=same?'同帳號':'曾一起來過'; why[a].add(w); why[b].add(w); }
+    }
+    const comp={}; g.forEach((_,i)=>{ (comp[find(i)] ||= []).push(i); });
+    Object.values(comp).filter(c=>c.length>1).forEach(c=>c.forEach(i=>{
+      const {ev}=g[i]; const others=c.filter(k=>k!==i).map(k=>g[k].t.name.split(' ')[0]);
+      ev.cp={ size:c.length, others };
+      (ev.hintWhy ||= []).unshift(`同行：與 ${others.join('、')} 同時段（${[...why[i]].join('、')}）`);
+    }));
+  });
+}
+function hintBubbles(ev){ const ks=hintKeys(ev); if(!ks.length) return null; const d=document.createElement('div'); d.className='hbubs'; d.innerHTML=ks.map(hbub).join(''); return d; }
+function hintLegendHtml(){ return `<span>${hbub('2p')}${HINT_LBL['2p']}</span><span>${hbub('bd')}${HINT_LBL.bd}</span><span>${hbub('cp')}${HINT_LBL.cp}</span><span style="color:var(--text-hint)">依紀錄推測，以櫃台確認為準</span>`; }
+const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp));
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
 function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
-function render(){ isMobile()?renderVertical():renderHorizontal(); }
+function render(){ const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; isMobile()?renderVertical():renderHorizontal(); }
 function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
-function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, t.isTrainee?'trn':(isFree(ev)?'free':`d${durOf(ev)}`), (isToday&&ev.e<NOW)?'past':'', selectedKey===ev.start+t.staffId?'sel':''].join(' '); }
+// 培訓色：老師仍是培訓身分，或預約本身是「培訓新師」方案（轉正過渡期的舊預約）
+const isTrnBk = (t,ev) => t.isTrainee || /培訓/.test(ev.title||'');
+function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, isTrnBk(t,ev)?'trn':(isFree(ev)?'free':`d${durOf(ev)}`), (isToday&&ev.e<NOW)?'past':'', selectedKey===ev.start+t.staffId?'sel':'', hintCls(ev)].join(' '); }
 function attachClick(el,ev,t){ el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); selectedKey=ev.start+t.staffId; openCustomer(ev,t); }); }
 
 /* 橫版 */
@@ -516,13 +607,14 @@ function renderHorizontal(){
           const bw=Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_W-2; buf.style.left=x(ev.e)+'px'; buf.style.width=bw+'px'; lane.appendChild(buf); }
         const el=document.createElement('button');
         el.className=bkClass('bk',t,ev,isToday,NOW);
-        el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title;
+        el.style.left=x(s)+'px'; el.style.width=Math.max(20,(e-s)*HOUR_W-3)+'px'; el.title=ev.title+hintTitle(ev);
         const w=(e-s)*HOUR_W-3;
         el.innerHTML=`<span class="l1">${ev.customerNum?`<span class="num">#${ev.customerNum}</span>`:''}${(w>=70||!ev.customerNum)?`<span class="nm">${esc(ev.displayName)}</span>`:''}</span>
           ${w>=95?`<span class="l2"><span class="t">${compact?fmt(ev.s):`${fmt(ev.s)}–${fmt(ev.e)}`}</span><span class="dur">${durLabel(ev)}</span></span>`:''}`;
         if(w<95) el.classList.add('one');
         attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
         lane.appendChild(el);
+        const hb=hintBubbles(ev); if(hb){ hb.style.left=(x(s)+Math.max(20,(e-s)*HOUR_W-3)+6)+'px'; hb.style.top='-1px'; hb.style.transform='translateX(-100%)'; lane.appendChild(hb); }
       });
       row.append(who,lane); grid.appendChild(row);
     });
@@ -552,7 +644,8 @@ function renderVertical(){
   const sum=document.createElement('div'); sum.className='vsum';
   sum.innerHTML=visibleBranches().map(br=>{ const list=data.teachers.filter(t=>t.branch===br.name);
     const c=list.reduce((n,t)=>n+bookingCount(t),0);
-    return `<span class="b"><span class="bwrap"><span class="bname" style="background:${br.color}">${br.name}</span>${c?`<span class="badge">${c}</span>`:''}</span>${bedsHtml(bedsNow(list,isToday,NOW))}${capHtml(br.name,true)}</span>`; }).join('');
+    return `<span class="b"><span class="bwrap"><span class="bname" style="background:${br.color}">${br.name}</span>${c?`<span class="badge">${c}</span>`:''}</span>${bedsHtml(bedsNow(list,isToday,NOW))}${capHtml(br.name,true)}</span>`; }).join('')
+    + (anyHints()?`<span class="hleg">${hintLegendHtml()}</span>`:'');
   // 表頭
   const corner=document.createElement('div'); corner.className='vhead corner'; corner.textContent='時間'; grid.appendChild(corner);
   cols.forEach(({t,br,first})=>{
@@ -581,10 +674,11 @@ function renderVertical(){
         buf.style.top=y(ev.e)+'px'; buf.style.height=(Math.min(BUFFER/60,CLOSE-ev.e)*HOUR_H-1)+'px'; col.appendChild(buf); }
       const el=document.createElement('button');
       el.className=bkClass('vbk',t,ev,isToday,NOW);
-      el.style.top=(y(s)+1)+'px'; el.style.height=Math.max(18,(e-s)*HOUR_H-3)+'px'; el.title=ev.title;
-      el.innerHTML=`<span class="vdur">${durOf(ev)}分${isFree(ev)?'不指定':''}</span><span class="t">${fmt(ev.s)}</span><span class="c">${esc(ev.displayName)}</span>${ev.customerNum?`<span class="id">#${ev.customerNum}</span>`:''}`;
+      el.style.top=(y(s)+1)+'px'; el.style.height=Math.max(18,(e-s)*HOUR_H-3)+'px'; el.title=ev.title+hintTitle(ev);
+      el.innerHTML=`<span class="t">${fmt(ev.s)}</span><span class="c">${esc(ev.displayName)}</span>${ev.customerNum?`<span class="id">#${ev.customerNum}</span>`:''}`;
       attachClick(el,ev,t); if(el.classList.contains('sel')) selectedEl=el;
       col.appendChild(el);
+      const hb=hintBubbles(ev); if(hb){ hb.style.top=(y(s)-5)+'px'; col.appendChild(hb); }
     });
     grid.appendChild(col);
   });
@@ -622,7 +716,7 @@ async function openCustomer(ev,t){
   const body=document.getElementById('pBody');
   panel.classList.add('open'); scrim.classList.add('on');
   if(!ev.customerNum){
-    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div><p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
+    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div>${ev.hintWhy?.length?`<div class="hdesc">${hintKeys(ev).map(k=>`<div>${hbub(k)}<span>${esc(ev.hintWhy.find(w=>w.startsWith(HINT_LBL[k]))||HINT_LBL[k])}</span></div>`).join('')}</div>`:''}<p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
     return;
   }
   body.innerHTML=`<div class="empty">載入 #${ev.customerNum}…</div>`;
@@ -644,6 +738,7 @@ async function openCustomer(ev,t){
   body.innerHTML=`
     <div class="cnum">顧客編號 #${c.num}</div>
     <div class="cname">${esc(c.name)}</div>
+    ${ev.hintWhy?.length?`<div class="hdesc">${hintKeys(ev).map((k,i)=>`<div>${hbub(k)}<span>${esc(ev.hintWhy.find(w=>w.startsWith(HINT_LBL[k]))||HINT_LBL[k])}</span></div>`).join('')}<small>依紀錄推測，以櫃台確認為準</small></div>`:''}
     <div class="tags">${(c.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>
     <dl class="kv">
       <dt>電話</dt><dd class="mono">${esc(c.phone||'—')}</dd>
