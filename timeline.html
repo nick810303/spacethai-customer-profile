@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>小泰空 · 時間軸</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DotGothic16&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   /* ── 與顧客檔案系統 style-*.css 同一組 tokens ── */
   :root{
@@ -87,37 +87,39 @@
   .beds .on{color:var(--red)} .beds .offb{color:#cfcfcf}
   .beds .bl{font-size:11px;color:var(--text-muted);margin-right:3px}
   /* ── 量能儀表（紅天／綠天／黃金天） ── */
-  .cap{--c:#DF4B3C;--c2:#F08A7E;display:inline-flex;align-items:center;gap:8px;margin-left:14px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .cap.green{--c:#4E9A57;--c2:#8CCB92} .cap.gold{--c:#D9A32B;--c2:#F5D06A}
-  .cap .pill{font-size:12px;font-weight:700;color:#fff;background:var(--c);padding:1px 8px;border-radius:6px;letter-spacing:.5px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
-  .cap.gold .pill{background:linear-gradient(90deg,#E2AA2C,#F2C85B);text-shadow:0 1px 0 rgba(0,0,0,.15)}
-  .cap .lbl{font-size:11px;color:var(--text-muted);margin-left:2px}
-  .cap .bar{position:relative;width:110px;height:5px;border-radius:3px;background:#E6E6E6;flex:none;margin:0 2px}
-  .cap .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--c),var(--c2));transition:width .5s ease}
-  .cap.gold .bar .fill{background:linear-gradient(90deg,#E2AA2C,#F7D774 60%,#FFE79A);box-shadow:0 0 5px rgba(226,170,44,.5)}
-  .cap .bar .tick{position:absolute;top:-2px;bottom:-2px;width:1px;background:#C4C4C4}
-  .cap .bar .tick.gold{background:#D9B15A}
-  .cap .bar .tick::after{content:attr(data-l);position:absolute;top:-11px;left:50%;transform:translateX(-50%);font:400 8px var(--mono);color:#B5B5B5}
-  .cap .bar .tick.gold::after{color:#C9A24A}
-  .cap .bar .ghost{position:absolute;top:-3px;bottom:-3px;width:0;border-left:1px dashed #8a8a8a;opacity:.8}
-  .cap .val{font-family:var(--mono);font-size:13px;color:var(--text);line-height:1}
-  .cap .val b{font-size:15px;font-weight:700}
-  .cap .val small{font-size:11px;color:var(--text-muted)}
-  .cap .ppl{display:inline-flex;gap:1px;align-items:center;position:static}
-  .cap .ppl svg{width:13px;height:15px;display:block;color:var(--c)}
-  .cap .ppl svg.need{color:#D6D6D6}
+  .cap{--c:#C0392B;display:inline-flex;align-items:center;gap:8px;margin-left:14px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .cap.wg{--c:#5DCAA5} .cap.hg{--c:#1A5C35} .cap.gold{--c:#E8960A}
+  /* r80：像素 pill（22px 圓圈動畫，可溢出）→「本日／量能」方框 → 像素血條（canvas）→ 時數。顏色依《小泰空新制說明 v16》 */
+  .cap .pill{display:inline-flex;align-items:center;gap:6px;border-radius:14px;padding:2px 11px 2px 2px;font-size:12px;font-weight:700;color:#fff;background:var(--c);letter-spacing:.3px}
+  .cap.wg .pill{color:#0F4D33}
+  .cap .pic{width:22px;height:22px;border-radius:50%;background:#fff;position:relative;flex:none}
+  .cap .pic svg{position:absolute;left:-2px;top:-2px;overflow:visible;pointer-events:none}
+  .cap .qbox{font-family:'DotGothic16',sans-serif;font-size:10px;line-height:11px;color:#8a7a70;border:1px solid #CFC6BF;border-radius:3px;padding:2px 3px;display:inline-flex;flex-direction:column;align-items:center;letter-spacing:1px;flex:none;font-weight:400}
+  .cap .hpc{display:block;flex:none;image-rendering:pixelated;margin:-6px -4px -2px 0}
+  .cap .hpn{font-family:'DotGothic16',sans-serif;font-size:20px;line-height:1;min-width:66px;font-weight:400}
+  .cap .hpn small{font-size:11px;margin-left:2px;color:var(--text-muted)}
+  svg.px .f{opacity:0}
+  @media (prefers-reduced-motion:reduce){svg.px .f{animation:none!important;opacity:0!important}svg.px .f0{opacity:1!important}}
+  /* 上班老師頭像疊加（r80）：外框＝量能色；虛線空圈＝還差的人數；灰字＝總人數 */
+  .cap .ppl{display:inline-flex;align-items:center;position:static;padding-left:5px}
+  .cap .ppl .cav{position:relative;width:22px;height:22px;margin-left:-6px;border-radius:50%;border:1.5px solid var(--c);box-shadow:0 0 0 1.5px var(--surface);background:var(--surface2);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);flex:none}
+  .cap .ppl .cav img{width:100%;height:100%;object-fit:cover;display:block}
+  .cap .ppl .cav.need{border:1.5px dashed #C4C4C4;background:var(--surface);box-shadow:none}
+  .cap .ppl .cav.more{border-color:#D2D2D2;font:500 9px var(--mono)}
+  .cap .ppl .pcnt{margin-left:5px;font:500 11px var(--mono);color:var(--text-muted)}
   .cap .tag{font-size:10px;color:var(--text-muted);border:1px solid var(--border);padding:0 5px;border-radius:4px;font-family:var(--mono)}
   .cap .delta{font-family:var(--mono);font-size:11px;color:var(--red)}
   .cap.mini{margin-left:6px;gap:4px}
-  .cap.mini .pill{font-size:10px;padding:0 6px}
-  .cap.mini .lbl,.cap.mini .bar,.cap.mini .val,.cap.mini .ppl,.cap.mini .tag,.cap.mini .delta{display:none}
+  .cap.mini .pill{padding:2px}
+  .cap.mini .ptx,.cap.mini .qbox,.cap.mini .hpc,.cap.mini .ppl,.cap.mini .tag,.cap.mini .delta{display:none}
+  .cap.mini .hpn{font-size:13px;min-width:0}
   /* 量能說明框 */
   .cappop{display:none;position:fixed;z-index:60;width:300px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:12px 14px;font-size:12px;line-height:1.55;color:var(--text)}
   .cappop.open{display:block}
   .cappop h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
   .cappop .meter{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
   .cappop .meter .cap{margin:0;cursor:default;gap:6px} .cappop .meter .cap .pill{display:none}
-  .cappop .meter .cap .bar{width:120px}
+  .cappop .meter .cap .ppl,.cappop .meter .cap .tag,.cappop .meter .cap .delta{display:none}
   .cappop .row{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);padding:2px 0}
   .cappop .row b{color:var(--text);font-weight:600}
   .cappop hr{border:0;border-top:1px solid var(--border2);margin:8px 0}
@@ -213,7 +215,7 @@
   .vsum .bname{font-size:11px;padding:0 6px}
   .vsum .beds svg{width:13px;height:13px}
   .vsum{padding:5px 8px} .vsum .b{gap:4px} .vsum .bwrap{margin-right:6px} .vsum .beds{gap:2px;margin-left:0}
-  .vsum .cap.mini{margin-left:3px;padding:2px 5px 2px 3px;gap:4px} .vsum .cap.mini .bar{width:44px}
+  .vsum .cap.mini{margin-left:3px;padding:2px 5px 2px 3px;gap:4px} .vsum .cap.mini .pill{padding:2px}
   /* ── 顧客面板（overlay，預設收合） ── */
   .panel{position:fixed;top:0;right:0;bottom:0;z-index:40;width:var(--panel-w);max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(0,0,0,.10);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
   .panel.open{transform:none;visibility:visible}
@@ -311,7 +313,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   小泰空 顧客檔案系統・時間軸（唯讀）r79
+   小泰空 顧客檔案系統・時間軸（唯讀）r80
    資料：Edge Function `timeline?date=`（teachers + teacher_shift + 各老師 Google 行事曆）
    顧客面板：customers + records（直接讀 Supabase，與顧客檔案系統同一 session）
    版面：寬螢幕＝老師列×時間橫軸；手機直屏＝時間縱軸×上班老師欄
@@ -362,7 +364,177 @@ function bedsNow(list,isToday,NOW){
 }
 // 量能儀表：計畫 vs 實績（過去日＝已記錄的實績；今天＝即時實績；未來＝計畫）
 const GRADE_LBL={red:'紅天',green:'綠天',gold:'黃金天'};
-const PERSON_SVG='<svg viewBox="0 0 12 14" fill="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2.6"/><path d="M1 13.5c0-3.4 2.1-5.6 5-5.6s5 2.2 5 5.6z"/></svg>';
+/* ── r80 量能小卡：像素 pill 動畫（規格見《量能pill像素動畫_定案.js》）──
+   每張影格一個 <symbol>（26×26、1 像素＝1px），用 <use> 疊起來以 steps(1) 輪播；負 delay 對齊全域時鐘，重繪不會跳格 */
+const PX_PAL={}, PXSP=(()=>{
+const P={k:'#2B211C',w:'#FFFFFF',R:'#C0392B',r:'#8E2A1F',p:'#F07A6C',q:'#FFC2B8',y:'#FFD34D',Y:'#E8960A',o:'#A86400',u:'#FFF2B0',z:'#6E4300',h:'#FFE27A',g:'#5DCAA5',n:'#3FAF86',m:'#2E8B60',G:'#1A5C35',l:'#CFF5E4',d:'#6B5A50',D:'#4A3C34',s:'#D8CFC8',S:'#9A8E86'};
+const N=26;
+const rowsPts=rows=>{const o=[];rows.forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=='.')o.push([x,y,c]);}));return o;};
+const sh=(pts,dx,dy)=>pts.map(([x,y,c])=>[x+dx,y+dy,c]);
+function rects(pts){const g={};pts.forEach(([x,y,c])=>{if(x<0||y<0||x>=N||y>=N)return;g[y*100+x]=c;});const byRow={};for(const k in g){const y=Math.floor(k/100),x=k%100;(byRow[y]=byRow[y]||[]).push([x,g[k]]);}
+ let s='';for(const y in byRow){const a=byRow[y].sort((p,q)=>p[0]-q[0]);let i=0;while(i<a.length){let j=i;while(j+1<a.length&&a[j+1][0]===a[j][0]+1&&a[j+1][1]===a[i][1])j++;s+='<rect x="'+a[i][0]+'" y="'+y+'" width="'+(a[j][0]-a[i][0]+1)+'" height="1" fill="'+P[a[i][1]]+'"/>';i=j+1;}}return s;}
+const RING=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const d=Math.hypot(x+0.5-13,y+0.5-13);if(d>=11.2&&d<12.7)RING.push([x,y,Math.atan2(y+0.5-13,x+0.5-13)]);}
+const arc=(k,F,cols,span)=>{span=span||0.55;const c0=-Math.PI/2+k*2*Math.PI/F;const o=[];RING.forEach(([x,y,t])=>{let d=c0-t;while(d<0)d+=2*Math.PI;while(d>=2*Math.PI)d-=2*Math.PI;if(d>Math.PI*span)return;const f=d/(Math.PI*span);o.push([x,y,f<0.15?cols[0]:f<0.5?cols[1]:cols[2]]);});return o;};
+const fullRing=c=>RING.map(([x,y])=>[x,y,c]);
+const star=(cx,cy,L,cc,a1,a2)=>{cc=cc||'w';a1=a1||'h';a2=a2||'u';const o=[[cx,cy,cc]];for(let i=1;i<=L;i++){const c=i===L?a2:a1;o.push([cx+i,cy,c],[cx-i,cy,c],[cx,cy+i,c],[cx,cy-i,c]);}return o;};
+const rays=cols=>{const o=[];for(let i=0;i<8;i++){const t=i*Math.PI/4+Math.PI/8;[11.8,13.0].forEach((r,j)=>{o.push([Math.floor(13+Math.cos(t)*r),Math.floor(13+Math.sin(t)*r),cols[j]]);});}return o;};
+const G16={};
+(()=>{const Lx={2:6,3:6,4:5,5:5,6:4,7:4,8:3,9:3,10:2,11:2,12:1,13:1};
+ const tri=(I,B,extra)=>{const o=[[7,1,'k'],[8,1,'k']];for(let y=2;y<=13;y++){const L=Lx[y],Rt=15-L;o.push([L,y,'k'],[Rt,y,'k']);for(let x=L+1;x<Rt;x++){let c;if(y===12)c='R';else if(y===13)c='r';else if(x===L+1)c='p';else if(x===Rt-1)c='r';else c=y>=4?I:'R';o.push([x,y,c]);}}
+  for(let x=1;x<=14;x++)o.push([x,14,'k']);[[7,6],[8,6],[7,7],[8,7],[7,8],[8,8],[7,10],[8,10],[7,11],[8,11]].forEach(([x,y])=>o.push([x,y,B]));return o.concat(extra||[]);};
+ const hl=y=>[[Lx[y]+1,y,'q'],[Lx[y+1]+1,y+1,'q']];
+ G16.warn=[tri('w','k'),tri('y','k'),tri('w','k'),tri('y','r'),tri('w','k',hl(4)),tri('w','k',hl(7)),tri('w','k',hl(10)),tri('w','k'),tri('w','k')];})();
+(()=>{const dome=[];for(let x=6;x<=9;x++)dome.push([x,3]);for(let y=4;y<=8;y++)for(let x=5;x<=10;x++)dome.push([x,y]);
+ const body=()=>{const o=[];for(let x=6;x<=9;x++)o.push([x,2,'k']);o.push([5,3,'k'],[10,3,'k']);for(let y=4;y<=8;y++)o.push([4,y,'k'],[11,y,'k']);for(let x=3;x<=12;x++)o.push([x,9,'k'],[x,13,'k']);o.push([2,13,'k'],[13,13,'k'],[3,10,'k'],[4,10,'S'],[11,10,'S'],[12,10,'k'],[3,11,'k'],[12,11,'k'],[2,12,'k'],[13,12,'k']);for(let x=5;x<=10;x++)o.push([x,10,'s']);for(let x=4;x<=11;x++)o.push([x,11,'S']);for(let x=3;x<=12;x++)o.push([x,12,'d']);return o;};
+ const fr=(mode,band)=>{const o=body();dome.forEach(([x,y])=>{let c=mode==='front'?'p':mode==='back'?'r':'R';if(mode!=='back'){if(x===5||(y===3&&x===6))c=mode==='front'?'q':'p';if(x===10||(y===3&&x===9))c=mode==='front'?'R':'r';}o.push([x,y,c]);});
+  if(band){const a=band[0],b=band[1];dome.forEach(([x,y])=>{if(x===a||x===b)o.push([x,y,y>=4&&y<=6?'w':'q']);else if(x===a-1||x===b+1)o.push([x,y,'p']);});}return o;};
+ G16.siren=[fr('side',[5,6]),fr('side',[6,7]),fr('front',[7,8]),fr('side',[8,9]),fr('side',[9,10]),fr('back'),fr('back'),fr('back')];})();
+(()=>{const base=["................","...kkkkkkkkkk...","...kssssssssk...","...ksggggggSk...","...ksggggggSk...","...ksggggggSk...","...ksggggggSk...","...ksggggggSk...","...ksggggggSk...","....ksggggSk....","....ksggggSk....",".....ksggSk.....","......ksSk......",".......kk.......","................","................"];
+ const pts=rowsPts(base).map(([x,y,c])=>{if(c!=='g')return [x,y,c];let cc='n';if(x===5&&y<=8)cc='g';if((x===10&&y<=8)||(x===9&&y>=9)||(x===8&&y===11))cc='m';return [x,y,cc];});
+ const field=pts.filter(p=>'gnm'.indexOf(p[2])>=0).map(p=>p[0]+','+p[1]);const isF=(x,y)=>field.indexOf(x+','+y)>=0;
+ const CK=[[10,4],[9,5],[9,6],[8,7],[8,8],[7,9],[5,7],[6,8]];const isC=(x,y)=>CK.some(p=>p[0]===x&&p[1]===y);
+ const ck=[];CK.forEach(([x,y])=>{if(isF(x,y+1)&&!isC(x,y+1))ck.push([x,y+1,'G']);});CK.forEach(([x,y])=>ck.push([x,y,'w']));const all=pts.concat(ck);
+ const gl=c=>all.concat(field.map(s=>s.split(',').map(Number)).filter(([x,y])=>!isC(x,y)&&(x+y===c||x+y===c+1)).map(([x,y])=>[x,y,x+y===c?'l':'g']));
+ G16.shield=[gl(7),gl(9),gl(11),gl(13),gl(15),gl(17),all,all];})();
+function flagFrame(f,big){const o=[];const px=big?6:8,top=big?5:8,h=big?8:6,c0=px+1,c1=big?25:19,amp0=big?2.2:1.4,bot=big?22:19;
+ o.push([px,top-2,'y'],[px,top-1,'Y']);for(let y=top;y<=bot;y++)o.push([px,y,'d']);o.push([px-1,bot+1,'D'],[px,bot+1,'D'],[px+1,bot+1,'D']);
+ const off={};for(let c=c0;c<=c1;c++){const t=(c-c0)/(c1-c0),ph=(c-c0)*0.7-f*Math.PI/3,amp=amp0*t;off[c]=Math.round(amp*Math.sin(ph));const sl=amp*Math.cos(ph);const col=sl>0.25?'m':sl<-0.25?'G':'n';for(let y=top+off[c];y<top+h+off[c];y++)o.push([c,y,y===top+h-1+off[c]?'G':col]);}
+ [13,14].forEach(x=>{o.push([x,top+2+off[x],'w'],[x,top+3+off[x],'w']);});return o;}
+function coin(cx,cy,a,hh,back,thick){const o=[];const inside=(x,y)=>{const dy=(y+0.5-cy)/hh;if(Math.abs(dy)>1)return false;const h=a*Math.sqrt(1-dy*dy);return Math.abs(x+0.5-cx)<=h+0.01;};
+ if(a<1.6){const x0=Math.round(cx)-1,y0=Math.round(cy-hh),y1=Math.round(cy+hh)-1;for(let y=y0+1;y<y1;y++){o.push([x0,y,'Y'],[x0+1,y,'o']);}o.push([x0,y0,'o'],[x0+1,y0,'o'],[x0,y1,'o'],[x0+1,y1,'o']);return o;}
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!inside(x,y))continue;const edge=!inside(x-1,y)||!inside(x+1,y)||!inside(x,y-1)||!inside(x,y+1);const dx=x+0.5-cx,dy=y+0.5-cy,h=a*Math.sqrt(Math.max(0,1-(dy/hh)*(dy/hh)));let c;
+  if(edge)c='o';else{c=back?'Y':'y';if(dx<-h*0.35&&dy<1)c=back?'y':'u';if(dx>h*0.45)c=back?'o':'Y';if(a>=3.5){const r2=(dx/(a-2))*(dx/(a-2))+(dy/(hh-2))*(dy/(hh-2));if(r2>0.72&&r2<1.3)c=back?'o':'Y';}if(a>=4.5&&Math.abs(dx)<1&&Math.abs(dy)<hh*0.36)c=back?'y':'o';}o.push([x,y,c]);}
+ if(thick){for(let y=0;y<N;y++){let ext=null;for(let x=0;x<N;x++)if(inside(x,y))ext=thick>0?x:(ext===null?x:ext);if(ext!==null)o.push([ext+thick,y,'z']);}}return o;}
+P.H='#E9C3A0';
+const SP={};
+const RC={red:['w','y','h'],wg:['w','l','l'],hg:['w','l','n'],gold:['w','u','h']};
+const dist=(x,y,cx,cy)=>Math.hypot(x+0.5-cx,y+0.5-cy);
+const angDiff=(a,b)=>{let d=Math.abs(a-b)%(2*Math.PI);return d>Math.PI?2*Math.PI-d:d;};
+const ringAt=(th,span,cols)=>RING.filter(([x,y,t])=>angDiff(t,th)<span).map(([x,y,t])=>[x,y,angDiff(t,th)<span*0.4?cols[0]:cols[1]]);
+// ── 已定案 ──
+const W=G16.warn.map(f=>sh(f,5,5));
+SP.r3={dur:1.8,frames:W.map((f,i)=>f.concat(i===1?rays(['y','h']):i===3?rays(['w','y']).concat(fullRing('h')):[]))};
+(()=>{const cs=[coin(13,13,7,7.5,false,0),coin(13,13,6,7.5,false,1),coin(13,13,4.2,7.5,false,1),coin(13,13,1.4,7.5,false,0),coin(13,13,4.2,7.5,true,-1),coin(13,13,6,7.5,true,-1),coin(13,13,7,7.5,true,0),coin(13,13,6,7.5,true,-1)];
+ const sp=[star(22,3,3),star(22,3,2),[],[],star(3,22,3),star(3,22,2),[],[]];
+ SP.y1={dur:1.2,frames:cs.map((c,i)=>c.concat(arc(i,8,RC.gold)).concat(sp[i]))};})();
+// ── 假日紅：旋轉警示燈 ──
+const S=G16.siren.map(f=>sh(f,5,5));
+const beam=(side,long)=>{const o=[];const xs=long?[0,1,2,3,4,5,6,7,8]:[6,7,8];xs.forEach(x=>{const X=side==='L'?x:25-x;o.push([X,10,x<3?'y':'p'],[X,11,x<3?'w':'q'],[X,12,x<3?'y':'p']);});if(long){o.push([side==='L'?1:24,9,'y'],[side==='L'?1:24,13,'y']);}return o;};
+const topRays=()=>[[12,1,'y'],[13,1,'y'],[12,2,'w'],[13,2,'w'],[8,3,'y'],[17,3,'y'],[6,5,'p'],[19,5,'p']];
+const sb=(i,long)=>i===0?beam('L',long):i===1?beam('L',false):i===2?topRays():i===3?beam('R',false):i===4?beam('R',long):[];
+const wedge=th=>{const o=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const d=dist(x,y,12.5,10.5);if(d<3||d>13.2)continue;const t=Math.atan2(y+0.5-10.5,x+0.5-12.5);
+ const a=Math.min(angDiff(t,th),angDiff(t,th+Math.PI));const w=0.42-d*0.012;if(a>w)continue;const core=a<w*0.45;const dc=dist(x,y,13,13);o.push([x,y,dc>11?(core?'w':'y'):core?(d<7?'w':'q'):'p']);}return o;};
+const sirenFront=S[2];
+const disc=c=>{const o=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(dist(x,y,13,13)<10.8)o.push([x,y,c]);return o;};
+SP.s5={dur:1.0,frames:[0,1,2,3,4,5,6,7].map(i=>{const on=i===0||i===2;return (on?disc('q'):[]).concat(on?sirenFront:S[6]).concat(on?fullRing(i===0?'y':'w').concat(rays(['w','y'])):[]);})};
+// ── 平日綠：盾牌 ──
+const SH=G16.shield.map(f=>sh(f,5,5));
+(()=>{const base=SH[6];const fieldC='gnm',rimC='sS';
+ const sweep=c=>base.map(([x,y,col])=>{const k=x+y-c;if(Math.abs(k)>1.5)return [x,y,col];if(fieldC.indexOf(col)>=0)return [x,y,Math.abs(k)<0.6?'w':'l'];if(rimC.indexOf(col)>=0)return [x,y,'w'];return [x,y,col];});
+ const outline=[];const occ={};base.forEach(([x,y])=>occ[x+','+y]=1);base.forEach(([x,y,c])=>{if(c!=='k')return;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const k=(x+dx)+','+(y+dy);if(!occ[k]){occ[k]=1;outline.push([x+dx,y+dy,'l']);}});});
+ const halo=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const d=dist(x,y,13,13);if(d>=12.7&&d<13.3)halo.push([x,y,'l']);}
+ const prog=p=>RING.filter(([x,y,t])=>{let a=t+Math.PI/2;while(a<0)a+=2*Math.PI;return a<=p*2*Math.PI;}).map(([x,y])=>[x,y,'l']);
+ const cs=[12,14,16,18,20,22,24];
+ SP.g4={dur:2.4,frames:cs.map(c=>sweep(c)).concat([base.concat(outline).concat(fullRing('w')).concat(halo).concat(star(21,4,3,'w','w','l')),base.concat(fullRing('l'))])};})();
+// ── 假日綠 ──
+
+
+
+// ── 假日綠 第三輪提案 ──
+const HG=(i,F)=>arc(i,F,RC.hg);
+// A. 訊號滿格 v2：每格分兩段長高、長滿時頂端白閃，滿格後頂上冒星星＋外環亮
+
+// B. Wi-Fi 訊號波：點亮 → 三道弧一道道亮起 → 全亮白閃
+
+// C. 四顆愛心血量：遊戲 HP，四顆綠心一顆顆補滿（＝4 人到位）
+(()=>{const HR=[".kk.kk.","kffkffk","kfffffk",".kfffk.","..kfk..","...k..."];
+ const heart=(ox,oy,state)=>{const o=[];HR.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='.')return;let cc;if(c==='k')cc=state?'G':'S';else cc=state===2?'w':state===1?'n':'s';if(state===1&&x===1&&y===1)cc='l';if(state===1&&x===5&&y===2)cc='m';o.push([ox+x,oy+y,cc]);}));return o;};
+ const PO=[[0,1],[8,1],[0,9],[8,9]];
+ const st=(n,popIdx)=>{let o=[];PO.forEach(([x,y],j)=>{o=o.concat(heart(x+1,y+1,j===popIdx?2:j<n?1:0));});return sh(o,5,4);};
+ SP.hC={dur:2.0,frames:[st(0),st(1,0),st(1),st(2,1),st(2),st(3,2),st(3),st(4,3),st(4).concat(fullRing('w')).concat(star(22,3,2,'w','l','l')),st(4).concat(HG(0,4)),st(4).concat(HG(1,4)),st(4).concat(fullRing('l'))]};})();
+// E. 綠色雷達：掃描線繞一圈，依序偵測到四個光點（＝4 人），全找到後外環亮
+
+// F. 綠色印章：印章落下「蓋」出綠色打勾圓章，提起後閃光——「到位確認」
+Object.assign(PX_PAL,P);return SP;})();
+function pxRects(pts){const P=PX_PAL;const g={};pts.forEach(([x,y,c])=>{if(x<0||y<0||x>=26||y>=26)return;g[y*100+x]=c;});const byRow={};for(const k in g){const y=Math.floor(k/100),x=k%100;(byRow[y]=byRow[y]||[]).push([x,g[k]]);}
+ let s='';for(const y in byRow){const a=byRow[y].sort((p,q)=>p[0]-q[0]);let i=0;while(i<a.length){let j=i;while(j+1<a.length&&a[j+1][0]===a[j][0]+1&&a[j+1][1]===a[i][1])j++;s+=`<rect x="${a[i][0]}" y="${y}" width="${a[j][0]-a[i][0]+1}" height="1" fill="${P[a[i][1]]}"/>`;i=j+1;}}return s;}
+(()=>{let defs='',kf='';const seen={};
+ for(const k in PXSP){const sp=PXSP[k],F=sp.frames.length;if(!seen[F]){seen[F]=1;kf+=`@keyframes pxf${F}{0%{opacity:1}${(100/F).toFixed(3)}%{opacity:0}100%{opacity:0}}`;}
+  sp.frames.forEach((pts,i)=>{defs+=`<symbol id="px_${k}_${i}" viewBox="0 0 26 26">${pxRects(pts)}</symbol>`;});}
+ const st=document.createElement('style');st.textContent=kf;document.head.appendChild(st);
+ document.body.insertAdjacentHTML('beforeend',`<svg width="0" height="0" style="position:absolute" aria-hidden="true">${defs}</svg>`);})();
+function pxIcon(k){const sp=PXSP[k],F=sp.frames.length,d=sp.dur,now=(performance.now()/1000)%d;let o=`<svg class="px" viewBox="0 0 26 26" width="26" height="26" shape-rendering="crispEdges" aria-hidden="true">`;
+ for(let i=0;i<F;i++)o+=`<use href="#px_${k}_${i}" class="f f${i}" style="animation:pxf${F} ${d}s steps(1) infinite;animation-delay:-${(((F-i)%F)*d/F+now).toFixed(3)}s"/>`;return o+'</svg>';}
+// 五種狀態（平日／假日 × 紅綠，外加黃金天）
+const CAPK={wr:{t:'平日紅・虧損警報',sp:'r3',cls:'red'},hr:{t:'假日紅・供不應求',sp:'s5',cls:'red'},wg:{t:'平日綠・安全撐住',sp:'g4',cls:'wg'},hg:{t:'假日綠・量能到位',sp:'hC',cls:'hg'},gd:{t:'黃金天・量能充足',sp:'y1',cls:'gold'}};
+const capKind=st=>st.cur.grade==='gold'?'gd':st.cur.grade==='green'?(st.isHoliday?'hg':'wg'):(st.isHoliday?'hr':'wr');
+/* ── r80 像素血條（canvas，1 像素＝1px）：同一天同一分店只充能一次（5 秒 ease-out），之後停在實際值；
+   每分鐘重抓若時數變了，從舊值平滑長到新值；
+   填色碰到 28／35（th.hoursOk／hoursGold）時刻度數字變徽章＋星星；條色依「目前時數」紅→綠→金；數字同步計數 ── */
+const HP={W:120,MAX:45,LBL:11,BY:13,BH:7,CH:29,CW:128,CHG:5};
+const HP_T={red:['#FFB3A8','#F07A6C','#D9493A','#C0392B','#8E2A1F'],green:['#D6F7E8','#8FE0C0','#4CC49A','#2E9E6E','#1E7050'],gold:['#FFF4C2','#FFD34D','#F5B52A','#E8960A','#A86400']};
+const HP_TRACK=['#F3EEE9','#EDE7E1','#E8E1DA','#E1D9D1','#D6CCC3'];
+const HP_REDUCE=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const HP_SEEN={};   // key（日期｜分店）→ {from, v, t0}：記住已播過的充能
+function hpState(key,v,now){let s=HP_SEEN[key];
+ if(!s){s=HP_SEEN[key]={from:0,v,t0:now};}
+ else if(s.v!==v){const c=hpCycle(s,now);s.from=c.cur;s.v=v;s.t0=now;}
+ return s;}
+function hpCycle(s,now){const u=now-s.t0;if(HP_REDUCE||u>=HP.CHG)return {cur:s.v,charging:false,fade:1,u};
+ const p=u/HP.CHG,e=1-Math.pow(1-p,2.4);return {cur:s.from+(s.v-s.from)*e,charging:true,fade:1,u};}
+// 充能曲線跨過 h 的時間點（沒跨過就 -1）
+const hpCross=(s,h)=>{if(!(s.v>=h&&s.from<h))return -1;const e=(h-s.from)/(s.v-s.from);return HP.CHG*(1-Math.pow(1-e,1/2.4));};
+function hpDraw(cv,s,ok,gold,plan,t,now){
+ if(!cv._g){const d=Math.max(2,Math.ceil(window.devicePixelRatio||1));cv.width=HP.CW*d;cv.height=HP.CH*d;cv.style.width=HP.CW+'px';cv.style.height=HP.CH+'px';const g=cv.getContext('2d');g.setTransform(d,0,0,d,0,0);g.imageSmoothingEnabled=false;cv._g=g;}
+ const g=cv._g,R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);},X=h=>Math.round(Math.min(h,HP.MAX)/HP.MAX*HP.W);
+ const {W,BY,BH,LBL}=HP,x28=X(ok),x35=X(gold),c=hpCycle(s,now),cur=c.cur,w=X(cur),z=cur>=gold?'gold':cur>=ok?'green':'red',T=HP_T[z];
+ g.clearRect(0,0,HP.CW,HP.CH);
+ R(1,BY,W,1,'#3A2E28');R(1,BY+BH-1,W,1,'#3A2E28');R(0,BY+1,1,BH-2,'#3A2E28');R(W+1,BY+1,1,BH-2,'#3A2E28');
+ for(let r=0;r<5;r++)R(1,BY+1+r,W,1,HP_TRACK[r]);
+ if(plan!=null&&!isNaN(plan)){const xp=X(plan);for(let r=0;r<5;r+=2)R(xp,BY+1+r,1,1,'#8a8a8a');}
+ g.globalAlpha=Math.max(0,c.fade);
+ for(let r=0;r<5;r++)R(1,BY+1+r,w,1,T[r]);
+ if(!HP_REDUCE){const off=Math.floor(t/0.16);for(let x=1;x<=w;x++)for(let r=1;r<=3;r++){if(((x-r-off)%6+6)%6===0)R(x,BY+1+r,1,1,r===1?'#fff':T[r-1]);}}
+ for(let r=0;r<5;r+=2)if(w>0)R(w+1,BY+1+r,1,1,T[Math.min(4,r+1)]);
+ if(c.charging&&w>0){for(let r=0;r<5;r++){R(w,BY+1+r,1,1,'#fff');if(w>1)R(w-1,BY+1+r,1,1,T[0]);}const k=(t*3)%1;[[1,-1],[2,-2],[0,-3]].forEach(([dx,dy],i)=>R(w+1+Math.round(dx*k*2),BY+2+Math.round(dy*k*2)-i%2,1,1,i===1?T[1]:'#fff'));}
+ else if(w>0&&!HP_REDUCE){const P=2.4,ph=(t%P)/P,pos=Math.round(ph*(w+10))-5;for(let dx=-2;dx<=2;dx++){const x=pos+dx;if(x<1||x>w)continue;const a=Math.abs(dx);for(let r=0;r<5;r++){if(a===2&&(r===0||r===4))continue;R(x,BY+1+r,1,1,a===0?'#fff':a===1?T[0]:T[1]);}}}
+ g.globalAlpha=1;
+ R(x28,BY-1,1,BH+2,cur>=ok?HP_T.green[3]:'#B9AFA7');R(x35,BY-1,1,BH+2,cur>=gold?HP_T.gold[3]:'#B9AFA7');
+ const k28=hpCross(s,ok),k35=hpCross(s,gold),a28=k28>=0?c.u-k28:-1,a35=k35>=0?c.u-k35:-1;
+ const bump=a=>a>=0&&a<0.25?2:a>=0.25&&a<0.4?1:0;
+ const lbl=(x,txt,chip,b)=>{g.font='9px DotGothic16';g.textAlign='center';g.textBaseline='alphabetic';const y=LBL-1-b;
+  if(chip){const tw=Math.round(g.measureText(txt).width+6),x0=Math.round(x-tw/2);R(x0,y-9,tw,10,chip);R(x0+1,y-10,tw-2,1,chip);R(x0+1,y+1,tw-2,1,chip);g.fillStyle='#fff';g.fillText(txt,x+0.5,y-0.5);}
+  else{g.fillStyle='#B9AFA7';g.fillText(txt,x+0.5,y);}};
+ const r28=cur>=ok&&c.fade>0.5,r35=cur>=gold&&c.fade>0.5;
+ lbl(x28,String(ok),r28?HP_T.green[3]:null,bump(a28));lbl(x35,String(gold),r35?HP_T.gold[3]:null,bump(a35));
+ const star=(x,y,c1,c2)=>{R(x,y-2,1,5,c2);R(x-2,y,5,1,c2);R(x,y-1,1,3,c1);R(x-1,y,3,1,c1);R(x,y,1,1,'#fff');};
+ if(a28>=0&&a28<0.9&&!(a35>=0&&a35<1.2)){star(x28+9,3,HP_T.green[1],HP_T.green[3]);if(a28<0.5)star(x28-9,6,HP_T.green[0],HP_T.green[2]);}
+ if(a35>=0&&a35<1.2){star(x35+9,3,'#FFD34D','#E8960A');star(x35-9,5,'#FFD34D','#E8960A');if(a35<0.6)star(x35+14,8,'#FFF4C2','#F5B52A');}
+ return c;}
+// 全域動畫迴圈：每張 .cap 依自己的 data-hpv 畫血條、跳數字；充能只在第一次看到（或數值改變）時播
+(function hpLoop(){const now=performance.now()/1000;
+ document.querySelectorAll('.cap[data-hpv]').forEach(cap=>{const v=+cap.dataset.hpv,ok=+cap.dataset.ok,gold=+cap.dataset.gold,plan=cap.dataset.plan===''?null:+cap.dataset.plan,tt=now+(+cap.dataset.off||0);
+  const s=hpState(cap.dataset.key+(cap.classList.contains('mini')?'|m':''),v,now);
+  const cv=cap.querySelector('.hpc');const c=cv?hpDraw(cv,s,ok,gold,plan,tt,now):hpCycle(s,now);
+  const n=cap.querySelector('.hpn');if(n&&n.firstChild){n.firstChild.nodeValue=c.cur.toFixed(2);n.style.color=c.cur>=gold?'#B87400':c.cur>=ok?'#1E7050':'#8E2A1F';}});
+ requestAnimationFrame(hpLoop);})();
+
+// 上班老師（未來＝排班計畫；今天／過去＝實績區間 > 0）→ 頭像疊加，最多 6 個，其餘收成 +N
+function capPeople(st){
+  const key = st.future ? 'planHours' : 'actualHours';
+  return st.c.teachers.filter(x=>x[key]>0).map(x=>data.teachers.find(t=>t.staffId===x.staffId)).filter(Boolean);
+}
+function capAvatars(st){
+  const ppl=capPeople(st), n=st.cur.headcount, MAXAV=6;
+  const shown = ppl.length>MAXAV ? ppl.slice(0,MAXAV-1) : ppl;
+  const rest = ppl.length-shown.length;
+  let z=20, html=shown.map(t=>{ const zh=t.name.split(' ')[0];
+    return `<span class="cav" style="z-index:${z--}">${t.avatar?`<img src="${esc(t.avatar)}" alt="" loading="lazy" data-z="${esc(zh)}" onerror="this.replaceWith(this.dataset.z)">`:esc(zh)}</span>`; }).join('');
+  if(rest>0) html+=`<span class="cav more" style="z-index:${z--}">+${rest}</span>`;
+  for(let i=n;i<st.need;i++) html+=`<span class="cav need" style="z-index:${z--}"></span>`;
+  const names=ppl.map(t=>t.name.split(' ')[0]).join('、');
+  return `<span class="ppl" title="上班 ${n} 人${names?`：${names}`:''}（門檻 ${st.need} 人）">${html}<span class="pcnt">${n}人</span></span>`;
+}
 function capState(brName){
   const cap=data.capacity; if(!cap||!cap.branches[brName]) return null;
   const c=cap.branches[brName], th=cap.thresholds, today=todayKey();
@@ -373,16 +545,16 @@ function capState(brName){
   const dH=Math.round((cur.hours-c.plan.hours)*100)/100, dN=cur.headcount-c.plan.headcount;
   const diff=(!future && (dH!==0||dN!==0));
   const cuts=c.teachers.filter(t=>t.cut.length).map(t=>`${t.name.split(' ')[0]}（${t.cut.join('、')}）`);
-  return { c, th, cur, tag, need, dH, dN, diff, cuts, isHoliday:cap.isHoliday, holidayName:cap.holidayName, future, past };
+  return { c, th, cur, tag, need, dH, dN, diff, cuts, isHoliday:cap.isHoliday, holidayName:cap.holidayName, future, past, brName };
 }
 function capMeter(st, cls){
-  const MAX=45, pct=v=>Math.min(100,v/MAX*100); const {cur,c,th,need,diff}=st;
-  const n=cur.headcount, icons=Array.from({length:Math.max(n,need)},(_,i)=>`${i<n?PERSON_SVG:PERSON_SVG.replace('<svg','<svg class="need"')}`).join('');
-  return `<span class="cap ${cur.grade}${cls||''}">
-    <span class="pill">${GRADE_LBL[cur.grade]}</span><span class="lbl">量能</span>
-    <span class="bar"><i class="fill" style="width:${pct(cur.hours)}%"></i><b class="tick" data-l="${th.hoursOk}" style="left:${pct(th.hoursOk)}%"></b><b class="tick gold" data-l="${th.hoursGold}" style="left:${pct(th.hoursGold)}%"></b>${diff?`<i class="ghost" style="left:${pct(c.plan.hours)}%"></i>`:''}</span>
-    <span class="val"><b>${cur.hours}</b><small>h</small></span>
-    <span class="ppl" title="今日上班 ${n} 人（門檻 ${need} 人）">${icons}</span>
+  const {cur,c,th,diff}=st; const K=CAPK[capKind(st)];
+  return `<span class="cap ${K.cls}${cls||''}" data-hpv="${cur.hours}" data-ok="${th.hoursOk}" data-gold="${th.hoursGold}" data-plan="${diff?c.plan.hours:''}" data-key="${dateKey}|${st.brName}" data-off="${Math.max(0,BRANCHES.findIndex(b=>b.name===st.brName))*0.7}">
+    <span class="pill" title="${K.t}"><span class="pic">${pxIcon(K.sp)}</span><span class="ptx">${K.t}</span></span>
+    <span class="qbox"><span>本日</span><span>量能</span></span>
+    <canvas class="hpc" aria-label="量能 ${cur.hours} 小時"></canvas>
+    <span class="hpn">${Number(cur.hours).toFixed(2)}<small>h</small></span>
+    ${capAvatars(st)}
     ${diff?`<span class="delta">${st.dH>0?'+':''}${st.dH}h${st.dN?` ${st.dN>0?'+':''}${st.dN}人`:''}</span>`:''}
     ${st.tag?`<span class="tag">${st.tag}</span>`:''}</span>`;
 }
@@ -396,7 +568,7 @@ function capPopHtml(brName){
   const st=capState(brName); if(!st) return '';
   const {c,th,cur,need,cuts,tag}=st;
   const dayType = st.isHoliday ? `假日類${st.holidayName?`（${st.holidayName}）`:''}` : '平日';
-  return `<h4>${brName}・${GRADE_LBL[cur.grade]}${tag?`<span class="tag" style="font-size:10px;border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text-muted);font-weight:400">${tag}</span>`:''}</h4>
+  return `<h4>${brName}・${CAPK[capKind(st)].t}${tag?`<span class="tag" style="font-size:10px;border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text-muted);font-weight:400">${tag}</span>`:''}</h4>
     <div class="meter">${capMeter(st,'')}</div>
     <div class="row"><span>${tag||'目前'}量能</span><b>${cur.hours} 小時・${cur.headcount} 人</b></div>
     ${st.future?'':`<div class="row"><span>班表計畫</span><b>${c.plan.hours} 小時・${c.plan.headcount} 人（${GRADE_LBL[c.plan.grade]}）</b></div>`}
@@ -404,9 +576,9 @@ function capPopHtml(brName){
     <div class="row"><span>日型</span><b>${dayType}，需 ${need} 人</b></div>
     <hr>
     <p><b>量能</b>＝當天所有上班老師的排班時數加總（每人「到 − 從」）。「到」是最後可接受預約的開始時間，所以它衡量的是<b>供給端準備了多少火力</b>，不是客人現在還能約到的時段。</p>
-    <p><span class="g" style="background:#DF4B3C"></span><b>紅天</b>：量能 &lt; ${th.hoursOk}h，或人數不足（平日 &lt; ${th.nWeekday}、假日 &lt; ${th.nHoliday}）→ 供給吃緊，要補班。</p>
-    <p><span class="g" style="background:#4E9A57"></span><b>綠天</b>：量能 ≥ ${th.hoursOk}h 且人數達標 → 守得住。</p>
-    <p><span class="g" style="background:#D9A32B"></span><b>黃金天</b>：量能 ≥ ${th.hoursGold}h 且 ≥ ${th.nGold} 人 → 火力全開，適合導流。</p>
+    <p><span class="g" style="background:#C0392B"></span><b>紅天</b>：量能 &lt; ${th.hoursOk}h，或人數不足（平日 &lt; ${th.nWeekday}、假日 &lt; ${th.nHoliday}）→ 供給吃緊，要補班。</p>
+    <p><span class="g" style="background:linear-gradient(90deg,#5DCAA5 50%,#1A5C35 50%)"></span><b>綠天</b>：量能 ≥ ${th.hoursOk}h 且人數達標 → 守得住。</p>
+    <p><span class="g" style="background:#E8960A"></span><b>黃金天</b>：量能 ≥ ${th.hoursGold}h 且 ≥ ${th.nGold} 人 → 火力全開，適合導流。</p>
     <p>實績＝班表區間扣掉開頭／結尾被標為休、病假等的占用（中間的占用與公務不算），打烊後自動記錄。</p>`;
 }
 function openCapPop(el){
