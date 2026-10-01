@@ -67,7 +67,7 @@ const D=[];for(let i=0;i<120;i++){const num=1+Math.floor(rnd()*3999);const visit
 const R=[...new Map(D.map(d=>[d.num,d])).values()];
 const TIER={vip:['重要常客','#B7791F'],reg:['固定回訪','#2F8F5B'],occ:['偶爾到訪','#2F6FB5'],dormant:['久未回訪','#7C8794'],once:['僅來一次','#9A8F88']};
 const ST={nj:['南京三民','#2F5E4A'],zs:['中山','#B84E2C']};
-const S={q:'',t:new Set(),s:null,l:new Set(),sp:[null,null],vi:[null,null],g:null,sort:'num',dir:1,cols:{tier:1,spend:1,visits:1,gap:0,last:1,main:1,phone:0,cc:0,bday:0,tag:0,note:0}};
+const S={q:'',t:new Set(),s:null,l:new Set(),cc:new Set(),sp:[null,null],vi:[null,null],g:null,sort:'num',dir:1,cols:{tier:1,spend:1,visits:1,gap:0,last:1,main:1,phone:0,cc:0,bday:0,tag:0,note:0}};
 const GAPS=[['30 天內',0,30],['31–90 天',31,90],['91–180 天',91,180],['181–365 天',181,365],['超過 365 天',366,9999]];
 const topT=d=>{const e=Object.entries(d.teachers).sort((a,b)=>b[1]-a[1]);const tot=e.reduce((a,b)=>a+b[1],0);return e[0]?[e[0][0],Math.round(e[0][1]/tot*100)]:['—',0]};
 const withT=d=>[...S.t].reduce((a,t)=>a+(d.teachers[t]||0),0);
@@ -75,13 +75,13 @@ const COLS=[['num','編號',1,'num'],['name','姓名',1,'name'],['tier','級別'
 const val=(d,k)=>k==='num'?d.num:k==='name'?d.name:k==='tier'?['vip','reg','occ','dormant','once'].indexOf(d.tier):k==='spend'?d.spend:k==='visits'?d.visits:k==='gap'||k==='last'?d.gap:k==='main'?topT(d)[1]:k==='withT'?withT(d):k==='bday'?parseInt(d.bday):String(d[k]||'');
 const DESC=new Set(['spend','visits','main','withT']);
 function match(d){const q=S.q.trim();if(q){for(const w of q.toLowerCase().split(/\s+/).filter(Boolean)){const ww=w.replace(/^#/,'');const ok=(/^\d+$/.test(ww)&&String(d.num).includes(ww))||d.name.toLowerCase().includes(ww)||d.phone.replace(/\s/g,'').includes(ww)||(d.cc+d.region).toLowerCase().includes(ww)||(d.tag||'').toLowerCase().includes(ww)||(d.note||'').includes(ww);if(!ok)return false}}
- if(S.t.size&&![...S.t].some(t=>d.teachers[t]))return false;if(S.s&&!(S.s==='both'?d.store==='both':(d.store===S.s||d.store==='both')))return false;if(S.l.size&&!S.l.has(d.tier))return false;
+ if(S.t.size&&![...S.t].some(t=>d.teachers[t]))return false;if(S.s&&!(S.s==='both'?d.store==='both':(d.store===S.s||d.store==='both')))return false;if(S.l.size&&!S.l.has(d.tier))return false;if(S.cc.size&&!S.cc.has(d.cc))return false;
  if(S.sp[0]!=null&&d.spend<S.sp[0])return false;if(S.sp[1]!=null&&d.spend>S.sp[1])return false;if(S.vi[0]!=null&&d.visits<S.vi[0])return false;if(S.vi[1]!=null&&d.visits>S.vi[1])return false;
  if(S.g!=null){const g=GAPS[S.g];if(d.gap<g[1]||d.gap>g[2])return false}return true}
 function why(d){const q=S.q.trim();if(!q)return'';const o=[];q.toLowerCase().split(/\s+/).filter(Boolean).forEach(w=>{const ww=w.replace(/^#/,'');if(!/^\d+$/.test(ww)||!String(d.num).includes(ww)){if(d.phone.replace(/\s/g,'').includes(ww)&&!d.name.toLowerCase().includes(ww))o.push('電話 …'+d.phone.slice(-4));else if((d.cc+d.region).toLowerCase().includes(ww))o.push('國碼 '+d.cc);else if((d.tag||'').toLowerCase().includes(ww))o.push('標籤：'+d.tag);else if((d.note||'').includes(ww))o.push('備注')}});return o.map(x=>`<span class="hit">${x}</span>`).join('')}
 const IC='<svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></svg>';
 function fbtn(k,label,n){return `<button class="fb${n?' on':''}" data-k="${k}">${IC}${label}${n?`<span class="n">${n}</span>`:''}</button>`}
-function renderFl(){const f=[['t','老師',S.t.size],['s','訪點',S.s?1:0],['l','級別',S.l.size],['sp','累計消費',S.sp[0]!=null||S.sp[1]!=null?1:0],['vi','次數',S.vi[0]!=null||S.vi[1]!=null?1:0],['g','距上次',S.g!=null?1:0]];const any=f.some(x=>x[2]);document.getElementById('fl').innerHTML=f.map(x=>fbtn(x[0],x[1],x[2])).join('')+(any?'<button class="fb ghost" data-k="clr">清除條件</button>':'');document.querySelectorAll('#fl .fb').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.k==='clr'){S.t.clear();S.s=null;S.l.clear();S.sp=[null,null];S.vi=[null,null];S.g=null;render();return}openPop(b.dataset.k,b)})}
+function renderFl(){const f=[['t','老師',S.t.size],['s','訪點',S.s?1:0],['l','級別',S.l.size],['cc','國碼',S.cc.size],['sp','累計消費',S.sp[0]!=null||S.sp[1]!=null?1:0],['vi','次數',S.vi[0]!=null||S.vi[1]!=null?1:0],['g','距上次',S.g!=null?1:0]];const any=f.some(x=>x[2]);document.getElementById('fl').innerHTML=f.map(x=>fbtn(x[0],x[1],x[2])).join('')+(any?'<button class="fb ghost" data-k="clr">清除條件</button>':'');document.querySelectorAll('#fl .fb').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.k==='clr'){S.t.clear();S.s=null;S.l.clear();S.cc.clear();S.sp=[null,null];S.vi=[null,null];S.g=null;render();return}openPop(b.dataset.k,b)})}
 const pop=document.getElementById('pop');let curK=null;
 function openPop(k,el){if(curK===k&&pop.classList.contains('on')){pop.classList.remove('on');curK=null;return}curK=k;const r=el.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-300,r.left))+'px';pop.style.top=(r.bottom+6)+'px';fillPop(k);pop.classList.add('on')}
 function chipset(items,isOn,fn){return '<div class="opts">'+items.map(([k,l])=>`<span class="opt${isOn(k)?' on':''}" data-k="${k}">${l}</span>`).join('')+'</div>'}
@@ -89,14 +89,15 @@ function fillPop(k){let h='';
  if(k==='t')h='<h6>老師（做過的客人・可多選）</h6>'+chipset(TEACH.map(t=>[t,t]),x=>S.t.has(x));
  if(k==='s')h='<h6>訪點</h6>'+chipset([['nj','南京三民'],['zs','中山'],['both','兩間都去過']],x=>S.s===x);
  if(k==='l')h='<h6>顧客級別（可多選）</h6>'+chipset(Object.entries(TIER).map(([a,b])=>[a,b[0]]),x=>S.l.has(x));
+ if(k==='cc')h='<h6>國碼／地區（可多選）</h6>'+chipset(CC.map(c=>[c[0],c[1]+' '+c[0]]),x=>S.cc.has(x));
  if(k==='g')h='<h6>距上次來</h6>'+chipset(GAPS.map((g,i)=>[i,g[0]]),x=>S.g===+x);
  if(k==='sp')h='<h6>累計消費（元）</h6><div class="rg"><input id="a1" type="number" placeholder="最低" value="'+(S.sp[0]??'')+'"> 〜 <input id="a2" type="number" placeholder="最高" value="'+(S.sp[1]??'')+'"></div>';
  if(k==='vi')h='<h6>到訪次數</h6><div class="rg"><input id="a1" type="number" placeholder="最少" value="'+(S.vi[0]??'')+'"> 〜 <input id="a2" type="number" placeholder="最多" value="'+(S.vi[1]??'')+'"></div>';
  if(k==='cols')h='<h6>顯示的欄位</h6>'+chipset(COLS.slice(2).map(c=>[c[0],c[1]]),x=>S.cols[x]);
  pop.innerHTML=h+'<div class="pf"><a id="pc">清除此項</a><a id="pd">完成</a></div>';
- pop.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{const v=o.dataset.k;if(k==='t')S.t.has(v)?S.t.delete(v):S.t.add(v);if(k==='s')S.s=S.s===v?null:v;if(k==='l')S.l.has(v)?S.l.delete(v):S.l.add(v);if(k==='g')S.g=S.g===+v?null:+v;if(k==='cols')S.cols[v]=S.cols[v]?0:1;fillPop(k);render(true)});
+ pop.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{const v=o.dataset.k;if(k==='t')S.t.has(v)?S.t.delete(v):S.t.add(v);if(k==='s')S.s=S.s===v?null:v;if(k==='l')S.l.has(v)?S.l.delete(v):S.l.add(v);if(k==='cc')S.cc.has(v)?S.cc.delete(v):S.cc.add(v);if(k==='g')S.g=S.g===+v?null:+v;if(k==='cols')S.cols[v]=S.cols[v]?0:1;fillPop(k);render(true)});
  if(k==='sp'||k==='vi'){const key=k;pop.querySelector('#a1').oninput=e=>{S[key][0]=e.target.value===''?null:+e.target.value;render(true)};pop.querySelector('#a2').oninput=e=>{S[key][1]=e.target.value===''?null:+e.target.value;render(true)}}
- document.getElementById('pc').onclick=()=>{if(k==='t')S.t.clear();if(k==='s')S.s=null;if(k==='l')S.l.clear();if(k==='g')S.g=null;if(k==='sp')S.sp=[null,null];if(k==='vi')S.vi=[null,null];fillPop(k);render(true)};document.getElementById('pd').onclick=()=>{pop.classList.remove('on');curK=null}}
+ document.getElementById('pc').onclick=()=>{if(k==='t')S.t.clear();if(k==='s')S.s=null;if(k==='l')S.l.clear();if(k==='cc')S.cc.clear();if(k==='g')S.g=null;if(k==='sp')S.sp=[null,null];if(k==='vi')S.vi=[null,null];fillPop(k);render(true)};document.getElementById('pd').onclick=()=>{pop.classList.remove('on');curK=null}}
 document.addEventListener('click',e=>{if(!pop.contains(e.target)&&!e.target.closest('.fb')){pop.classList.remove('on');curK=null}});
 document.getElementById('cols').onclick=e=>{e.stopPropagation();openPop('cols',e.currentTarget)};
 function render(keep){renderFl();const showT=S.t.size>0;
