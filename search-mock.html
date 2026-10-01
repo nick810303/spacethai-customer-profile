@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
+<title>顧客搜尋 mockup（假資料）</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F1ED;--card:#fff;--br:#E7DAD2;--br2:#F0E8E2;--t:#2C2520;--m:#7A6C64;--h:#A89B93;--hd:#F3ECE6;--zb:#FBF8F5;--bd:#8C513C;--ac:#8C5E48}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1F1B19;--card:#2A2523;--br:#443B36;--br2:#38302C;--t:#F1E9E4;--m:#B8A9A0;--h:#8C7F77;--hd:#352F2C;--zb:#2F2926;--bd:#E0B3A0;--ac:#C9A084}}
+:root[data-theme=dark]{--bg:#1F1B19;--card:#2A2523;--br:#443B36;--br2:#38302C;--t:#F1E9E4;--m:#B8A9A0;--h:#8C7F77;--hd:#352F2C;--zb:#2F2926;--bd:#E0B3A0;--ac:#C9A084}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:13px/1.4 Manrope,'Noto Sans TC',sans-serif;font-variant-numeric:tabular-nums;padding-inline:12px;padding-block:14px 40px}
+h1{font-size:15px;margin:0 0 3px}.sub{font-size:11px;color:var(--m);margin:0 0 10px}
+.app{max-width:960px;margin:0 auto}
+.tb{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.inp{flex:1 1 220px;display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--br);border-radius:8px;padding:0 10px;height:34px;min-width:0}
+.inp input{flex:1;border:0;outline:0;background:transparent;font:500 13px Manrope,'Noto Sans TC';color:var(--t);min-width:0}
+.inp svg,.fb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;color:var(--h)}
+.fl{display:flex;gap:6px;margin-top:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;position:relative}.fl::-webkit-scrollbar{display:none}
+.fb{flex:none;height:28px;border-radius:7px;border:1px solid var(--br);background:var(--card);color:var(--t);font:600 12px Manrope,'Noto Sans TC';padding:0 9px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.fb.on{background:#3D2E26;color:#fff;border-color:#3D2E26}.fb.on svg{color:#fff}.fb .n{background:rgba(255,255,255,.22);border-radius:999px;font:700 10px Manrope;padding:0 6px;line-height:15px}
+.fb.ghost{border-style:dashed;color:var(--m)}
+.pop{position:fixed;z-index:50;background:var(--card);border:1px solid var(--br);border-radius:10px;box-shadow:0 14px 34px rgba(60,40,30,.2);padding:10px;width:min(290px,calc(100vw - 24px));display:none}
+.pop.on{display:block}.pop h6{margin:0 0 7px;font:700 11px Manrope,'Noto Sans TC';color:var(--h);letter-spacing:.05em}
+.opts{display:flex;flex-wrap:wrap;gap:5px}.opt{border:1px solid var(--br);background:var(--card);border-radius:6px;font:600 12px Manrope,'Noto Sans TC';padding:4px 9px;cursor:pointer;color:var(--t)}.opt.on{background:#3D2E26;color:#fff;border-color:#3D2E26}
+.rg{display:flex;gap:6px;align-items:center;color:var(--m);font-size:12px}.rg input{width:92px;height:30px;border:1px solid var(--br);border-radius:6px;padding:0 8px;font:600 12px Manrope;background:var(--card);color:var(--t)}
+.pf{display:flex;justify-content:space-between;margin-top:9px;font-size:11px}.pf a{color:var(--ac);font-weight:700;cursor:pointer}
+.meta{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 5px;font-size:11px;color:var(--m)}.meta b{color:var(--t)}
+.tw{background:var(--card);border:1px solid var(--br);border-radius:10px;overflow:auto;max-height:560px;position:relative}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:620px;font-size:12px}
+th,td{padding:0 8px;height:30px;white-space:nowrap;border-bottom:1px solid var(--br2);text-align:left}
+th{position:sticky;top:0;z-index:3;background:var(--hd);font:700 11px Manrope,'Noto Sans TC';color:var(--m);cursor:pointer;user-select:none;height:30px;border-bottom:1px solid var(--br)}
+th.r,td.r{text-align:right}th .ar{display:inline-block;width:10px;color:var(--ac);font-size:9px}
+th.on{color:var(--t)}
+tbody tr:nth-child(even) td{background:var(--zb)}tbody tr:hover td{background:#F3E8DF}
+.stk{position:sticky;left:0;z-index:2;background:var(--card)}th.stk{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk{background:var(--zb)}
+.stk2{position:sticky;left:58px;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--br)}th.stk2{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk2{background:var(--zb)}
+td.num{font:700 12px Manrope;color:var(--bd);width:58px;min-width:58px}td.num i{font-style:normal;opacity:.5;font-size:10px}
+td.nm{font-weight:700;max-width:130px;min-width:96px;overflow:hidden;text-overflow:ellipsis}
+.tg{display:inline-flex;align-items:center;gap:4px;font:700 10px/1 'Noto Sans TC';color:#fff;border-radius:4px;padding:3px 6px}
+.sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:2px}
+.sub2{color:var(--h);font-size:10px}
+.hit{font-size:10px;color:var(--ac);background:#F6EBE3;border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600}
+.note{font-size:12px;color:var(--m);max-width:860px;margin:16px auto 0;line-height:1.8}
+</style>
+
+</head><body>
+<h1>顧客搜尋（專業版・資料表格）</h1>
+<p class="sub">120 位虛構客人。點欄位標題排序、點上方篩選鈕展開條件、右側「欄位」可增減顯示的欄。手機寬度下左邊兩欄（編號、姓名）固定，其他欄左右滑動。</p>
+<div class="app">
+ <div class="tb"><div class="inp"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="編號、姓名、電話、國碼、標籤、備注（空格＝而且）"></div><button class="fb ghost" id="cols"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>欄位</button></div>
+ <div class="fl" id="fl"></div>
+ <div class="meta"><span id="cnt"></span><span id="act"></span></div>
+ <div class="tw"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+</div>
+<div class="pop" id="pop"></div>
+<p class="note"><b>這一版的做法</b>：<br>• 改成「資料表格」：每位客人一行、約 30px 高，固定欄寬、數字靠右對齊，所以資料再多、名字再長，格式都不會跑掉（名字超過就用 … 截斷，點進去看完整）。<br>• 欄位標題就是排序鈕：點一下由大到小、再點由小到大，目前排序欄會有箭頭。<br>• 篩選條件變成一排小工具列（老師、訪點、級別、累計、次數、距上次），點開是小視窗，選了的鈕會變深色並顯示數字。<br>• 「欄位」鈕可以多開電話、國碼、標籤、備注欄，想看多少看多少。<br>• 搜尋命中的位置會在行尾標示（例如「電話 …1234」「標籤：怕冷」）。<br>• 一次只載一部分，往下捲動再載入，量大也不卡。</p>
+<script>
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;const pick=a=>a[Math.floor(rnd()*a.length)];
+const TEACH=['澈','獺','令','悟','沐','昇','汪','書','柏','鍛','曜','源','寧','椰','昊','栩','尚','浤'];
+const FAM=['林','陳','王','張','李','黃','吳','周','許','蔡'],GIV=['小明','怡君','建宏','雅婷','志豪','佳穎','柏翰','淑芬','宗翰','欣怡'],EN=['Alex','Mina','Ken','Jo','Sam','Rin','Tom','Ivy','Leo','Eva'];
+const CC=[['+886','台灣',70],['+852','香港',10],['+81','日本',8],['+65','新加坡',4],['+1','北美',4],['+44','英國',4]],TAGS=['怕冷','不要香膏','Line未綁定','他人預約同行','澈自帶','Nick朋友','視障人士','','',''];
+const TODAY=new Date(2026,9,2);const md=g=>{const d=new Date(TODAY);d.setDate(d.getDate()-g);return (d.getMonth()+1)+'/'+d.getDate()};
+const D=[];for(let i=0;i<120;i++){const num=1+Math.floor(rnd()*3999);const visits=1+Math.floor(Math.pow(rnd(),2.2)*45);const spend=visits*(1500+Math.floor(rnd()*600));const gap=Math.floor(Math.pow(rnd(),1.6)*420);const nt=1+Math.floor(rnd()*3);const ts={};for(let k=0;k<nt;k++){const t=pick(TEACH);ts[t]=(ts[t]||0)+1+Math.floor(rnd()*visits)}
+ const cc=(()=>{let r=rnd()*100,a=0;for(const c of CC){a+=c[2];if(r<a)return c}return CC[0]})();const store=rnd()<.25?'both':rnd()<.5?'nj':'zs';
+ const tier=visits===1?'once':gap>180?'dormant':(visits>=4&&gap<=90&&spend>=11000)?'vip':visits>=4&&gap<=90?'reg':visits>=2&&gap<=180?'occ':'dormant';
+ const nm=rnd()<.2?pick(EN)+' '+pick(['Lin','Wu','Chen','Kim']):pick(FAM)+pick(GIV);
+ D.push({num,name:rnd()<.04?nm+'（#'+(num+1)+'同行無電話）':nm,phone:cc[0]+' '+String(100000000+Math.floor(rnd()*899999999)),cc:cc[0],region:cc[1],visits,spend,gap,tier,store,teachers:ts,tag:pick(TAGS),bday:(1+Math.floor(rnd()*12))+'/'+(1+Math.floor(rnd()*28)),note:rnd()<.15?'容易緊張，力道偏輕':''})}
+const R=[...new Map(D.map(d=>[d.num,d])).values()];
+const TIER={vip:['重要常客','#B7791F'],reg:['固定回訪','#2F8F5B'],occ:['偶爾到訪','#2F6FB5'],dormant:['久未回訪','#7C8794'],once:['僅來一次','#9A8F88']};
+const ST={nj:['南京三民','#2F5E4A'],zs:['中山','#B84E2C']};
+const S={q:'',t:new Set(),s:null,l:new Set(),sp:[null,null],vi:[null,null],g:null,sort:'num',dir:1,cols:{tier:1,spend:1,visits:1,gap:1,last:1,main:1,phone:0,cc:0,bday:0,tag:0,note:0}};
+const GAPS=[['30 天內',0,30],['31–90 天',31,90],['91–180 天',91,180],['181–365 天',181,365],['超過 365 天',366,9999]];
+const topT=d=>{const e=Object.entries(d.teachers).sort((a,b)=>b[1]-a[1]);const tot=e.reduce((a,b)=>a+b[1],0);return e[0]?[e[0][0],Math.round(e[0][1]/tot*100)]:['—',0]};
+const withT=d=>[...S.t].reduce((a,t)=>a+(d.teachers[t]||0),0);
+const COLS=[['num','編號',1,'num'],['name','姓名',1,'name'],['tier','級別',0,'tier'],['spend','累計消費',0,'spend','r'],['visits','次數',0,'visits','r'],['gap','距上次',0,'gap','r'],['last','上次到訪',0,'gap'],['main','主要老師',0,'main'],['phone','電話',0,'phone'],['cc','國碼',0,'cc'],['bday','生日',0,'bday'],['tag','標籤',0,'tag'],['note','備注',0,'note']];
+const val=(d,k)=>k==='num'?d.num:k==='name'?d.name:k==='tier'?['vip','reg','occ','dormant','once'].indexOf(d.tier):k==='spend'?d.spend:k==='visits'?d.visits:k==='gap'||k==='last'?d.gap:k==='main'?topT(d)[1]:k==='withT'?withT(d):k==='bday'?parseInt(d.bday):String(d[k]||'');
+const DESC=new Set(['spend','visits','main','withT']);
+function match(d){const q=S.q.trim();if(q){for(const w of q.toLowerCase().split(/\s+/).filter(Boolean)){const ww=w.replace(/^#/,'');const ok=(/^\d+$/.test(ww)&&String(d.num).includes(ww))||d.name.toLowerCase().includes(ww)||d.phone.replace(/\s/g,'').includes(ww)||(d.cc+d.region).toLowerCase().includes(ww)||(d.tag||'').toLowerCase().includes(ww)||(d.note||'').includes(ww);if(!ok)return false}}
+ if(S.t.size&&![...S.t].some(t=>d.teachers[t]))return false;if(S.s&&!(S.s==='both'?d.store==='both':(d.store===S.s||d.store==='both')))return false;if(S.l.size&&!S.l.has(d.tier))return false;
+ if(S.sp[0]!=null&&d.spend<S.sp[0])return false;if(S.sp[1]!=null&&d.spend>S.sp[1])return false;if(S.vi[0]!=null&&d.visits<S.vi[0])return false;if(S.vi[1]!=null&&d.visits>S.vi[1])return false;
+ if(S.g!=null){const g=GAPS[S.g];if(d.gap<g[1]||d.gap>g[2])return false}return true}
+function why(d){const q=S.q.trim();if(!q)return'';const o=[];q.toLowerCase().split(/\s+/).filter(Boolean).forEach(w=>{const ww=w.replace(/^#/,'');if(!/^\d+$/.test(ww)||!String(d.num).includes(ww)){if(d.phone.replace(/\s/g,'').includes(ww)&&!d.name.toLowerCase().includes(ww))o.push('電話 …'+d.phone.slice(-4));else if((d.cc+d.region).toLowerCase().includes(ww))o.push('國碼 '+d.cc);else if((d.tag||'').toLowerCase().includes(ww))o.push('標籤：'+d.tag);else if((d.note||'').includes(ww))o.push('備注')}});return o.map(x=>`<span class="hit">${x}</span>`).join('')}
+const IC='<svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></svg>';
+function fbtn(k,label,n){return `<button class="fb${n?' on':''}" data-k="${k}">${IC}${label}${n?`<span class="n">${n}</span>`:''}</button>`}
+function renderFl(){const f=[['t','老師',S.t.size],['s','訪點',S.s?1:0],['l','級別',S.l.size],['sp','累計消費',S.sp[0]!=null||S.sp[1]!=null?1:0],['vi','次數',S.vi[0]!=null||S.vi[1]!=null?1:0],['g','距上次',S.g!=null?1:0]];const any=f.some(x=>x[2]);document.getElementById('fl').innerHTML=f.map(x=>fbtn(x[0],x[1],x[2])).join('')+(any?'<button class="fb ghost" data-k="clr">清除條件</button>':'');document.querySelectorAll('#fl .fb').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.k==='clr'){S.t.clear();S.s=null;S.l.clear();S.sp=[null,null];S.vi=[null,null];S.g=null;render();return}openPop(b.dataset.k,b)})}
+const pop=document.getElementById('pop');let curK=null;
+function openPop(k,el){if(curK===k&&pop.classList.contains('on')){pop.classList.remove('on');curK=null;return}curK=k;const r=el.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-300,r.left))+'px';pop.style.top=(r.bottom+6)+'px';fillPop(k);pop.classList.add('on')}
+function chipset(items,isOn,fn){return '<div class="opts">'+items.map(([k,l])=>`<span class="opt${isOn(k)?' on':''}" data-k="${k}">${l}</span>`).join('')+'</div>'}
+function fillPop(k){let h='';
+ if(k==='t')h='<h6>老師（做過的客人・可多選）</h6>'+chipset(TEACH.map(t=>[t,t]),x=>S.t.has(x));
+ if(k==='s')h='<h6>訪點</h6>'+chipset([['nj','南京三民'],['zs','中山'],['both','兩間都去過']],x=>S.s===x);
+ if(k==='l')h='<h6>顧客級別（可多選）</h6>'+chipset(Object.entries(TIER).map(([a,b])=>[a,b[0]]),x=>S.l.has(x));
+ if(k==='g')h='<h6>距上次來</h6>'+chipset(GAPS.map((g,i)=>[i,g[0]]),x=>S.g===+x);
+ if(k==='sp')h='<h6>累計消費（元）</h6><div class="rg"><input id="a1" type="number" placeholder="最低" value="'+(S.sp[0]??'')+'"> 〜 <input id="a2" type="number" placeholder="最高" value="'+(S.sp[1]??'')+'"></div>';
+ if(k==='vi')h='<h6>到訪次數</h6><div class="rg"><input id="a1" type="number" placeholder="最少" value="'+(S.vi[0]??'')+'"> 〜 <input id="a2" type="number" placeholder="最多" value="'+(S.vi[1]??'')+'"></div>';
+ if(k==='cols')h='<h6>顯示的欄位</h6>'+chipset(COLS.slice(2).map(c=>[c[0],c[1]]),x=>S.cols[x]);
+ pop.innerHTML=h+'<div class="pf"><a id="pc">清除此項</a><a id="pd">完成</a></div>';
+ pop.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{const v=o.dataset.k;if(k==='t')S.t.has(v)?S.t.delete(v):S.t.add(v);if(k==='s')S.s=S.s===v?null:v;if(k==='l')S.l.has(v)?S.l.delete(v):S.l.add(v);if(k==='g')S.g=S.g===+v?null:+v;if(k==='cols')S.cols[v]=S.cols[v]?0:1;fillPop(k);render(true)});
+ if(k==='sp'||k==='vi'){const key=k;pop.querySelector('#a1').oninput=e=>{S[key][0]=e.target.value===''?null:+e.target.value;render(true)};pop.querySelector('#a2').oninput=e=>{S[key][1]=e.target.value===''?null:+e.target.value;render(true)}}
+ document.getElementById('pc').onclick=()=>{if(k==='t')S.t.clear();if(k==='s')S.s=null;if(k==='l')S.l.clear();if(k==='g')S.g=null;if(k==='sp')S.sp=[null,null];if(k==='vi')S.vi=[null,null];fillPop(k);render(true)};document.getElementById('pd').onclick=()=>{pop.classList.remove('on');curK=null}}
+document.addEventListener('click',e=>{if(!pop.contains(e.target)&&!e.target.closest('.fb')){pop.classList.remove('on');curK=null}});
+document.getElementById('cols').onclick=e=>{e.stopPropagation();openPop('cols',e.currentTarget)};
+function render(keep){renderFl();const showT=S.t.size>0;
+ const cols=COLS.filter(c=>c[2]||S.cols[c[0]]);if(showT)cols.splice(2,0,['withT','跟所選老師',0,'withT','r']);
+ document.getElementById('th').innerHTML='<tr>'+cols.map((c,i)=>`<th class="${c[4]||''}${S.sort===c[3]?' on':''}${i===0?' stk':i===1?' stk2':''}" data-k="${c[3]}">${c[1]}<span class="ar">${S.sort===c[3]?(S.dir>0?'▲':'▼'):''}</span></th>`).join('')+'</tr>';
+ document.querySelectorAll('#th th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(S.sort===k)S.dir*=-1;else{S.sort=k;S.dir=DESC.has(k)?-1:1}render()});
+ if(showT&&S.sort==='num'&&!keep){S.sort='withT';S.dir=-1}
+ const rs=R.filter(match).sort((a,b)=>{const x=val(a,S.sort),y=val(b,S.sort);return (x>y?1:x<y?-1:0)*S.dir});
+ document.getElementById('cnt').innerHTML='共 <b>'+rs.length+'</b> 位　依「'+(COLS.find(c=>c[3]===S.sort)||[0,'跟所選老師'])[1]+'」'+(S.dir>0?'由小到大':'由大到小');
+ document.getElementById('tb').innerHTML=rs.slice(0,60).map(d=>{const t=TIER[d.tier],sts=d.store==='both'?['nj','zs']:[d.store],m=topT(d);
+  const cell=c=>{const k=c[0];return k==='num'?`<td class="num stk"><i>#</i>${d.num}</td>`:k==='name'?`<td class="nm stk2" title="${d.name}">${d.name}</td>`:k==='tier'?`<td><span class="tg" style="background:${t[1]}">${t[0]}</span></td>`:k==='spend'?`<td class="r"><b>$${d.spend.toLocaleString()}</b></td>`:k==='visits'?`<td class="r">${d.visits}</td>`:k==='gap'?`<td class="r">${d.gap} 天</td>`:k==='last'?`<td>${md(d.gap)} ${sts.map(s=>`<span class="sd" style="background:${ST[s][1]}" title="${ST[s][0]}"></span>`).join('')}</td>`:k==='main'?`<td><b>${m[0]}</b> <span class="sub2">${m[1]}%</span></td>`:k==='withT'?`<td class="r"><b>${withT(d)}</b> 次</td>`:k==='phone'?`<td>${d.phone}</td>`:k==='cc'?`<td>${d.cc} ${d.region}</td>`:k==='bday'?`<td>${d.bday}</td>`:k==='tag'?`<td>${d.tag||'<span class="sub2">—</span>'}</td>`:`<td>${d.note||'<span class="sub2">—</span>'}</td>`};
+  return '<tr>'+cols.map(cell).join('')+'</tr>'}).join('')+(rs.length>60?`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center">…還有 ${rs.length-60} 位（往下捲動載入）</td></tr>`:'');
+ if(!rs.length)document.getElementById('tb').innerHTML=`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center;height:60px">沒有符合的客人，試著放寬條件</td></tr>`;
+ const q=S.q.trim();document.getElementById('act').innerHTML=q?'搜尋命中處標在行尾':'';
+ if(q){const rows=document.querySelectorAll('#tb tr');rs.slice(0,60).forEach((d,i)=>{const w=why(d);if(w&&rows[i]){const td=rows[i].querySelector('td.nm');if(td){td.title=td.title;td.insertAdjacentHTML('beforeend',w)}}})}}
+document.getElementById('q').oninput=e=>{S.q=e.target.value;render(true)};
+render();
+</script>
+
+</body></html>
