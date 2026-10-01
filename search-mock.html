@@ -25,7 +25,7 @@ h1{font-size:15px;margin:0 0 3px}.sub{font-size:11px;color:var(--m);margin:0 0 1
 .pf{display:flex;justify-content:space-between;margin-top:9px;font-size:11px}.pf a{color:var(--ac);font-weight:700;cursor:pointer}
 .meta{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 5px;font-size:11px;color:var(--m)}.meta b{color:var(--t)}
 .tw{background:var(--card);border:1px solid var(--br);border-radius:10px;overflow:auto;max-height:560px;position:relative}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:620px;font-size:12px}
+table{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:12px}td{overflow:hidden;text-overflow:ellipsis}
 th,td{padding:0 8px;height:30px;white-space:nowrap;border-bottom:1px solid var(--br2);text-align:left}
 th{position:sticky;top:0;z-index:3;background:var(--hd);font:700 11px Manrope,'Noto Sans TC';color:var(--m);cursor:pointer;user-select:none;height:30px;border-bottom:1px solid var(--br)}
 th.r,td.r{text-align:right}th .ar{display:inline-block;width:10px;color:var(--ac);font-size:9px}
@@ -33,8 +33,8 @@ th.on{color:var(--t)}
 tbody tr:nth-child(even) td{background:var(--zb)}tbody tr:hover td{background:#F3E8DF}
 .stk{position:sticky;left:0;z-index:2;background:var(--card)}th.stk{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk{background:var(--zb)}
 .stk2{position:sticky;left:46px;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--br)}th.stk2{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk2{background:var(--zb)}
-td.num{font:700 12px Manrope;color:var(--bd);width:46px;min-width:46px}td.num,td.nm{padding:0 6px}th.stk{width:46px;min-width:46px;padding:0 6px}th.stk2{width:74px;min-width:74px;max-width:74px;padding:0 6px}td.num i{font-style:normal;opacity:.5;font-size:10px}
-td.nm{font-weight:700;width:74px;min-width:74px;max-width:74px;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+td.num{font:700 12px Manrope;color:var(--bd)}td.num,td.nm{padding:0 5px}th.stk,th.stk2{padding:0 5px}td.num i{font-style:normal;opacity:.5;font-size:10px}
+td.nm{font-weight:700;cursor:pointer}
 .tg{display:inline-flex;align-items:center;gap:4px;font:700 10px/1 'Noto Sans TC';color:#fff;border-radius:4px;padding:3px 6px}
 .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:2px}
 .sub2{color:var(--h);font-size:10px}
@@ -44,12 +44,12 @@ td.nm{font-weight:700;width:74px;min-width:74px;max-width:74px;overflow:hidden;t
 
 </head><body>
 <h1>顧客搜尋（專業版・資料表格）</h1>
-<p class="sub">120 位虛構客人。點欄位標題排序、點上方篩選鈕展開條件、右側「欄位」可增減顯示的欄。手機寬度下左邊兩欄（編號、姓名）固定，姓名欄縮窄，點姓名可看完整名字；其他欄左右滑動。</p>
+<p class="sub">120 位虛構客人。點欄位標題排序、點上方篩選鈕展開條件、右側「欄位」可增減顯示的欄。手機寬度下左邊兩欄（編號、姓名）固定，姓名欄嚴格限制約 4 個字，點姓名可看完整名字；其他欄左右滑動。</p>
 <div class="app">
  <div class="tb"><div class="inp"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="編號、姓名、電話、國碼、標籤、備注（空格＝而且）"></div><button class="fb ghost" id="cols"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>欄位</button></div>
  <div class="fl" id="fl"></div>
  <div class="meta"><span id="cnt"></span><span id="act"></span></div>
- <div class="tw"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+ <div class="tw"><table id="tbl"><colgroup id="cg"></colgroup><thead id="th"></thead><tbody id="tb"></tbody></table></div>
 </div>
 <div class="pop" id="pop"></div>
 <p class="note"><b>這一版的做法</b>：<br>• 改成「資料表格」：每位客人一行、約 30px 高，固定欄寬、數字靠右對齊，所以資料再多、名字再長，格式都不會跑掉（名字超過就用 … 截斷，點進去看完整）。<br>• 欄位標題就是排序鈕：點一下由大到小、再點由小到大，目前排序欄會有箭頭。<br>• 篩選條件變成一排小工具列（老師、訪點、級別、累計、次數、距上次），點開是小視窗，選了的鈕會變深色並顯示數字。<br>• 「欄位」鈕可以多開電話、國碼、標籤、備注欄，想看多少看多少。<br>• 搜尋命中的位置會在行尾標示（例如「電話 …1234」「標籤：怕冷」）。<br>• 一次只載一部分，往下捲動再載入，量大也不卡。</p>
@@ -101,6 +101,7 @@ document.addEventListener('click',e=>{if(!pop.contains(e.target)&&!e.target.clos
 document.getElementById('cols').onclick=e=>{e.stopPropagation();openPop('cols',e.currentTarget)};
 function render(keep){renderFl();const showT=S.t.size>0;
  const cols=COLS.filter(c=>c[2]||S.cols[c[0]]);if(showT)cols.splice(2,0,['withT','跟所選老師',0,'withT','r']);if(S.q.trim())cols.push(['hit','符合處',0,'hit']);
+ const W={num:46,name:62,withT:78,tier:66,spend:76,visits:46,gap:58,last:76,main:72,phone:122,cc:96,bday:54,tag:100,note:116,hit:150};document.getElementById('cg').innerHTML=cols.map(c=>`<col style="width:${W[c[0]]||80}px">`).join('');document.getElementById('tbl').style.width=cols.reduce((a,c)=>a+(W[c[0]]||80),0)+'px';
  document.getElementById('th').innerHTML='<tr>'+cols.map((c,i)=>`<th class="${c[4]||''}${S.sort===c[3]?' on':''}${i===0?' stk':i===1?' stk2':''}" data-k="${c[3]}">${c[1]}<span class="ar">${S.sort===c[3]?(S.dir>0?'▲':'▼'):''}</span></th>`).join('')+'</tr>';
  document.querySelectorAll('#th th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(S.sort===k)S.dir*=-1;else{S.sort=k;S.dir=DESC.has(k)?-1:1}render()});
  if(showT&&S.sort==='num'&&!keep){S.sort='withT';S.dir=-1}
