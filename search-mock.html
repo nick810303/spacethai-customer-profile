@@ -32,9 +32,9 @@ th.r,td.r{text-align:right}th .ar{display:inline-block;width:10px;color:var(--ac
 th.on{color:var(--t)}
 tbody tr:nth-child(even) td{background:var(--zb)}tbody tr:hover td{background:#F3E8DF}
 .stk{position:sticky;left:0;z-index:2;background:var(--card)}th.stk{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk{background:var(--zb)}
-.stk2{position:sticky;left:58px;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--br)}th.stk2{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk2{background:var(--zb)}
-td.num{font:700 12px Manrope;color:var(--bd);width:58px;min-width:58px}td.num i{font-style:normal;opacity:.5;font-size:10px}
-td.nm{font-weight:700;max-width:130px;min-width:96px;overflow:hidden;text-overflow:ellipsis}
+.stk2{position:sticky;left:46px;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--br)}th.stk2{z-index:4;background:var(--hd)}tbody tr:nth-child(even) .stk2{background:var(--zb)}
+td.num{font:700 12px Manrope;color:var(--bd);width:46px;min-width:46px}td.num,td.nm{padding:0 6px}th.stk{width:46px;min-width:46px;padding:0 6px}th.stk2{width:74px;min-width:74px;max-width:74px;padding:0 6px}td.num i{font-style:normal;opacity:.5;font-size:10px}
+td.nm{font-weight:700;width:74px;min-width:74px;max-width:74px;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .tg{display:inline-flex;align-items:center;gap:4px;font:700 10px/1 'Noto Sans TC';color:#fff;border-radius:4px;padding:3px 6px}
 .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:2px}
 .sub2{color:var(--h);font-size:10px}
@@ -44,7 +44,7 @@ td.nm{font-weight:700;max-width:130px;min-width:96px;overflow:hidden;text-overfl
 
 </head><body>
 <h1>顧客搜尋（專業版・資料表格）</h1>
-<p class="sub">120 位虛構客人。點欄位標題排序、點上方篩選鈕展開條件、右側「欄位」可增減顯示的欄。手機寬度下左邊兩欄（編號、姓名）固定，其他欄左右滑動。</p>
+<p class="sub">120 位虛構客人。點欄位標題排序、點上方篩選鈕展開條件、右側「欄位」可增減顯示的欄。手機寬度下左邊兩欄（編號、姓名）固定，姓名欄縮窄，點姓名可看完整名字；其他欄左右滑動。</p>
 <div class="app">
  <div class="tb"><div class="inp"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="編號、姓名、電話、國碼、標籤、備注（空格＝而且）"></div><button class="fb ghost" id="cols"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>欄位</button></div>
  <div class="fl" id="fl"></div>
@@ -100,18 +100,19 @@ function fillPop(k){let h='';
 document.addEventListener('click',e=>{if(!pop.contains(e.target)&&!e.target.closest('.fb')){pop.classList.remove('on');curK=null}});
 document.getElementById('cols').onclick=e=>{e.stopPropagation();openPop('cols',e.currentTarget)};
 function render(keep){renderFl();const showT=S.t.size>0;
- const cols=COLS.filter(c=>c[2]||S.cols[c[0]]);if(showT)cols.splice(2,0,['withT','跟所選老師',0,'withT','r']);
+ const cols=COLS.filter(c=>c[2]||S.cols[c[0]]);if(showT)cols.splice(2,0,['withT','跟所選老師',0,'withT','r']);if(S.q.trim())cols.push(['hit','符合處',0,'hit']);
  document.getElementById('th').innerHTML='<tr>'+cols.map((c,i)=>`<th class="${c[4]||''}${S.sort===c[3]?' on':''}${i===0?' stk':i===1?' stk2':''}" data-k="${c[3]}">${c[1]}<span class="ar">${S.sort===c[3]?(S.dir>0?'▲':'▼'):''}</span></th>`).join('')+'</tr>';
  document.querySelectorAll('#th th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(S.sort===k)S.dir*=-1;else{S.sort=k;S.dir=DESC.has(k)?-1:1}render()});
  if(showT&&S.sort==='num'&&!keep){S.sort='withT';S.dir=-1}
  const rs=R.filter(match).sort((a,b)=>{const x=val(a,S.sort),y=val(b,S.sort);return (x>y?1:x<y?-1:0)*S.dir});
  document.getElementById('cnt').innerHTML='共 <b>'+rs.length+'</b> 位　依「'+(COLS.find(c=>c[3]===S.sort)||[0,'跟所選老師'])[1]+'」'+(S.dir>0?'由小到大':'由大到小');
  document.getElementById('tb').innerHTML=rs.slice(0,60).map(d=>{const t=TIER[d.tier],sts=d.store==='both'?['nj','zs']:[d.store],m=topT(d);
-  const cell=c=>{const k=c[0];return k==='num'?`<td class="num stk"><i>#</i>${d.num}</td>`:k==='name'?`<td class="nm stk2" title="${d.name}">${d.name}</td>`:k==='tier'?`<td><span class="tg" style="background:${t[1]}">${t[0]}</span></td>`:k==='spend'?`<td class="r"><b>$${d.spend.toLocaleString()}</b></td>`:k==='visits'?`<td class="r">${d.visits}</td>`:k==='gap'?`<td class="r">${d.gap} 天</td>`:k==='last'?`<td>${md(d.gap)} ${sts.map(s=>`<span class="sd" style="background:${ST[s][1]}" title="${ST[s][0]}"></span>`).join('')}</td>`:k==='main'?`<td><b>${m[0]}</b> <span class="sub2">${m[1]}%</span></td>`:k==='withT'?`<td class="r"><b>${withT(d)}</b> 次</td>`:k==='phone'?`<td>${d.phone}</td>`:k==='cc'?`<td>${d.cc} ${d.region}</td>`:k==='bday'?`<td>${d.bday}</td>`:k==='tag'?`<td>${d.tag||'<span class="sub2">—</span>'}</td>`:`<td>${d.note||'<span class="sub2">—</span>'}</td>`};
+  const cell=c=>{const k=c[0];return k==='num'?`<td class="num stk"><i>#</i>${d.num}</td>`:k==='name'?`<td class="nm stk2" title="${d.name}">${d.name}</td>`:k==='tier'?`<td><span class="tg" style="background:${t[1]}">${t[0]}</span></td>`:k==='spend'?`<td class="r"><b>$${d.spend.toLocaleString()}</b></td>`:k==='visits'?`<td class="r">${d.visits}</td>`:k==='gap'?`<td class="r">${d.gap} 天</td>`:k==='last'?`<td>${md(d.gap)} ${sts.map(s=>`<span class="sd" style="background:${ST[s][1]}" title="${ST[s][0]}"></span>`).join('')}</td>`:k==='main'?`<td><b>${m[0]}</b> <span class="sub2">${m[1]}%</span></td>`:k==='withT'?`<td class="r"><b>${withT(d)}</b> 次</td>`:k==='phone'?`<td>${d.phone}</td>`:k==='cc'?`<td>${d.cc} ${d.region}</td>`:k==='bday'?`<td>${d.bday}</td>`:k==='hit'?`<td>${why(d)||'<span class="sub2">—</span>'}</td>`:k==='tag'?`<td>${d.tag||'<span class="sub2">—</span>'}</td>`:`<td>${d.note||'<span class="sub2">—</span>'}</td>`};
   return '<tr>'+cols.map(cell).join('')+'</tr>'}).join('')+(rs.length>60?`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center">…還有 ${rs.length-60} 位（往下捲動載入）</td></tr>`:'');
  if(!rs.length)document.getElementById('tb').innerHTML=`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center;height:60px">沒有符合的客人，試著放寬條件</td></tr>`;
- const q=S.q.trim();document.getElementById('act').innerHTML=q?'搜尋命中處標在行尾':'';
- if(q){const rows=document.querySelectorAll('#tb tr');rs.slice(0,60).forEach((d,i)=>{const w=why(d);if(w&&rows[i]){const td=rows[i].querySelector('td.nm');if(td){td.title=td.title;td.insertAdjacentHTML('beforeend',w)}}})}}
+ const q=S.q.trim();document.getElementById('act').innerHTML=q?'搜尋命中處在最後一欄「符合處」':'';
+ }
+document.getElementById('tb').onclick=e=>{const td=e.target.closest('td.nm');if(!td)return;e.stopPropagation();pop.innerHTML='<h6>完整姓名</h6><div style="font:700 15px Manrope,Noto Sans TC,sans-serif">'+td.title+'</div>';const r=td.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-300,r.left))+'px';pop.style.top=(r.bottom+4)+'px';pop.classList.add('on');curK='nm'};
 document.getElementById('q').oninput=e=>{S.q=e.target.value;render(true)};
 render();
 </script>
