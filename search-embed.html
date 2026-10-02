@@ -250,7 +250,7 @@ body.d .layer.on{background:none;border:0;padding:8px 0 0}
   <button class="ib" id="bf"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></svg><span class="bl">篩選</span></button>
   <button class="ib" id="bc" aria-label="欄位"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg></button>
  </div>
- <div class="sg" id="sg"><span>試試：</span><b data-s="45歲">45歲</b><b data-s="拒">拒</b><b data-s="香港">香港</b><b data-s="0912">0912</b><b data-s="肩頸">肩頸</b></div>
+ <div class="sg" id="sg"></div>
 </div>
 <section class="layer" id="layer">
  <div class="ldw" id="ld"><div class="ldc"><div class="ldt">顧客搜尋</div><div class="ldb"><div class="ldf"></div></div><div class="ldr"><span class="ldm">連線中…</span><span class="lds"></span></div><ul class="ldl"><li class="on"><i></i>確認登入</li><li><i></i>取得老師名單</li><li><i></i>載入顧客資料</li><li><i></i>整理資料、建立搜尋</li></ul></div></div>
@@ -274,6 +274,15 @@ window.addEventListener('message',e=>{if(e.source!==parent)return;const d=e.data
  else if(d.kx==='token'){TOKEN=d.token;if(TOKW){TOKW(d.token);TOKW=null}}
  else if(d.kx==='mode'){MODE=d.mode;document.body.classList.remove('m','d');document.body.classList.add(MODE);window.__kxMode&&window.__kxMode()}
  else if(d.kx==='sel'){if(window.__kxSel)window.__kxSel(d.n);else window.__kxSelP=d.n}});
+const SUPA='https://lyphciitrhfomquorhfm.supabase.co',AKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
+async function rest(path,onP){const out=[];let total=0;for(let from=0;;from+=1000){const go=()=>fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+TOKEN,Range:from+'-'+(from+999),'Range-Unit':'items',Prefer:'count=exact'}});let r=await go();if(r.status===401){TOKEN=await askToken();r=await go()}if(!r.ok)throw new Error(path+' '+r.status);if(!total){const m=(r.headers.get('content-range')||'').match(/\/(\d+)$/);if(m)total=+m[1]}const j=await r.json();out.push(...j);if(onP)onP(out.length,total);if(j.length<1000)break}return out}
+let DATAP=null;
+function loadData(){if(DATAP)return DATAP;DATAP=(async()=>{await initP;if(RAWTEST)return{RAW:RAWTEST.raw,TCH:RAWTEST.tch};if(!TOKEN)throw new Error('尚未登入');ldStep(1,10,'已確認登入');const TCH=await rest('teachers?select=name,active,sort&order=sort.asc');ldStep(2,20,'已取得老師名單');const RAW=await rest('customer_search?select=*&order=num.asc',(n,t)=>ldStep(2,20+Math.round(60*(t?n/t:.5)),'正在載入顧客資料',t?n.toLocaleString()+' / '+t.toLocaleString()+' 位':''));ldStep(3,88,'整理資料、建立搜尋');return{RAW,TCH}})();DATAP.catch(()=>{DATAP=null});return DATAP}
+let POOL=[],tryI=0;
+function drawTry(){const sg=document.getElementById('sg');if(!POOL.length){sg.innerHTML='';return}let o='<span>試試：</span>';const n=Math.min(5,POOL.length);for(let k=0;k<n;k++){const t=POOL[(tryI+k)%POOL.length];o+='<b class="fi" data-s="'+t[0]+'" title="'+t[1]+'">'+t[0]+'</b>'}sg.innerHTML=o;sg.querySelectorAll('b').forEach(b=>b.onclick=()=>{if(window.__kxSetQ)window.__kxSetQ(b.dataset.s);else start({q:b.dataset.s})})}
+setInterval(()=>{const q=document.getElementById('q');if((window.__kxQ&&window.__kxQ())||!POOL.length)return;tryI=(tryI+1)%POOL.length;drawTry()},2600);
+function buildPool(RAW){const tg={},pre={},rg={};const RM={'+852':'香港','+853':'澳門','+81':'日本','+82':'韓國','+65':'新加坡','+60':'馬來西亞','+61':'澳洲','+66':'泰國','+44':'英國','+86':'中國','+1':'北美'};RAW.forEach(r=>{(r.tags||[]).forEach(t=>{if(/^[^#\d]{1,8}$/.test(t))tg[t]=(tg[t]||0)+1});const p=String(r.phone||'').replace(/[\s-]/g,'');if(p[0]==='0'&&p.length>=4)pre[p.slice(0,4)]=(pre[p.slice(0,4)]||0)+1;else if(p[0]==='+'){const k=Object.keys(RM).sort((a,b)=>b.length-a.length).find(z=>p.startsWith(z));if(k)rg[RM[k]]=(rg[RM[k]]||0)+1}});const top=(m,n,min)=>Object.entries(m).filter(x=>x[1]>=min).sort((a,b)=>b[1]-a[1]).slice(0,n);const out=[...top(tg,8,3).map(x=>[x[0],'標籤']),...top(pre,2,5).map(x=>[x[0],'電話']),...top(rg,3,3).map(x=>[x[0],'國碼'])];const seen=new Set(),bk={};out.forEach(c=>{(bk[c[1]]=bk[c[1]]||[]).push(c)});const ORD=['標籤','年紀','國碼','月日','電話','星座','中文日期','同行紀錄','年月','日期'],keys=ORD.filter(k=>bk[k]),res=[];let more=true,k=0;while(more){more=false;for(const key of keys){const c=bk[key][k];if(c){more=true;if(!seen.has(c[0])){seen.add(c[0]);res.push(c)}}}k++}POOL=res;tryI=0;drawTry()}
+initP.then(()=>setTimeout(()=>loadData().then(d=>buildPool(d.RAW)).catch(()=>{}),800));
 const LD=()=>document.getElementById('ld');
 const ldStep=(i,p,msg,sub)=>{const L=LD();if(!L)return;L.querySelector('.ldf').style.width=p+'%';L.querySelector('.ldm').textContent=msg;L.querySelector('.lds').textContent=sub||'';L.querySelectorAll('.ldl li').forEach((li,k)=>{li.className=k<i?'dn':k===i?'on':''})};
 const ldHide=()=>{const L=LD();if(!L)return;L.classList.add('out');setTimeout(()=>L.remove(),350)};
@@ -285,16 +294,12 @@ function start(o){if(BOOT)return BOOT;BOOT=(async()=>{await initP;document.body.
 const q0=document.getElementById('q');q0.addEventListener('focus',()=>start({}));q0.addEventListener('click',()=>start({}));q0.addEventListener('input',()=>start({q:q0.value}));
 document.getElementById('bf').addEventListener('click',()=>start({filter:true}));
 document.getElementById('bc').addEventListener('click',()=>start({}));
-document.querySelectorAll('#sg b[data-s]').forEach(b=>b.addEventListener('click',()=>start({q:b.dataset.s})));
+
 async function boot(OPTS){
 
-const SUPA='https://lyphciitrhfomquorhfm.supabase.co',AKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
 const fail=(t,sub)=>{const L=document.getElementById('ld');if(L){L.className='ldw err';L.innerHTML='<div class="ldc"><div class="ldt">'+t+'</div></div>'}};
-async function rest(path,onP){const out=[];let total=0;for(let from=0;;from+=1000){let r=await fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+TOKEN,Range:from+'-'+(from+999),'Range-Unit':'items',Prefer:'count=exact'}});if(r.status===401){TOKEN=await askToken();r=await fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+TOKEN,Range:from+'-'+(from+999),'Range-Unit':'items',Prefer:'count=exact'}})}if(!r.ok)throw new Error(path+' '+r.status);if(!total){const m=(r.headers.get('content-range')||'').match(/\/(\d+)$/);if(m)total=+m[1]}const j=await r.json();out.push(...j);if(onP)onP(out.length,total);if(j.length<1000)break}return out}
 let RAW,TCH;
-if(RAWTEST){RAW=RAWTEST.raw;TCH=RAWTEST.tch}else{
- if(!TOKEN){fail('請先登入顧客檔案系統');return}
- try{ldStep(1,10,'已確認登入');TCH=await rest('teachers?select=name,active,sort&order=sort.asc');ldStep(2,20,'已取得老師名單');RAW=await rest('customer_search?select=*&order=num.asc',(n,t)=>{ldStep(2,20+Math.round(60*(t?n/t:.5)),'正在載入顧客資料',t?n.toLocaleString()+' / '+t.toLocaleString()+' 位':'')});ldStep(3,88,'整理資料、建立搜尋')}catch(e){fail('資料載入失敗（'+String(e.message).replace(/[<>&]/g,'')+'）');return}}
+try{const dd=await loadData();RAW=dd.RAW;TCH=dd.TCH}catch(e){fail(TOKEN?'資料載入失敗（'+String(e.message).replace(/[<>&]/g,'')+'）':'請先登入顧客檔案系統');return}
 const TODAY=new Date();TODAY.setHours(0,0,0,0);const TY=TODAY.getFullYear(),TM=TODAY.getMonth()+1,TDD=TODAY.getDate();
 const ymd=g=>{if(g>=99999)return'—';const d=new Date(TODAY);d.setDate(d.getDate()-g);return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()};
 const ageOf=d=>{if(!d.by)return null;let a=TY-d.by;if(d.bm>TM||(d.bm===TM&&d.bd>TDD))a--;return a};
@@ -482,10 +487,20 @@ document.getElementById('nw').onclick=e=>{post('add',{n:+e.currentTarget.dataset
 
 const qi=document.getElementById('q');qi.addEventListener('focus',()=>{if(!layer.classList.contains('on'))openLayer()});qi.addEventListener('input',()=>{if(!layer.classList.contains('on'))openLayer()});document.getElementById('lx').onclick=closeLayer;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLayer()});document.body.addEventListener('mousedown',e=>{if(!isDesk()&&layer.classList.contains('on')&&!e.target.closest('#sbar')&&!e.target.closest('#layer')&&!e.target.closest('#pop'))closeLayer()});
 qi.oninput=e=>{S.q=e.target.value;render(true)};document.getElementById('qc').onclick=()=>{S.q='';qi.value='';qi.focus();render(true)};
-const TRY=[['45歲','年紀'],['拒','標籤'],['香港','國碼'],['0912','電話／日期'],['肩頸','小本本'],['同行','標籤'],['代約','標籤'],['澈自帶','標籤'],['202606','年月'],['2024/3/3','日期'],['0928','月日'],['9月28日','中文日期'],['獅子座','星座'],['怕冷','標籤'],['微拒','標籤'],['不穿按摩褲','釘選'],['+81','國碼'],['2026','年']];
-let tryI=0;function drawTry(){const sg=document.getElementById('sg');let o='<span>試試：</span>';for(let k=0;k<5;k++){const t=TRY[(tryI+k)%TRY.length];o+=`<b class="fi" data-s="${t[0]}" title="${t[1]}">${t[0]}</b>`}sg.innerHTML=o;sg.querySelectorAll('b').forEach(b=>b.onclick=()=>{S.q=b.dataset.s;qi.value=S.q;render(true)})}
-drawTry();setInterval(()=>{if(S.q||document.activeElement===qi)return;tryI=(tryI+1)%TRY.length;drawTry()},2600);
-render();ldHide();openLayer();if(OPTS.q){S.q=OPTS.q;qi.value=OPTS.q;render(true)}if(OPTS.filter){const f=document.getElementById('fp');buildSheet();f.classList.add('on');document.getElementById('bf').classList.add('open')}qi.focus();
+window.__kxSetQ=q=>{S.q=q;qi.value=q;render(true);qi.focus()};window.__kxQ=()=>!!S.q;
+function hasHit(q){const o=S.q;S.q=q;let ok=false;try{ok=R.some(match)}catch(e){}S.q=o;return ok}
+(function(){const p2=n=>String(n).padStart(2,'0');const cnt=f=>{const m={};R.forEach(d=>{const k=f(d);if(k!=null&&k!=='')m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};const cand=[];
+ cnt(d=>ageOf(d)).slice(0,3).forEach(x=>cand.push([x[0]+'歲','年紀']));
+ const bd=R.filter(d=>d.bm&&d.bd);if(bd.length){const a=bd[Math.floor(bd.length*.3)],b=bd[Math.floor(bd.length*.6)];cand.push([p2(a.bm)+p2(a.bd),'月日']);cand.push([b.bm+'月'+b.bd+'日','中文日期']);const f=bd.find(d=>d.by);if(f)cand.push([f.by+'/'+f.bm+'/'+f.bd,'日期'])}
+ const lv=R.filter(d=>d.visits&&d.gap<400);if(lv.length){const g=lv[Math.floor(lv.length/2)].gap,dt=new Date(TODAY);dt.setDate(dt.getDate()-g);cand.push([''+dt.getFullYear()+p2(dt.getMonth()+1),'年月'])}
+ cnt(d=>d.bm?zodiacOf(d.bm,d.bd):'').slice(0,2).forEach(x=>cand.push([x[0],'星座']));
+ if(R.some(d=>d.cps))cand.push(['同行','同行紀錄']);
+ cnt(d=>d.cc&&d.cc!=='+886'?d.region:'').slice(0,3).forEach(x=>cand.push([x[0],'國碼']));
+ const tm={};R.forEach(d=>d.tags.forEach(t=>{if(/^[^#\d]{1,8}$/.test(t))tm[t]=(tm[t]||0)+1}));Object.entries(tm).filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(x=>cand.push([x[0],'標籤']));
+ const pm={};R.forEach(d=>{if(d.cc==='+886'&&d.phone){const k='0'+d.phone.split(' ')[1].slice(0,3);pm[k]=(pm[k]||0)+1}});Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,2).forEach(x=>cand.push([x[0],'電話']));
+ const ok=cand.filter(c=>hasHit(c[0]));const seen=new Set(),res=[];const bucket={};ok.forEach(c=>{(bucket[c[1]]=bucket[c[1]]||[]).push(c)});const ORD=['標籤','年紀','國碼','月日','電話','星座','中文日期','同行紀錄','年月','日期'],keys=ORD.filter(k=>bucket[k]);let more=true,k=0;while(more){more=false;for(const key of keys){const c=bucket[key][k];if(c){more=true;if(!seen.has(c[0])){seen.add(c[0]);res.push(c)}}}k++}
+ if(res.length){POOL=res;tryI=0;drawTry()}})();
+render();ldHide();openLayer();if(window.__kxSelP!=null)window.__kxSel(window.__kxSelP);if(OPTS.q){S.q=OPTS.q;qi.value=OPTS.q;render(true)}if(OPTS.filter){const f=document.getElementById('fp');buildSheet();f.classList.add('on');document.getElementById('bf').classList.add('open')}qi.focus();
 
 }
 })();
