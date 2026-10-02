@@ -243,6 +243,13 @@ body.d .layer.on{background:none;border:0;padding:8px 0 0}
 .ldw.err .ldt{font-size:14px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){.ldw .ldf{animation:none}}
 body.al .lx{display:none}
+.pop[data-k=cell]{width:auto;min-width:0;max-width:min(250px,calc(100vw - 24px));padding:5px 7px 6px;border-radius:10px;box-shadow:0 8px 22px rgba(60,40,30,.22)}
+.pop[data-k=cell] .ph{margin:0 0 3px;gap:12px}.pop[data-k=cell] .ph h6{font-size:9.5px;letter-spacing:.03em}
+.pop[data-k=cell] .px{width:17px;height:17px;font-size:9px;line-height:17px}
+.pop[data-k=cell] div[style*="font:600 14px"]{font-size:12px!important;padding:4px 7px!important;margin:0 0 3px!important;line-height:1.4!important;border-radius:7px!important}
+.pop[data-k=cell] div[style*="margin:3px 0"]{margin:2px 0!important;font-size:11px}
+.pop[data-k=cell] .sub2{display:none}
+.pop[data-k=cell] .ofb{margin-top:3px;height:22px;width:auto;padding:0 9px;font-size:10.5px;border-radius:7px}
 .sg>span{color:#5C4A3F;font-weight:700;font-size:11.5px}
 .sg b{border-radius:8px!important;padding:3px 10px!important}
 .sg b{cursor:pointer}
@@ -487,7 +494,7 @@ function render(keep){const showT=S.t.size>0,hasQ=!!WORDS().length;
 document.getElementById('tb').onclick=e=>{const td=e.target.closest('td.nm,td.ell,td.mc');if(!td){const tr=e.target.closest('tr[data-n]');if(tr)openFile(tr.dataset.n);return}e.stopPropagation();pop.className='pop on';pop.dataset.k='cell';const kd=td.dataset.kind||td.dataset.k;let body='',ttl='完整內容';
  if(td.classList.contains('mc')){const d=R.find(x=>String(x.num)===td.dataset.n);if(kd==='rej'){ttl='拒接（哪位老師）';body=(d.blk?'<div style="margin:3px 0"><span class="rj r0">'+hl('店家黑名單')+'</span> 全店</div>':'')+d.rej.map(r=>'<div style="margin:3px 0">'+rjc(r)+' <span class="sub2">'+(r.lv==='拒'?'這位老師不接':r.lv==='微拒'?'這位老師偏不想接':'視狀況決定')+'</span></div>').join('')}else{ttl='自帶（哪位老師）';body=d.sbT.map(x=>'<div style="margin:3px 0">'+sbc(x)+' <span class="sub2">'+esc(x)+' 老師自帶的客人</span></div>').join('')}}
  else{const st=kd==='pin'?'background:#FFF1BF;border:1px solid #E7C44F':kd==='ln'?'background:#F1ECE8;border:1px solid #D9CEC7':kd==='note'?'background:#FFF9E6;border:1px dashed #E2C877':'';ttl=kd==='pin'?'釘選置頂':kd==='ln'?'泰空小本本':kd==='note'?'客立樂備注':'完整內容';const its=td.title.split('\n');if(its.length>1&&kd!=='note')ttl+='（'+its.length+' 則）';body=its.map(x=>'<div style="font:600 14px/1.5 Manrope,Noto Sans TC,sans-serif;border-radius:8px;padding:8px 10px;margin:0 0 6px;color:#2C2520;'+st+'">'+hl(x)+'</div>').join('')}
- const rn=td.closest('tr').dataset.n;pop.innerHTML=popHead(ttl)+body+'<button class="ofb" data-n="'+rn+'">打開顧客檔案 ›</button>';bindPx();pop.querySelector('.ofb').onclick=e=>{e.stopPropagation();pop.classList.remove('on');openFile(rn)};const r=td.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-310,r.left))+'px';pop.style.top=(r.bottom+4)+'px'};
+ const rn=td.closest('tr').dataset.n;pop.innerHTML=popHead(ttl)+body+'<button class="ofb" data-n="'+rn+'">打開顧客檔案 ›</button>';bindPx();pop.querySelector('.ofb').onclick=e=>{e.stopPropagation();pop.classList.remove('on');openFile(rn)};const r=td.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-262,r.left))+'px';pop.style.top=(r.bottom+4)+'px'};
 const layer=document.getElementById('layer'),sbar=document.getElementById('sbar');
 const isDesk=()=>MODE==='d';
 function openLayer(){layer.classList.add('on');sbar.classList.add('open');document.body.classList.add('exp');post('open')}
