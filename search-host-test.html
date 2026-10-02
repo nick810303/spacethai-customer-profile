@@ -1,9 +1,0 @@
-<!doctype html><meta charset="utf-8"><title>搜尋測試殼（暫時）</title>
-<body style="margin:0;background:#F1ECE8"><iframe id="f" src="search-embed-test.html" style="border:0;width:1000px;height:760px;display:block;margin:8px auto;background:#fff"></iframe>
-<script>
-const f=document.getElementById('f');
-window.addEventListener('message',async e=>{const d=e.data||{};if(e.source!==f.contentWindow)return;
- if(d.kx==='ready'||d.kx==='tok'){let t=null;try{t=JSON.parse(localStorage.getItem('sb-lyphciitrhfomquorhfm-auth-token')).access_token}catch(_){}
-  if(d.kx==='ready')f.contentWindow.postMessage({kx:'init',mode:'d',token:t,always:true,pad:{l:12,r:12,t:10}},location.origin);
-  else f.contentWindow.postMessage({kx:'token',token:t},location.origin)}});
-</script>
