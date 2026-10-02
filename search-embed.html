@@ -243,6 +243,8 @@ body.d .layer.on{background:none;border:0;padding:8px 0 0}
 .ldw.err .ldt{font-size:14px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){.ldw .ldf{animation:none}}
 body.al .lx{display:none}
+.sg>span{color:#5C4A3F;font-weight:700;font-size:11.5px}
+.sg b{border-radius:8px!important;padding:3px 10px!important}
 .sg b{cursor:pointer}
 body.exp{padding:var(--pt,0px) var(--pr,0px) 0 var(--pl,0px)!important}
 body.d.exp{padding-bottom:12px!important}
@@ -354,7 +356,7 @@ const yrOf=(lo,hi)=>{const y2=lo!=null?TY-lo:null,y1=hi!=null?TY-hi-1:null;retur
 const S={q:'',zo:new Set(),t:new Set(),st:new Set(),l:new Set(),rj:new Set(),sb:new Set(),cc:new Set(),sp:[null,null],vi:[null,null],ag:[null,null],gm:[null,null],bmo:new Set(),has:new Set(),sort:'num',dir:1,
  cols:{num:1,name:1,phone:1,bday:1,tier:1,rej:1,sb:1,pin:1,last:1,spend:0,visits:0,tag:0,note:0,ln:0,main:0,gap:0}};
 const COLS=[['num','編號'],['name','姓名'],['phone','電話'],['bday','生日'],['tier','級別'],['rej','拒接'],['sb','自帶'],['pin','釘選置頂'],['last','上次到訪'],['spend','累計消費','r'],['visits','次數','r'],['tag','客立樂標籤'],['note','客立樂備注'],['ln','小本本'],['main','主要老師'],['gap','距上次','r']];
-const W={num:56,name:58,withT:68,hit:116,phone:124,bday:126,tier:80,rej:78,sb:78,pin:110,last:150,spend:64,visits:44,tag:110,note:110,ln:120,main:66,gap:54};
+const W={num:56,name:82,withT:68,hit:116,phone:124,bday:126,tier:80,rej:78,sb:78,pin:110,last:150,spend:64,visits:44,tag:110,note:110,ln:120,main:66,gap:54};
 const PRE={'預設（日常用）':['num','name','phone','bday','tier','rej','sb','pin','last'],'接待前':['num','name','phone','tier','rej','sb','pin','ln'],'行銷':['num','name','phone','bday','tier','spend','visits','last','tag']};
 const topT=d=>{const e=Object.entries(d.teachers).sort((a,b)=>b[1]-a[1]);const tot=e.reduce((a,b)=>a+b[1],0);return e[0]?[e[0][0],Math.round(e[0][1]/tot*100)]:['—',0]};
 const withT=d=>[...S.t].reduce((a,t)=>a+(d.teachers[t]||0),0);
