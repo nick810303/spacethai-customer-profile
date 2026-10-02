@@ -162,18 +162,39 @@ body[data-hl=A] .pt mark.h0,body[data-hl=A] .pt mark.h1,body[data-hl=A] .pt mark
 
  </div>
 </div>
+<style>
+#ld{position:fixed;inset:0;z-index:150;background:var(--bg,#FBF7F3);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .3s}#ld.out{opacity:0;pointer-events:none}
+#ld .ldc{width:min(340px,100%);display:flex;flex-direction:column;gap:14px}
+#ld .ldt{font:800 17px 'Noto Sans TC',Manrope,sans-serif;color:#2C2520}
+#ld .ldb{height:10px;border-radius:999px;background:#EFE6DF;overflow:hidden}
+#ld .ldf{height:100%;width:3%;border-radius:999px;background:linear-gradient(90deg,#8C5E48,#B88468,#8C5E48);background-size:200% 100%;animation:ldsh 1.4s linear infinite;transition:width .35s ease}
+@keyframes ldsh{to{background-position:-200% 0}}
+#ld .ldr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:600 12.5px 'Noto Sans TC',Manrope,sans-serif;color:#5C4A3F}#ld .lds{font:600 11.5px Manrope,sans-serif;color:#8C7B72;font-variant-numeric:tabular-nums}
+#ld .ldl{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+#ld .ldl li{display:flex;align-items:center;gap:9px;font:500 12px 'Noto Sans TC',Manrope,sans-serif;color:#A89B93}
+#ld .ldl li i{width:16px;height:16px;border-radius:50%;border:1.5px solid #D9CEC7;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;line-height:1;flex:none}
+#ld .ldl li.on{color:#2C2520;font-weight:700}#ld .ldl li.on i{border-color:#8C5E48;background:#F6ECE4}
+#ld .ldl li.dn{color:#6B5A50}#ld .ldl li.dn i{background:#8C5E48;border-color:#8C5E48;color:#fff}#ld .ldl li.dn i::before{content:'✓'}
+@media (prefers-reduced-motion:reduce){#ld .ldf{animation:none}}
+</style>
+<div id="ld"><div class="ldc"><div class="ldt">顧客搜尋</div><div class="ldb"><div class="ldf"></div></div><div class="ldr"><span class="ldm">連線中…</span><span class="lds"></span></div><ul class="ldl"><li class="on"><i></i>確認登入</li><li><i></i>取得老師名單</li><li><i></i>載入顧客資料</li><li><i></i>整理資料、建立搜尋</li></ul></div></div>
 <div class="pop" id="pop"></div>
 <script>
 (async()=>{
 
 
+
+const LD=document.getElementById('ld');
+const ldStep=(i,p,msg,sub)=>{if(!LD)return;LD.querySelector('.ldf').style.width=p+'%';LD.querySelector('.ldm').textContent=msg;LD.querySelector('.lds').textContent=sub||'';LD.querySelectorAll('.ldl li').forEach((li,k)=>{li.className=k<i?'dn':k===i?'on':''})};
+const ldHide=()=>{if(!LD)return;LD.classList.add('out');setTimeout(()=>LD.remove(),350)};
+window.__ld={set:ldStep,hide:ldHide};
 const SUPA='https://lyphciitrhfomquorhfm.supabase.co',AKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
-const fail=(t,sub)=>{document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;inset:0;z-index:200;background:#FBF7F3;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font:600 15px/1.7 Manrope,Noto Sans TC,sans-serif;color:#2C2520"><div>'+t+'<div style="margin-top:14px"><a href="./" style="display:inline-block;padding:9px 18px;border-radius:9px;background:#F6ECE4;border:1px solid #DDBFAC;color:#6B3F2B;text-decoration:none;font-weight:700">'+(sub||'回顧客檔案系統')+'</a></div></div></div>')};
+const fail=(t,sub)=>{ldHide();document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;inset:0;z-index:200;background:#FBF7F3;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font:600 15px/1.7 Manrope,Noto Sans TC,sans-serif;color:#2C2520"><div>'+t+'<div style="margin-top:14px"><a href="./" style="display:inline-block;padding:9px 18px;border-radius:9px;background:#F6ECE4;border:1px solid #DDBFAC;color:#6B3F2B;text-decoration:none;font-weight:700">'+(sub||'回顧客檔案系統')+'</a></div></div></div>')};
 const getTok=()=>{try{const o=JSON.parse(localStorage.getItem('sb-lyphciitrhfomquorhfm-auth-token')||'null');if(!o||!o.access_token)return null;if(o.expires_at&&o.expires_at*1000<Date.now()+5000)return 'expired';return o.access_token}catch(e){return null}};
-async function rest(path,tok){const out=[];for(let from=0;;from+=1000){const r=await fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+tok,Range:from+'-'+(from+999),'Range-Unit':'items'}});if(!r.ok)throw new Error(path+' '+r.status);const j=await r.json();out.push(...j);if(j.length<1000)break}return out}
+async function rest(path,tok,onP){const out=[];let total=0;for(let from=0;;from+=1000){const r=await fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+tok,Range:from+'-'+(from+999),'Range-Unit':'items',Prefer:'count=exact'}});if(!r.ok)throw new Error(path+' '+r.status);if(!total){const m=(r.headers.get('content-range')||'').match(/\/(\d+)$/);if(m)total=+m[1]}const j=await r.json();out.push(...j);if(onP)onP(out.length,total);if(j.length<1000)break}return out}
 let RAW,TCH;
 if(window.__RAW){RAW=window.__RAW;TCH=window.__TCH}else{const tok=getTok();if(!tok){fail('請先登入顧客檔案系統，再回到這個頁面。');return}if(tok==='expired'){fail('登入已逾時，請先回顧客檔案系統開啟一次，再回到這個頁面。');return}
- try{[RAW,TCH]=await Promise.all([rest('customer_search?select=*&order=num.asc',tok),rest('teachers?select=name,active,sort&order=sort.asc',tok)])}catch(e){fail('資料載入失敗（'+esc0(e.message)+'）。請稍後重試。','重新整理');return}}
+ try{ldStep(1,10,'已確認登入');TCH=await rest('teachers?select=name,active,sort&order=sort.asc',tok);ldStep(2,20,'已取得老師名單');RAW=await rest('customer_search?select=*&order=num.asc',tok,(n,t)=>{ldStep(2,20+Math.round(60*(t?n/t:.5)),'正在載入顧客資料',t?n.toLocaleString()+' / '+t.toLocaleString()+' 位':'')});ldStep(3,88,'整理資料、建立搜尋')}catch(e){fail('資料載入失敗（'+esc0(e.message)+'）。請稍後重試。','重新整理');return}}
 function esc0(s){return String(s).replace(/[<>&]/g,'')}
 const TODAY=new Date();TODAY.setHours(0,0,0,0);const TY=TODAY.getFullYear(),TM=TODAY.getMonth()+1,TDD=TODAY.getDate();
 const ymd=g=>{if(g>=99999)return'—';const d=new Date(TODAY);d.setDate(d.getDate()-g);return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()};
@@ -357,7 +378,7 @@ const TRY=[['45歲','年紀'],['拒','標籤'],['香港','國碼'],['0912','電�
 let tryI=0;function drawTry(){const sg=document.getElementById('sg');let o='<span>試試：</span>';for(let k=0;k<5;k++){const t=TRY[(tryI+k)%TRY.length];o+=`<b class="fi" data-s="${t[0]}" title="${t[1]}">${t[0]}</b>`}sg.innerHTML=o;sg.querySelectorAll('b').forEach(b=>b.onclick=()=>{S.q=b.dataset.s;qi.value=S.q;render(true)})}
 drawTry();setInterval(()=>{if(S.q||document.activeElement===qi)return;tryI=(tryI+1)%TRY.length;drawTry()},2600);
 document.getElementById('hd').onclick=()=>{const t=document.getElementById('tool'),c=t.classList.toggle('closed');document.getElementById('hd').classList.toggle('closed',c)};
-const y0=loadState();qi.value=S.q;render();if(y0)requestAnimationFrame(()=>window.scrollTo(0,y0));
+const y0=loadState();qi.value=S.q;ldStep(4,100,'完成');render();ldHide();if(y0)requestAnimationFrame(()=>window.scrollTo(0,y0));
 
 })().catch(e=>{console.error(e);document.body.insertAdjacentHTML('beforeend','<pre style="position:fixed;inset:0;z-index:300;background:#fff;color:#900;padding:16px;white-space:pre-wrap">頁面錯誤：'+String(e&&e.message||e).replace(/[<>&]/g,'')+'</pre>')});
 </script></body></html>
