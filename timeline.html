@@ -145,7 +145,9 @@
   .cap.mini .hpn{font-size:13px;min-width:0}
   /* 量能說明框 */
   .cappop{display:none;position:fixed;z-index:60;width:300px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:12px 14px;font-size:12px;line-height:1.55;color:var(--text)}
-  .cappop.open{display:block}
+  .cappop .px{position:absolute;right:8px;top:8px;width:26px;height:26px;border:0;border-radius:50%;background:var(--surface2,#f1ece8);color:var(--text-muted,#6f625a);font-size:12px;line-height:26px;cursor:pointer;padding:0;z-index:2}
+.cappop h4{padding-right:34px}
+.cappop.open{display:block}
   .cappop h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
   .cappop .meter{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
   .cappop .meter .cap{margin:0;cursor:default;gap:6px} .cappop .meter .cap .pill{display:none}
@@ -626,21 +628,20 @@ function capPopHtml(brName){
 }
 function openCapPop(el){
   const br=el.dataset.br; const pop=document.getElementById('capPop');
-  pop.innerHTML=capPopHtml(br); pop.classList.add('open'); capPopBr=br;
+  pop.innerHTML='<button class="px" aria-label="關閉">✕</button>'+capPopHtml(br); pop.classList.add('open'); capPopBr=br;
   const r=el.getBoundingClientRect(), W=pop.offsetWidth, H=pop.offsetHeight;
   let left=Math.min(Math.max(8,r.left), window.innerWidth-W-8);
   let top=r.bottom+6; if(top+H>window.innerHeight-8) top=Math.max(8,r.top-H-6);
   pop.style.left=left+'px'; pop.style.top=top+'px';
 }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCapPop(); });
 function closeCapPop(){ document.getElementById('capPop').classList.remove('open'); capPopBr=null; }
 document.addEventListener('click',e=>{
+  if(e.target.closest('#capPop .px')){ closeCapPop(); return; }
   const el=e.target.closest('.cap[data-br]');
   if(el){ e.stopPropagation(); if(capPopBr===el.dataset.br) closeCapPop(); else openCapPop(el); return; }
   if(!e.target.closest('#capPop')) closeCapPop();
 });
-document.addEventListener('mouseover',e=>{ if(isMobile()) return; const el=e.target.closest('.cap[data-br]'); if(el && capPopBr!==el.dataset.br) openCapPop(el); });
-document.addEventListener('mouseout',e=>{ if(isMobile()) return; const el=e.target.closest('.cap[data-br]'); if(el && !e.relatedTarget?.closest?.('#capPop,.cap[data-br]')) closeCapPop(); });
-document.addEventListener('mouseout',e=>{ if(isMobile()) return; if(e.target.closest?.('#capPop') && !e.relatedTarget?.closest?.('#capPop,.cap[data-br]')) closeCapPop(); });
 function bedsHtml(used){
   if(used==null) return '';
   const n=Math.min(5,used);
