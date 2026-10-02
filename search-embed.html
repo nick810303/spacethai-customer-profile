@@ -243,6 +243,8 @@ body.d .layer.on{background:none;border:0;padding:8px 0 0}
 .ldw.err .ldt{font-size:14px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){.ldw .ldf{animation:none}}
 .sg b{cursor:pointer}
+body.exp{padding:var(--pt,0px) var(--pr,0px) 0 var(--pl,0px)!important}
+body.d.exp{padding-bottom:12px!important}
 
 th,td{padding:0 6px;border-right:1px solid #E4D8CF}
 th{border-right-color:#D8CABF}
@@ -279,6 +281,7 @@ window.addEventListener('message',e=>{if(e.source!==parent)return;const d=e.data
  if(d.kx==='init'){MODE=d.mode;TOKEN=d.token;if(d.raw)RAWTEST={raw:d.raw,tch:d.tch};document.body.classList.remove('m','d');document.body.classList.add(MODE);GOT=true;INITW()}
  else if(d.kx==='token'){TOKEN=d.token;if(TOKW){TOKW(d.token);TOKW=null}}
  else if(d.kx==='mode'){MODE=d.mode;document.body.classList.remove('m','d');document.body.classList.add(MODE);window.__kxMode&&window.__kxMode()}
+ else if(d.kx==='pad'){const b=document.body.style;b.setProperty('--pl',d.l+'px');b.setProperty('--pr',d.r+'px');b.setProperty('--pt',d.t+'px')}
  else if(d.kx==='sel'){if(window.__kxSel)window.__kxSel(d.n);else window.__kxSelP=d.n}});
 const SUPA='https://lyphciitrhfomquorhfm.supabase.co',AKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
 async function rest(path,onP){const out=[];let total=0;for(let from=0;;from+=1000){const go=()=>fetch(SUPA+'/rest/v1/'+path,{headers:{apikey:AKEY,Authorization:'Bearer '+TOKEN,Range:from+'-'+(from+999),'Range-Unit':'items',Prefer:'count=exact'}});let r=await go();if(r.status===401){TOKEN=await askToken();r=await go()}if(!r.ok)throw new Error(path+' '+r.status);if(!total){const m=(r.headers.get('content-range')||'').match(/\/(\d+)$/);if(m)total=+m[1]}const j=await r.json();out.push(...j);if(onP)onP(out.length,total);if(j.length<1000)break}return out}
@@ -350,7 +353,7 @@ const yrOf=(lo,hi)=>{const y2=lo!=null?TY-lo:null,y1=hi!=null?TY-hi-1:null;retur
 const S={q:'',zo:new Set(),t:new Set(),st:new Set(),l:new Set(),rj:new Set(),sb:new Set(),cc:new Set(),sp:[null,null],vi:[null,null],ag:[null,null],gm:[null,null],bmo:new Set(),has:new Set(),sort:'num',dir:1,
  cols:{num:1,name:1,phone:1,bday:1,tier:1,rej:1,sb:1,pin:1,last:1,spend:0,visits:0,tag:0,note:0,ln:0,main:0,gap:0}};
 const COLS=[['num','編號'],['name','姓名'],['phone','電話'],['bday','生日'],['tier','級別'],['rej','拒接'],['sb','自帶'],['pin','釘選置頂'],['last','上次到訪'],['spend','累計消費','r'],['visits','次數','r'],['tag','客立樂標籤'],['note','客立樂備注'],['ln','小本本'],['main','主要老師'],['gap','距上次','r']];
-const W={num:56,name:58,withT:68,hit:170,phone:124,bday:126,tier:80,rej:78,sb:78,pin:110,last:150,spend:64,visits:44,tag:110,note:110,ln:120,main:66,gap:54};
+const W={num:56,name:58,withT:68,hit:116,phone:124,bday:126,tier:80,rej:78,sb:78,pin:110,last:150,spend:64,visits:44,tag:110,note:110,ln:120,main:66,gap:54};
 const PRE={'預設（日常用）':['num','name','phone','bday','tier','rej','sb','pin','last'],'接待前':['num','name','phone','tier','rej','sb','pin','ln'],'行銷':['num','name','phone','bday','tier','spend','visits','last','tag']};
 const topT=d=>{const e=Object.entries(d.teachers).sort((a,b)=>b[1]-a[1]);const tot=e.reduce((a,b)=>a+b[1],0);return e[0]?[e[0][0],Math.round(e[0][1]/tot*100)]:['—',0]};
 const withT=d=>[...S.t].reduce((a,t)=>a+(d.teachers[t]||0),0);
@@ -485,7 +488,8 @@ const isDesk=()=>MODE==='d';
 function openLayer(){layer.classList.add('on');sbar.classList.add('open');document.body.classList.add('exp');post('open')}
 function closeLayer(){layer.classList.remove('on');sbar.classList.remove('open');document.getElementById('fp').classList.remove('on');document.getElementById('bf').classList.remove('open');pop.classList.remove('on');document.body.classList.remove('exp');post('close');reportH()}
 let selN=null;const markSel=()=>document.querySelectorAll('#tb tr[data-n]').forEach(t=>t.classList.toggle('sel',isDesk()&&t.dataset.n===String(selN)));
-new MutationObserver(markSel).observe(document.getElementById('tb'),{childList:true});
+function fitHit(){const ci=[...document.querySelectorAll('#cg col')],th=[...document.querySelectorAll('#th th')],idx=th.findIndex(x=>x.dataset.k==='hit');if(idx<0||!ci[idx])return;let mx=0;document.querySelectorAll('#tb td.hc .ht').forEach(el=>{const r=document.createRange();r.selectNodeContents(el);mx=Math.max(mx,Math.ceil(r.getBoundingClientRect().width))});const w=Math.max(80,Math.min(260,mx+14)),old=parseFloat(ci[idx].style.width);if(!(Math.abs(w-old)>=2))return;ci[idx].style.width=w+'px';const t=document.getElementById('tbl');t.style.width=(parseFloat(t.style.width)+w-old)+'px'}
+new MutationObserver(()=>{markSel();fitHit()}).observe(document.getElementById('tb'),{childList:true});
 window.__kxSel=n=>{selN=n;markSel()};window.__kxMode=()=>{markSel()};
 function openFile(n){pop.classList.remove('on');selN=+n;post('pick',{n:+n});if(isDesk()){markSel()}else{closeLayer()}}
 function updNew(){const el=document.getElementById('nw'),q=S.q.trim();if(/^\d+$/.test(q)&&!R.some(d=>String(d.num)===q)){el.style.display='flex';el.dataset.n=q;el.querySelector('b').textContent='新增 #'+q}else el.style.display='none'}
