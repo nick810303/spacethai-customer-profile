@@ -242,6 +242,7 @@ body.d .layer.on{background:none;border:0;padding:8px 0 0}
 .ldw .ldl li.dn{color:#6B5A50}.ldw .ldl li.dn i{background:#8C5E48;border-color:#8C5E48;color:#fff}.ldw .ldl li.dn i::before{content:'✓'}
 .ldw.err .ldt{font-size:14px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){.ldw .ldf{animation:none}}
+body.al .lx{display:none}
 .sg b{cursor:pointer}
 body.exp{padding:var(--pt,0px) var(--pr,0px) 0 var(--pl,0px)!important}
 body.d.exp{padding-bottom:12px!important}
@@ -273,12 +274,12 @@ td.num,td.nm,th.stk,th.stk2{padding:0 4px}
 <script>
 
 (function(){
-let MODE='d',TOKEN=null,RAWTEST=null,BOOT=null,TOKW=null,INITW=null,GOT=false;
+let ALWAYS=false,MODE='d',TOKEN=null,RAWTEST=null,BOOT=null,TOKW=null,INITW=null,GOT=false;
 const post=(k,o)=>{try{parent.postMessage(Object.assign({kx:k},o||{}),location.origin)}catch(e){}};
 const askToken=()=>new Promise(r=>{TOKW=r;post('tok')});
 const initP=new Promise(r=>{INITW=r});
 window.addEventListener('message',e=>{if(e.source!==parent)return;const d=e.data||{};
- if(d.kx==='init'){MODE=d.mode;TOKEN=d.token;if(d.raw)RAWTEST={raw:d.raw,tch:d.tch};document.body.classList.remove('m','d');document.body.classList.add(MODE);GOT=true;INITW()}
+ if(d.kx==='init'){MODE=d.mode;TOKEN=d.token;if(d.raw)RAWTEST={raw:d.raw,tch:d.tch};document.body.classList.remove('m','d');document.body.classList.add(MODE);GOT=true;INITW();if(d.always){ALWAYS=true;document.body.classList.add('al','exp');const b=document.body.style;b.setProperty('--pl',d.pad.l+'px');b.setProperty('--pr',d.pad.r+'px');b.setProperty('--pt',d.pad.t+'px');setTimeout(()=>start({}),0)}}
  else if(d.kx==='token'){TOKEN=d.token;if(TOKW){TOKW(d.token);TOKW=null}}
  else if(d.kx==='mode'){MODE=d.mode;document.body.classList.remove('m','d');document.body.classList.add(MODE);window.__kxMode&&window.__kxMode()}
  else if(d.kx==='pad'){const b=document.body.style;b.setProperty('--pl',d.l+'px');b.setProperty('--pr',d.r+'px');b.setProperty('--pt',d.t+'px')}
@@ -455,6 +456,7 @@ document.addEventListener('click',e=>{if(!pop.contains(e.target)&&!e.target.clos
 /* ---------- 主畫面 ---------- */
 function activeChips(){const a=[];S.t.forEach(t=>a.push(['老師 '+t,()=>S.t.delete(t)]));if(S.st.size===2)a.push(['兩間都去過',()=>S.st.clear()]);else S.st.forEach(x=>a.push([{nj:'南京三民',zs:'中山'}[x],()=>S.st.delete(x)]));S.l.forEach(l=>a.push([TIER[l][0],()=>S.l.delete(l)]));S.rj.forEach(x=>a.push(['拒接 '+(x==='blk'?'店家黑名單':x.startsWith('lv:')?x.slice(3):x.slice(2)),()=>S.rj.delete(x)]));S.sb.forEach(x=>a.push([x==='any'?'有自帶':x+'自帶',()=>S.sb.delete(x)]));S.cc.forEach(x=>a.push([CC.find(c=>c[0]===x)[1],()=>S.cc.delete(x)]));
  const rg=(k,l,f1,f2)=>{if(S[k][0]!=null||S[k][1]!=null)a.push([l+' '+(S[k][0]!=null?SL[k][3](S[k][0]):'不限')+'–'+(S[k][1]!=null?SL[k][4](S[k][1]):'不限'),()=>S[k]=[null,null]])};rg('gm','上次到訪');rg('sp','消費');rg('vi','次數');rg('ag','年紀');S.bmo.forEach(m=>a.push([m+' 月生日',()=>S.bmo.delete(m)]));S.zo.forEach(z=>a.push([ZSYM(z)+' '+z,()=>S.zo.delete(z)]));S.has.forEach(x=>a.push(['有'+({pin:'釘選置頂',ln:'小本本',note:'備注',tag:'標籤'})[x],()=>S.has.delete(x)]));return a}
+let LIM=80,LSIG='',LRS=[];
 function render(keep){const showT=S.t.size>0,hasQ=!!WORDS().length;
  const chips=activeChips();document.getElementById('act').innerHTML=chips.map((c,i)=>`<span class="ch" data-i="${i}">${c[0]}<i>✕</i></span>`).join('')+(chips.length>1?'<span class="ch" style="background:none;color:var(--m);border:1px dashed var(--br)" data-i="x">清除全部</span>':'');
  document.querySelectorAll('#act .ch').forEach(c=>c.onclick=()=>{if(c.dataset.i==='x')clearAll();else chips[+c.dataset.i][1]();render(true)});
@@ -475,9 +477,10 @@ function render(keep){const showT=S.t.size>0,hasQ=!!WORDS().length;
  const PIC='<svg viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3.2 3.2H6.8L10 9z"/><path d="M12 12.5V21"/></svg>',NIC='<svg viewBox="0 0 24 24"><rect x="6" y="3" width="14" height="18" rx="2"/><path d="M3 7.5h4M3 12h4M3 16.5h4M10.5 8h6M10.5 12h6"/></svg>';
  const ell=(t,kind)=>!t?'<td><span class="sub2">—</span></td>':kind==='pin'?`<td class="ell" data-kind="pin" title="${esc(t)}"><div class="pn pin"><span class="pc">${PIC}</span><span class="pt">${hl(t.split('\n')[0])}</span>${t.includes('\n')?'<span class="more">+'+(t.split('\n').length-1)+'</span>':''}</div></td>`:kind==='ln'?`<td class="ell" data-kind="ln" title="${esc(t)}"><div class="pn ln"><span class="pc">${NIC}</span><span class="pt">${hl(t.split('\n')[0])}</span>${t.includes('\n')?'<span class="more">+'+(t.split('\n').length-1)+'</span>':''}</div></td>`:kind==='note'?`<td class="ell" data-kind="note" title="${esc(t)}"><div class="pn note"><span class="pt">${hl(t)}</span></div></td>`:`<td class="ell" title="${esc(t)}">${hl(t)}</td>`;
  const mc=(kind,d,items,pills)=>!items.length?'<td><span class="sub2">—</span></td>':`<td class="mc" data-k="${kind}" data-n="${d.num}" title="點一下看完整內容"><span class="mr">${pills.slice(0,3).join('')}${pills.length>3?`<span class="more">+${pills.length-3}</span>`:''}</span></td>`;
- document.getElementById('tb').innerHTML=rs.slice(0,60).map(d=>{const t=TIER[d.tier],m=topT(d);
+ {const sg=JSON.stringify([S.q,[...S.t],[...S.st],[...S.l],[...S.rj],[...S.sb],[...S.cc],S.sp,S.vi,S.ag,S.gm,[...S.bmo],[...S.zo],[...S.has],S.sort,S.dir]);if(sg!==LSIG){LSIG=sg;LIM=80}LRS=rs}
+ document.getElementById('tb').innerHTML=rs.slice(0,LIM).map(d=>{const t=TIER[d.tier],m=topT(d);
   const cell=c=>{const k=c[0];return k==='num'?`<td class="num stk"><i>#</i>${hl(d.num)}</td>`:k==='name'?`<td class="nm stk2" title="${esc(d.name)}">${hl(d.name)}</td>`:k==='hit'?`<td class="hc"><div class="hits">${hits(d)||'<span class="sub2">—</span>'}</div></td>`:k==='phone'?`<td title="${d.region} ${d.cc}">${FL[d.cc]==='北美'?'<b>北美</b>':'<span style="font-size:14px;vertical-align:-1px">'+(FL[d.cc]||'')+'</span>'} ${hl(phoneShow(d))}</td>`:k==='bday'?`<td>${dm(d,'生日',bdayText(d))}${ageText(d)?`<span class="age">${hl(ageText(d))}</span>`:''}</td>`:k==='tier'?`<td><span class="tg" style="background:${t[1]}" title="${t[0]}">${KI[TS[d.tier]]}${hl(t[0])}</span></td>`:k==='rej'?(()=>{const it=[...(d.blk?['blk']:[]),...d.rej];return mc('rej',d,it,it.map(r=>r==='blk'?`<span class="rs r0">${hl('黑')}</span>`:`<span class="rs r${r.lv==='拒'?1:r.lv==='微拒'?2:3}">${hl(r.t)}</span>`))})():k==='sb'?mc('sb',d,d.sbT,d.sbT.map(x=>`<span class="rs r4">${hl(x)}</span>`)):k==='pin'?ell(d.pin,'pin'):k==='spend'?`<td class="r"><b>$${d.spend.toLocaleString()}</b></td>`:k==='visits'?`<td class="r">${d.visits}</td>`:k==='last'?(!d.visits?'<td><span class="sub2">—</span></td>':`<td>${dm(d,'上次到訪',ymd(d.gap))}<span class="sc2" style="background:${ST[d.ls][1]}">${hl(ST[d.ls][0])}</span></td>`):k==='tag'?ell(d.oth.join('、')):k==='note'?ell(d.note,'note'):k==='ln'?ell(d.ln,'ln'):k==='main'?`<td><b>${m[0]}</b> <span class="sub2">${m[1]}%</span></td>`:k==='gap'?`<td class="r">${d.gap} 天</td>`:`<td class="r"><b>${withT(d)}</b> 次</td>`};
-  return '<tr data-n="'+d.num+'">'+cols.map(cell).join('')+'</tr>'}).join('')+(rs.length>60?`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center">…還有 ${rs.length-60} 位（往下捲動載入）</td></tr>`:'');
+  return '<tr data-n="'+d.num+'">'+cols.map(cell).join('')+'</tr>'}).join('')+(rs.length>LIM?`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center">…還有 ${rs.length-LIM} 位（往下捲動載入）</td></tr>`:'');
  if(!rs.length)document.getElementById('tb').innerHTML=`<tr><td colspan="${cols.length}" class="sub2" style="text-align:center;height:60px">沒有符合的客人，試著放寬條件</td></tr>`}
 document.getElementById('tb').onclick=e=>{const td=e.target.closest('td.nm,td.ell,td.mc');if(!td){const tr=e.target.closest('tr[data-n]');if(tr)openFile(tr.dataset.n);return}e.stopPropagation();pop.className='pop on';pop.dataset.k='cell';const kd=td.dataset.kind||td.dataset.k;let body='',ttl='完整內容';
  if(td.classList.contains('mc')){const d=R.find(x=>String(x.num)===td.dataset.n);if(kd==='rej'){ttl='拒接（哪位老師）';body=(d.blk?'<div style="margin:3px 0"><span class="rj r0">'+hl('店家黑名單')+'</span> 全店</div>':'')+d.rej.map(r=>'<div style="margin:3px 0">'+rjc(r)+' <span class="sub2">'+(r.lv==='拒'?'這位老師不接':r.lv==='微拒'?'這位老師偏不想接':'視狀況決定')+'</span></div>').join('')}else{ttl='自帶（哪位老師）';body=d.sbT.map(x=>'<div style="margin:3px 0">'+sbc(x)+' <span class="sub2">'+esc(x)+' 老師自帶的客人</span></div>').join('')}}
@@ -486,7 +489,7 @@ document.getElementById('tb').onclick=e=>{const td=e.target.closest('td.nm,td.el
 const layer=document.getElementById('layer'),sbar=document.getElementById('sbar');
 const isDesk=()=>MODE==='d';
 function openLayer(){layer.classList.add('on');sbar.classList.add('open');document.body.classList.add('exp');post('open')}
-function closeLayer(){layer.classList.remove('on');sbar.classList.remove('open');document.getElementById('fp').classList.remove('on');document.getElementById('bf').classList.remove('open');pop.classList.remove('on');document.body.classList.remove('exp');post('close');reportH()}
+function closeLayer(){if(ALWAYS)return;layer.classList.remove('on');sbar.classList.remove('open');document.getElementById('fp').classList.remove('on');document.getElementById('bf').classList.remove('open');pop.classList.remove('on');document.body.classList.remove('exp');post('close');reportH()}
 let selN=null;const markSel=()=>document.querySelectorAll('#tb tr[data-n]').forEach(t=>t.classList.toggle('sel',isDesk()&&t.dataset.n===String(selN)));
 function fitHit(){const ci=[...document.querySelectorAll('#cg col')],th=[...document.querySelectorAll('#th th')],idx=th.findIndex(x=>x.dataset.k==='hit');if(idx<0||!ci[idx])return;let mx=0;document.querySelectorAll('#tb td.hc .ht').forEach(el=>{const r=document.createRange();r.selectNodeContents(el);mx=Math.max(mx,Math.ceil(r.getBoundingClientRect().width))});const w=Math.max(80,Math.min(260,mx+14)),old=parseFloat(ci[idx].style.width);if(!(Math.abs(w-old)>=2))return;ci[idx].style.width=w+'px';const t=document.getElementById('tbl');t.style.width=(parseFloat(t.style.width)+w-old)+'px'}
 new MutationObserver(()=>{markSel();fitHit()}).observe(document.getElementById('tb'),{childList:true});
@@ -495,7 +498,7 @@ function openFile(n){pop.classList.remove('on');selN=+n;post('pick',{n:+n});if(i
 function updNew(){const el=document.getElementById('nw'),q=S.q.trim();if(/^\d+$/.test(q)&&!R.some(d=>String(d.num)===q)){el.style.display='flex';el.dataset.n=q;el.querySelector('b').textContent='新增 #'+q}else el.style.display='none'}
 document.getElementById('nw').onclick=e=>{post('add',{n:+e.currentTarget.dataset.n});closeLayer()};
 
-const qi=document.getElementById('q');qi.addEventListener('focus',()=>{if(!layer.classList.contains('on'))openLayer()});qi.addEventListener('input',()=>{if(!layer.classList.contains('on'))openLayer()});document.getElementById('lx').onclick=closeLayer;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLayer()});document.body.addEventListener('mousedown',e=>{if(!isDesk()&&layer.classList.contains('on')&&!e.target.closest('#sbar')&&!e.target.closest('#layer')&&!e.target.closest('#pop'))closeLayer()});
+const qi=document.getElementById('q');qi.addEventListener('focus',()=>{if(!layer.classList.contains('on'))openLayer()});qi.addEventListener('input',()=>{if(!layer.classList.contains('on'))openLayer()});document.getElementById('lx').onclick=closeLayer;document.querySelector('.tw').addEventListener('scroll',e=>{const t=e.target;if(t.scrollTop+t.clientHeight>=t.scrollHeight-300&&LIM<LRS.length){LIM+=120;render(true)}});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLayer()});document.body.addEventListener('mousedown',e=>{if(!isDesk()&&layer.classList.contains('on')&&!e.target.closest('#sbar')&&!e.target.closest('#layer')&&!e.target.closest('#pop'))closeLayer()});
 qi.oninput=e=>{S.q=e.target.value;render(true)};document.getElementById('qc').onclick=()=>{S.q='';qi.value='';qi.focus();render(true)};
 window.__kxSetQ=q=>{S.q=q;qi.value=q;render(true);qi.focus()};window.__kxQ=()=>!!S.q;
 function hasHit(q){const o=S.q;S.q=q;let ok=false;try{ok=R.some(match)}catch(e){}S.q=o;return ok}
