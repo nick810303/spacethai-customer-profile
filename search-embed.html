@@ -294,6 +294,13 @@ td.num,td.nm,th.stk,th.stk2{padding:0 4px}
 .hc2 ul.hl{margin:0;padding:0;list-style:none;font:500 11.5px/1.6 'Noto Sans TC'}.hc2 ul.hl li{display:flex;gap:7px;margin:4px 0}.hc2 ul.hl li b{flex:none;min-width:46px;color:var(--t)}.hc2 ul.hl li span{color:#5C4A3F}
 .hc2 .htip{font:500 10.5px/1.6 'Noto Sans TC';color:var(--m);margin-top:7px}
 .hc2 .lvr{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* ---- r106：頁首／頁尾色底，讓中間看起來可捲動 ---- */
+.fp{overflow:hidden}
+.fp .sh-h{background:#F3E9E0;padding:9px 12px;border-bottom:1px solid #E6D8CC;border-radius:12px 12px 0 0}
+.fp .sh-h button{background:#fff!important}
+.fp .sh-f{background:#F3E9E0;border-top:1px solid #E6D8CC;padding:8px 12px 10px;border-radius:0 0 12px 12px}
+.fp .sh-b{background:linear-gradient(#fff 30%,rgba(255,255,255,0)) 0 0/100% 22px no-repeat local,linear-gradient(rgba(255,255,255,0),#fff 70%) 0 100%/100% 22px no-repeat local,radial-gradient(farthest-side at 50% 0,rgba(70,45,30,.2),transparent) 0 0/100% 9px no-repeat scroll,radial-gradient(farthest-side at 50% 100%,rgba(70,45,30,.2),transparent) 0 100%/100% 9px no-repeat scroll;background-color:#fff;padding-top:4px}
 </style></head><body data-hl="A">
 <div class="sbar" id="sbar">
  <div class="top">
@@ -396,7 +403,7 @@ const ZSYM=n=>(ZO.find(z=>z[0]===n)||[])[1]+'\uFE0E';
 const yrOf=(lo,hi)=>{const y2=lo!=null?TY-lo:null,y1=hi!=null?TY-hi-1:null;return y1!=null&&y2!=null?'約 '+y1+'–'+y2+' 年生':y1!=null?'約 '+y1+' 年後生':y2!=null?'約 '+y2+' 年前生':''};
 const S={q:'',zo:new Set(),t:new Set(),st:new Set(),l:new Set(),fq:new Set(),hp:new Set(),ht:new Set(),hw:new Set(),rj:new Set(),sb:new Set(),cc:new Set(),sp:[null,null],vi:[null,null],ag:[null,null],gm:[null,null],bmo:new Set(),has:new Set(),sort:'num',dir:1,
  cols:{num:1,name:1,phone:1,bday:1,tier:1,rej:1,sb:1,pin:1,last:1,spend:0,visits:0,tag:0,note:0,ln:0,main:0,gap:0,freq:0}};
-const COLS=[['num','編號'],['name','姓名'],['phone','電話'],['bday','生日'],['tier','級別'],['rej','拒接'],['sb','自帶'],['pin','釘選置頂'],['last','上次到訪'],['spend','累計消費','r'],['visits','次數','r'],['tag','客立樂標籤'],['note','客立樂備注'],['ln','小本本'],['main','主要老師'],['gap','距上次','r'],['freq','回訪頻率'],['hp','方案佔比','r'],['ht','時段佔比','r'],['hw','平假日佔比','r']];
+const COLS=[['num','編號'],['name','姓名'],['phone','電話'],['bday','生日'],['tier','等級'],['rej','拒接'],['sb','自帶'],['pin','釘選置頂'],['last','上次到訪'],['spend','累計消費','r'],['visits','次數','r'],['tag','客立樂標籤'],['note','客立樂備注'],['ln','小本本'],['main','主要老師'],['gap','距上次','r'],['freq','回訪頻率'],['hp','方案佔比','r'],['ht','時段佔比','r'],['hw','平假日佔比','r']];
 const W={num:56,name:82,withT:68,hit:116,phone:124,bday:126,tier:80,rej:78,sb:78,pin:110,last:150,spend:64,visits:44,tag:110,note:110,ln:120,main:66,gap:54,freq:132,hp:128,ht:128,hw:128};
 const PRE={'預設（日常用）':['num','name','phone','bday','tier','rej','sb','pin','last'],'接待前':['num','name','phone','tier','rej','sb','pin','ln'],'行銷':['num','name','phone','bday','tier','freq','spend','visits','last','tag']};
 const HB={p:{n:'方案',it:[['120','120 min','#CFB3B3',0],['90','90 min','#D1C2B3',1],['60','60 min','#EAD6C5',2]]},t:{n:'時段',it:[['pm','下午','#D5D9DF',0,'〜18'],['ev','晚上','#8A929D',1,'18–21'],['nt','夜間','#2E333B',2,'21〜']]},w:{n:'平假日',it:[['w1','週一','#3C5094',0],['w2','週二','#3C5094',1],['w3','週三','#3C5094',2],['w4','週四','#3C5094',3],['w5','週五','#3C5094',4],['we','假日','#E5251C',5]]}};
@@ -465,7 +472,8 @@ const spTxt=(lo,hi)=>{if(lo==null&&hi==null)return'';const n=R.filter(d=>(lo==nu
 const viTxt=(lo,hi)=>{if(lo==null&&hi==null)return'';const n=R.filter(d=>(lo==null||d.visits>=lo)&&(hi==null||d.visits<=hi)).length,p=Math.round(n/R.length*100);return n===0?'沒有客人':p===0?'不到 1% 的客人':'約 '+p+'% 的客人'};
 const gpTxt=(lo,hi)=>{const t=gmTxt(lo,hi);if(!t)return'';const n=R.filter(d=>(lo==null||d.gap>=lo*30)&&(hi==null||d.gap<=hi*30)).length,p=Math.round(n/R.length*100);return t};
 const qm=k=>`<span class="qm" data-help="${k}">?</span>`;
-function showHelp(k,el){const r=el.getBoundingClientRect();pop.className='pop on';pop.dataset.k='help';pop.style.left=Math.max(8,Math.min(innerWidth-312,r.left-20))+'px';pop.style.top=(r.bottom+8)+'px';pop.innerHTML=popHead(HELP[k][0])+'<div class="hc2">'+HELP[k][1]+'</div>';bindPx()}
+function fitPop(r,gap){pop.style.zoom='';pop.style.maxHeight='';pop.style.overflow='';const W=innerWidth,H=innerHeight,m=8;let w=pop.offsetWidth,h=pop.offsetHeight,z=1;if(h>H-2*m)z=(H-2*m)/h;if(w>W-2*m)z=Math.min(z,(W-2*m)/w);if(z<1)pop.style.zoom=z;const w2=w*z,h2=h*z;let x=Math.max(m,Math.min(W-w2-m,r.left-20)),y=r.bottom+gap;if(y+h2>H-m){const up=r.top-gap-h2;y=up>=m?up:Math.max(m,H-h2-m)}pop.style.left=x/z+'px';pop.style.top=y/z+'px'}
+function showHelp(k,el){const r=el.getBoundingClientRect();pop.className='pop on';pop.dataset.k='help';pop.innerHTML=popHead(HELP[k][0])+'<div class="hc2">'+HELP[k][1]+'</div>';bindPx();fitPop(r,8)}
 const popHead=t=>`<div class="ph"><h6>${t}</h6><button class="px" aria-label="關閉">✕</button></div>`;
 const bindPx=()=>{const x=pop.querySelector('.px');if(x)x.onclick=e=>{e.stopPropagation();pop.classList.remove('on')}};
 document.addEventListener('click',e=>{const q=e.target.closest('.qm');if(q){e.stopPropagation();e.preventDefault();showHelp(q.dataset.help,q)}},true);
@@ -482,7 +490,7 @@ function updCnt(){const e=document.getElementById('kcnt'),c=document.getElementB
 const kt=(g,pre,isOn,pool,tog)=>{const lf=pool.filter(t=>LEFT.includes(t)),ac=pool.filter(t=>!LEFT.includes(t)),show=MORE[g]||lf.some(t=>isOn(pre+t));let h=ac.map(t=>kc(g,pre+t,t,isOn(pre+t))).join('')+(show?lf.map(t=>kc(g,pre+t,t,isOn(pre+t),'lf')).join(''):'');return '<div class="kcs g kg8">'+h+'</div>'+(tog&&lf.length?'<div class="kcs" style="margin-top:4px"><span class="kc sub gry" data-g="more" data-k="'+g+'">'+(MORE[g]?'收合 ▴':'其他 '+lf.length+' 位 ▾')+'</span></div>':'')};
 function buildSheet(){
  const kr=(lb,h,sub)=>`<div class="kr">${sub?`<div class="klb2">${lb}<small>${sub}</small></div>`:`<div class="klb">${lb}</div>`}<div>${h}</div></div>`;
- const lvl=Object.entries(TIER).sort((a,b)=>(a[0]==='none')-(b[0]==='none')).map(([a,b])=>kc('l',a,ico(KI[TS[a]],b[1])+(a==='none'?'無到訪':b[0].replace('顧客','')),S.l.has(a)));
+ const lvl=Object.entries(TIER).filter(x=>x[0]!=='none').map(([a,b])=>kc('l',a,ico(KI[TS[a]],b[1])+b[0].replace('顧客',''),S.l.has(a)));
  const hn=[...habNames('hp'),...habNames('ht'),...habNames('hw')],habAct=hn.length;
  const lfT=TEACH.filter(t=>LEFT.includes(t)),teachRow=`<div class="kr"><div class="klb2" style="justify-content:flex-start;padding-top:4px">老師${lfT.length?`<small class="klk" data-g="more" data-k="t" style="color:#B3A59B;font-weight:500">${MORE.t?'收合 ▴':'其他 '+lfT.length+' ▾'}</small>`:''}</div><div>${kt('t','',x=>S.t.has(x),TEACH,0)}</div></div>`;
  const rjOn=x=>S.rj.has(x),rjN=[...S.rj].filter(x=>x.startsWith('t:')).length,sbN=[...S.sb].filter(x=>x!=='any').length;
@@ -490,7 +498,7 @@ function buildSheet(){
   `<div class="kgb"><div class="dsg"><div class="ds2">${ds('gm').replace('<div class="dv">','<div class="lbl">上次到訪<span class="yr">'+gpTxt(S.gm[0],S.gm[1])+'</span></div><div class="dv">')}</div><div class="ds2">${ds('sp').replace('<div class="dv">','<div class="lbl">累計消費<span class="yr">'+spTxt(S.sp[0],S.sp[1])+'</span></div><div class="dv">')}</div><div class="ds2">${ds('vi').replace('<div class="dv">','<div class="lbl">到訪次數<span class="yr">'+viTxt(S.vi[0],S.vi[1])+'</span></div><div class="dv">')}</div><div class="ds2">${ds('ag').replace('<div class="dv">','<div class="lbl">年紀'+qm('age')+'<span class="yr">'+yrOf(S.ag[0],S.ag[1])+'</span></div><div class="dv">')}</div></div>`+
   `<div class="kgh">客人</div>`+teachRow+
   kr('訪點',`<div class="kcs g kg2">${kc('st','nj','<i class="dt" style="background:#2F5E4A"></i>南京三民',S.st.has('nj'))}${kc('st','zs','<i class="dt" style="background:#B84E2C"></i>中山',S.st.has('zs'))}</div>`)+
-  kr('級別'+qm('tier'),`<div class="kcs g" style="grid-template-columns:repeat(5,minmax(0,1fr)) auto">${lvl.join('')}</div>`)+
+  kr('等級'+qm('tier'),`<div class="kcs g" style="grid-template-columns:repeat(5,minmax(0,1fr))">${lvl.join('')}</div>`)+
   kr('回訪'+qm('fq'),`<div class="kcs g kg3">${[['g','穩定回訪','#17797A'],['y','流失預警','#DBA400'],['d','流失警報','#D2690A']].map(([k,l,c])=>kc('fq',k,`<i class="dt" style="background:${c}"></i>${l}`,S.fq.has(k))).join('')}</div>`)+
   `</div><div class="kgb"><div class="khab${habAct?' hot':''}"><div class="khh"><b>來訪習慣</b>${qm('hb')}<span class="ks">找出「總是這樣」的客人</span></div>`+
   kr('方案',`<div class="kcs g kg3">${HB.p.it.map(z=>kc('hp',z[0],'<i class="sw" style="background:'+z[2]+'"></i>'+z[1],S.hp.has(z[0]))).join('')}</div>`,'常做多久')+
@@ -516,7 +524,7 @@ document.getElementById('bf').onclick=openSheet;document.getElementById('shx').o
 document.getElementById('shc2').onclick=()=>{clearAll();buildSheet();render(true)};
 /* ---------- 欄位面板 ---------- */
 const pop=document.getElementById('pop');
-function openCols(el){const r=el.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-310,r.right-300))+'px';pop.style.top=(r.bottom+6)+'px';pop.className='pop on';fillCols()}
+function openCols(el){const r=el.getBoundingClientRect();pop.className='pop on';fillCols();fitPop(r,6)}
 function fillCols(){pop.innerHTML=popHead('欄位')+'<h6>顯示的欄位（編號、姓名固定）</h6><div class="opts">'+COLS.slice(2).filter(c=>!HK[c[0]]).filter(c=>c[0]!=='pin'||pinAvail()).map(c=>`<span class="opt${S.cols[c[0]]?' on':''}" data-c="${c[0]}"><i class="ck"></i>${c[0]==='pin'?ico(PICO,'#E0A010'):c[0]==='ln'?ico(NICO,'#6F5A4E'):''}${c[1]}${['tier','pin','ln'].includes(c[0])?qm(c[0]):c[0]==='tag'?qm('ktag'):c[0]==='note'?qm('knote'):''}</span>`).join('')+'</div>'+(pinAvail()?'':'<div class="hint" style="font-size:10px;color:var(--h);margin-top:8px">「釘選置頂」目前沒有任何資料，所以先隱藏這一欄；有人使用後會自動出現在原本的位置。</div>')+'<div class="pf"><a id="pd">完成</a></div>';bindPx();
  pop.querySelectorAll('[data-c]').forEach(o=>o.onclick=()=>{S.cols[o.dataset.c]=S.cols[o.dataset.c]?0:1;fillCols();render(true)});document.getElementById('pd').onclick=()=>pop.classList.remove('on')}
 document.getElementById('bc').onclick=e=>{e.stopPropagation();pop.classList.contains('on')&&pop.dataset.k==='cols'?pop.classList.remove('on'):(pop.dataset.k='cols',openCols(e.currentTarget))};
@@ -553,7 +561,7 @@ function render(keep){const showT=S.t.size>0,hasQ=!!WORDS().length;
 document.getElementById('tb').onclick=e=>{const td=e.target.closest('td.nm,td.ell,td.mc');if(!td){const tr=e.target.closest('tr[data-n]');if(tr)openFile(tr.dataset.n);return}e.stopPropagation();pop.className='pop on';pop.dataset.k='cell';const kd=td.dataset.kind||td.dataset.k;let body='',ttl='完整內容';
  if(td.classList.contains('mc')){const d=R.find(x=>String(x.num)===td.dataset.n);if(kd==='rej'){ttl='拒接（哪位老師）';body=(d.blk?'<div style="margin:3px 0"><span class="rj r0">'+hl('店家黑名單')+'</span> 全店</div>':'')+d.rej.map(r=>'<div style="margin:3px 0">'+rjc(r)+' <span class="sub2">'+(r.lv==='拒'?'這位老師不接':r.lv==='微拒'?'這位老師偏不想接':'視狀況決定')+'</span></div>').join('')}else{ttl='自帶（哪位老師）';body=d.sbT.map(x=>'<div style="margin:3px 0">'+sbc(x)+' <span class="sub2">'+esc(x)+' 老師自帶的客人</span></div>').join('')}}
  else{const st=kd==='pin'?'background:#FFF1BF;border:1px solid #E7C44F':kd==='ln'?'background:#F1ECE8;border:1px solid #D9CEC7':kd==='note'?'background:#FFF9E6;border:1px dashed #E2C877':'';ttl=kd==='pin'?'釘選置頂':kd==='ln'?'泰空小本本':kd==='note'?'客立樂備注':'完整內容';const its=td.title.split('\n');if(its.length>1&&kd!=='note')ttl+='（'+its.length+' 則）';body=its.map(x=>'<div style="font:600 14px/1.5 Manrope,Noto Sans TC,sans-serif;border-radius:8px;padding:8px 10px;margin:0 0 6px;color:#2C2520;'+st+'">'+hl(x)+'</div>').join('')}
- const rn=td.closest('tr').dataset.n;pop.innerHTML=popHead(ttl)+body+'<button class="ofb" data-n="'+rn+'">打開顧客檔案 ›</button>';bindPx();pop.querySelector('.ofb').onclick=e=>{e.stopPropagation();pop.classList.remove('on');openFile(rn)};const r=td.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-262,r.left))+'px';pop.style.top=(r.bottom+4)+'px'};
+ const rn=td.closest('tr').dataset.n;pop.innerHTML=popHead(ttl)+body+'<button class="ofb" data-n="'+rn+'">打開顧客檔案 ›</button>';bindPx();pop.querySelector('.ofb').onclick=e=>{e.stopPropagation();pop.classList.remove('on');openFile(rn)};const r=td.getBoundingClientRect();fitPop(r,4)};
 const layer=document.getElementById('layer'),sbar=document.getElementById('sbar');
 const isDesk=()=>MODE==='d';
 function openLayer(){layer.classList.add('on');sbar.classList.add('open');document.body.classList.add('exp');post('open')}
