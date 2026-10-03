@@ -630,9 +630,12 @@ function openCapPop(el){
   const br=el.dataset.br; const pop=document.getElementById('capPop');
   pop.innerHTML='<button class="px" aria-label="關閉">✕</button>'+capPopHtml(br); pop.classList.add('open'); capPopBr=br;
   const r=el.getBoundingClientRect(), W=pop.offsetWidth, H=pop.offsetHeight;
-  let left=Math.min(Math.max(8,r.left), window.innerWidth-W-8);
-  let top=r.bottom+6; if(top+H>window.innerHeight-8) top=Math.max(8,r.top-H-6);
-  pop.style.left=left+'px'; pop.style.top=top+'px';
+  const VW=window.innerWidth, VH=window.innerHeight; pop.style.zoom='';
+  let z=1; if(H>VH-16) z=(VH-16)/H; if(W>VW-16) z=Math.min(z,(VW-16)/W); if(z<1) pop.style.zoom=z;
+  const W2=W*z, H2=H*z;
+  let left=Math.min(Math.max(8,r.left), VW-W2-8);
+  let top=r.bottom+6; if(top+H2>VH-8){ const up=r.top-H2-6; top=up>=8?up:Math.max(8,VH-H2-8); }
+  pop.style.left=(left/z)+'px'; pop.style.top=(top/z)+'px';
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCapPop(); });
 function closeCapPop(){ document.getElementById('capPop').classList.remove('open'); capPopBr=null; }
