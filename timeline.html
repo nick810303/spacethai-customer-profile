@@ -929,6 +929,9 @@ function renderDate(){
 /* ── 顧客面板（overlay，預設收合） ── */
 const panel=document.getElementById('panel'), scrim=document.getElementById('scrim');
 async function openCustomer(ev,t){
+  if(EMBEDDED){   /* r108：嵌在顧客檔案系統裡時，改由外層開「時間軸側欄」（沿用顧客檔案表頭＋到訪紀錄） */
+    try{ window.parent.postMessage({ type:'spacethai:open-booking', booking:{ num:ev.customerNum||null, name:ev.displayName||'', date:dateKey, start:fmt(ev.s), end:fmt(ev.e), dur:durOf(ev), teacher:t.name, cp:!!ev.cp, plan:ev.plan||null, title:ev.title||'', trainee:!!t.isTrainee, why:ev.hintWhy||[], key:Date.now() } }, location.origin); return; }catch(e){}
+  }
   const [zh]=t.name.split(' ');
   const [y,m,d]=dateKey.split('-');
   document.getElementById('ctxText').textContent=`${m}/${d} ${fmt(ev.s)}–${fmt(ev.e)} · ${zh} · ${durOf(ev)} 分`;
@@ -982,6 +985,7 @@ function openFullProfile(num){
 }
 function closePanel(){ panel.classList.remove('open'); scrim.classList.remove('on'); if(selectedEl){selectedEl.classList.remove('sel');selectedEl=null;} selectedKey=null; }
 document.getElementById('pClose').onclick=closePanel;
+window.addEventListener('message',e=>{ if(e.origin===location.origin && e.data && e.data.type==='spacethai:booking-closed') closePanel(); });
 scrim.onclick=closePanel;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePanel(); });
 
