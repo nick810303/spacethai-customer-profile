@@ -1252,6 +1252,9 @@ header{display:none}
   .vband .r1 .cap .pic{transform:scale(.77)}
   .vband .r1 .cap{margin-left:auto}
 }
+/* 嵌在 App 內（iPhone）：不讓捲動連鎖到外層、不出現下拉回彈的空白，表頭才不會被推走 */
+html,body{overscroll-behavior:none}
+.board{overscroll-behavior:contain}
 
 </style>
 </head>
