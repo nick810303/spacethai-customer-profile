@@ -1166,6 +1166,9 @@ header{display:none}
 .now::before{font-size:11.5px;padding:2px 7px}
 
 /* ═══ v34 ═══ */
+.avw{position:relative}
+.avw>em.tr2{position:absolute!important;left:-3px!important;bottom:-2px!important;top:auto!important;width:14px!important;height:14px!important;line-height:11px!important;padding:0!important;margin:0!important;border:1.3px solid #fff!important;border-radius:50%!important;background:#6FA55A!important;color:#fff!important;font:700 8px/11px 'Noto Sans TC','Manrope',sans-serif!important;text-align:center!important;box-sizing:border-box!important;z-index:3}
+.vgrid.dense .avw>em.tr2{width:12px!important;height:12px!important;line-height:9px!important;font-size:7px!important;left:-3px!important;bottom:-3px!important}
 :root{--hnw:#7B5EA7}
 .hbub.hnw{background:var(--hnw);color:#fff}
 button.hx-nw{box-shadow:none;outline:2.5px solid var(--hnw);outline-offset:-2.5px}
@@ -1358,7 +1361,7 @@ function isoToH(iso, dateKey){
 }
 const avatarHtml = (t,zh) => `<span class="av">${t.avatar?`<img src="${esc(t.avatar)}" alt="" loading="lazy" data-z="${esc(zh)}" onerror="this.replaceWith(this.dataset.z)">`:esc(zh)}</span>`;
 // 頭像＋右上角紅圈（今日預約數，0 不顯示）
-const avatarBadge = (t,zh) => `<span class="avw">${avatarHtml(t,zh)}${bookingCount(t)?`<span class="badge" title="今日預約數">${bookingCount(t)}</span>`:''}</span>`;
+const avatarBadge = (t,zh) => `<span class="avw">${avatarHtml(t,zh)}${bookingCount(t)?`<span class="badge" title="今日預約數">${bookingCount(t)}</span>`:''}${t.isTrainee?'<em class="tr2" title="培訓老師">培</em>':''}</span>`;
 const blockLabel = (ev,t,zh) => (ev.title.replace(t.name,'').replace(zh,'').trim()||ev.title);
 const durOf = ev => ev.duration || Math.round((ev.e-ev.s)*60);
 const isFree = ev => /不指定/.test(ev.title||'');
@@ -1951,7 +1954,7 @@ function renderHorizontal(){
       const row=document.createElement('div'); row.className='row'+(t.shift?'':' off');
       const who=document.createElement('div'); who.className='who';
       who.style.setProperty('--bc',br.hex);
-      who.innerHTML=`${avatarBadge(t,zh)}<span class="zh">${esc(zh)}${t.isTrainee?'<em class="tr2">培</em>':''}</span>${t.shift?'':'<span class="offlbl">休</span>'}`;
+      who.innerHTML=`${avatarBadge(t,zh)}<span class="zh">${esc(zh)}</span>${t.shift?'':'<span class="offlbl">休</span>'}`;
       const lane=document.createElement('div'); lane.className='lane'; lane.style.width=totalW+'px';
       if(t.shift){ const sh=document.createElement('div'); sh.className='shift';
         const s=Math.max(OPEN,minToH(t.shift.fromMin)), e=Math.min(CLOSE,minToH(t.shift.toMin-BUFFER));
@@ -2012,7 +2015,7 @@ function renderVertical(){
   cols.forEach(({t,br,first})=>{
     const [zh]=t.name.split(' ');
     const h=document.createElement('div'); h.className='vhead'+(first?' bstart':''); h.style.setProperty('--bc',br.hex); h.style.zIndex=String(60-cols.findIndex(c=>c.t===t));
-    h.innerHTML=`${avatarBadge(t,zh)}<span class="zh">${esc(zh)}${t.isTrainee?'<em class="tr2">培</em>':''}</span>`;
+    h.innerHTML=`${avatarBadge(t,zh)}<span class="zh">${esc(zh)}</span>`;
     h.title=`${t.name} · ${br.name}`;
     grid.appendChild(h);
   });
