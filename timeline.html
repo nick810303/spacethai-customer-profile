@@ -1239,6 +1239,20 @@ header{display:none}
 .axis .h.f{transform:none;padding-left:5px}.axis .h.f::after{left:0}
 .axis .h.l{transform:translateX(-100%);padding-right:5px}.axis .h.l::after{left:auto;right:0}
 
+/* 手機：量能圓圈一律靠右（非今日沒有床位時也一樣） */
+.vband .r1 .cap{margin-left:auto}
+.vband .bd3 + .cap{margin-left:0}
+/* 手機：據點只有一欄（約 85px）時，名稱＋預約數＋量能圓圈要擠得進去、圓圈不被切掉 */
+@container band (max-width:100px){
+  .vband .in{padding-left:3px;padding-right:3px}
+  .vband .r1{gap:2px}
+  .vband .r1 b{font-size:11px;letter-spacing:0}
+  .vband .r1 .cnt{min-width:14px;height:14px;line-height:14px;font-size:9px;padding:0}
+  .vband .r1 .cap,.vband .r1 .cap .pill{width:20px;height:20px}
+  .vband .r1 .cap .pic{transform:scale(.77)}
+  .vband .r1 .cap{margin-left:auto}
+}
+
 </style>
 </head>
 <body>
@@ -1984,7 +1998,7 @@ function renderVertical(){
   groups.forEach((g,gi)=>{ const cnt=data.teachers.filter(t=>t.branch===g.br.name).reduce((n,t)=>n+bookingCount(t),0);
     const b=document.createElement('div'); b.className='vband'; b.style.gridColumn='span '+g.n; b.style.setProperty('--bc',g.br.hex);
     const bl=data.teachers.filter(t=>t.branch===g.br.name); const used=bedsNow(bl,isToday,NOW);
-    b.innerHTML=`<span class="in"><span class="r1"><b>${g.br.name}</b><i class="cnt">${cnt}</i>${bedsBand(used)}${capHtml(g.br.name,true)}</span></span>`; grid.appendChild(b); });
+    b.innerHTML=`<span class="in"><span class="r1"><b>${g.br.name}</b><i class="cnt">${cnt}</i>${bedsBand(g.n>=2?used:null)}${capHtml(g.br.name,true)}</span></span>`; grid.appendChild(b); });
   
   cols.forEach(({t,br,first})=>{
     const [zh]=t.name.split(' ');
