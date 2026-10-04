@@ -1264,6 +1264,8 @@ button.hx-nw.hx-cp{outline:2.5px solid var(--hnw);box-shadow:0 0 0 2.5px var(--h
 html,body{overscroll-behavior:none}
 .board{overscroll-behavior:contain}
 
+/* r132: 手機直式版面不可橫向捲動（欄位本來就會縮到塞滿螢幕；橫向捲動會讓表頭蓋過左邊時間軸欄而破格） */
+@media (max-width:700px){ .board{overflow-x:hidden !important;overflow-y:auto;overscroll-behavior-x:none;touch-action:pan-y} .vgrid{overflow-x:clip} }
 </style>
 </head>
 <body>
@@ -1666,7 +1668,11 @@ document.getElementById('pplList').onchange=e=>{ const id=e.target.dataset.id; i
   pref.hidden=e.target.checked?pref.hidden.filter(x=>x!==id):[...pref.hidden,id]; savePref(); renderPpl(); board.innerHTML=''; render(); };
 
 /* ── 載入 ── */
-async function getToken(){ if(EMBEDDED) return storedToken(); const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
+function tokenExp(tk){ try{ return JSON.parse(atob(tk.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000; }catch{ return 0; } }
+let _forceTok=false;
+function askParentToken(force){ return new Promise(res=>{ const id=Math.random().toString(36).slice(2); const h=e=>{ if(e.origin===location.origin&&e.data&&e.data.type==='spacethai:token'&&e.data.id===id){ window.removeEventListener('message',h); res(e.data.token||null); } };
+  window.addEventListener('message',h); try{ window.parent.postMessage({ type:'spacethai:get-token', id, force:!!force }, location.origin); }catch{ res(null); } setTimeout(()=>{ window.removeEventListener('message',h); res(null); },8000); }); }
+async function getToken(){ if(EMBEDDED){ const force=_forceTok; _forceTok=false; const t=storedToken(); if(!force && t && tokenExp(t)-Date.now()>60000) return t; const p=await askParentToken(force); return p||t; } const { data:{ session } } = await sb.auth.getSession(); return session?.access_token || null; }
 
 
 const KXTIP={
@@ -1824,9 +1830,9 @@ DP.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>document.querySelector
 const nameHtml=n=>{ n=String(n||''); return `<span class="c ${/[\u3400-\u9fff]/.test(n)?'cjk':'lat'}">${esc(n)}</span>`; };
 async function loadTimeline(dk, retry=true){
   const token = await getToken();
-  if(!token){ if(retry){ await new Promise(r=>setTimeout(r,1500)); return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }
+  if(!token){ if(retry){ _forceTok=true; await new Promise(r=>setTimeout(r,800)); return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }
   const r = await fetch(`${SB_URL}/functions/v1/timeline?date=${dk}`, { headers:{ Authorization:`Bearer ${token}`, apikey: SB_ANON } });
-  if(r.status===401){ if(retry){ await new Promise(r=>setTimeout(r,2000)); return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }  // 主系統可能正在刷新 token
+  if(r.status===401){ if(retry){ _forceTok=true; return loadTimeline(dk,false); } throw Object.assign(new Error('noauth'),{noauth:true}); }  // 主系統可能正在刷新 token
   if(r.status===403) throw Object.assign(new Error('forbidden'),{forbidden:true});
   if(!r.ok) throw new Error(`timeline ${r.status}`);
   const j = await r.json();
@@ -1917,6 +1923,7 @@ const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
+board.addEventListener('scroll',()=>{ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; },{passive:true});   // r132 手機直式不可橫向位移（程式或手勢造成的也歸零）
 function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
 function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; isMobile()?renderVertical():renderHorizontal(); }
 function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
@@ -2147,6 +2154,7 @@ async function load(){
   catch(e){
     tlReady();
     src.classList.remove('busy'); src.classList.add('err');
+    if(e.noauth && (window._nar=(window._nar||0)+1)<=3){ document.getElementById('srcText').textContent='確認登入中…'; showMsg('正在確認登入狀態…'); _forceTok=true; setTimeout(load,2500); return; }
     if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'<br><a href="#" onclick="load();return false">重試</a>':'<br><a href="./">前往登入 →</a>'}`); noauthWait=true; return; }
     if(e.forbidden){ document.getElementById('srcText').textContent='無權限'; showMsg('你的帳號沒有時間軸權限，請聯絡管理員。'); return; }
     const t=lastOk?new Date(lastOk):null;
