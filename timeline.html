@@ -1166,6 +1166,10 @@ header{display:none}
 .now::before{font-size:11.5px;padding:2px 7px}
 
 /* ═══ v34 ═══ */
+:root{--hnw:#7B5EA7}
+.hbub.hnw{background:var(--hnw);color:#fff}
+button.hx-nw{box-shadow:none;outline:2.5px solid var(--hnw);outline-offset:-2.5px}
+button.hx-nw.hx-cp{outline:2.5px solid var(--hnw);box-shadow:0 0 0 2.5px var(--hcp)}
 .cx-strip .d.k-u{color:rgba(255,255,255,.3)}
 .cx-strip .d.plan.k-u{box-shadow:inset 0 0 0 1px currentColor;opacity:.6}
 /* ── v34：電腦版縮回專業尺寸；左上角一體化控制列；時間軸表頭（軸）改深棕底（手機＋電腦） ── */
@@ -1663,6 +1667,7 @@ async function getToken(){ if(EMBEDDED) return storedToken(); const { data:{ ses
 
 const KXTIP={
  cp:{c:'#1C7ED6',t:'同行',p:'1 人預約，卻同時約了多位老師。系統判斷可能是多人同行。',s:['現場務必先確認是否多人同行','請盡量分辨：誰是預約者、誰是同行第二人','盡量請每位客人都留下電話號碼']},
+ nw:{c:'#7B5EA7',t:'可能是新朋友',p:'這筆預約沒有顧客編號，系統判斷可能是新朋友。',s:['接待時，先確認這位客人有沒有來過（少數可能是早期客人，沒有完整歸檔）','結帳時，請盡量在客人手機的 LINE 官方帳號，送出這位客人新編的顧客編號']},
  pin:{c:'#E0A010',t:'釘選提醒',p:'同事針對這位客人釘選的重要資訊或警訊，會顯示在顧客檔案頂部。',s:['接待前先看完釘選內容','想讓所有同事都看到的新資訊：每日上傳寫小本本時，打開「釘選」']},
  p2:{c:'#E8590C',t:'當月再訪',p:'系統判讀：這位客人「當月第二次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認']},
  bd:{c:'#D6336C',t:'本月壽星',p:'系統判斷：這位客人是壽星，且「當月首次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認','確實核實生日','確實核實優惠券']},
@@ -1838,14 +1843,15 @@ async function loadTimeline(dk, retry=true){
    本月壽星：同上條件但本月還沒做過 120 分，且生日在本月（資料：沒做過→用壽星 165 筆；做過→用 2+）。兩者互斥
    同行   ：同分店、同開始時間、不同老師，且 ①同編號／同名字（同帳號）或 ②過去紀錄互為同行（records.companions） */
 const HINT_SVG={
+  nw:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10" cy="8" r="3.4"/><path d="M3.5 20c0-3.4 2.9-5.8 6.5-5.8"/><path d="M18 13v7M14.5 16.5h7"/></svg>',
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l-1 6 3.2 3.2H6.8L10 9z"/><path d="M12 12.5V21"/></svg>',
   cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.2 2.4-5.5 5.5-5.5s5.5 2.3 5.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.4.3 4 2.2 4 5"/></svg>',
   bd:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16v-7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M4 15.5c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M12 11V8"/><path d="M12 3.5c.9 1 .9 2.2 0 3-.9-.8-.9-2 0-3z"/></svg>',
 };
-const HINT_LBL={ '2p':'當月再訪', bd:'本月壽星', cp:'同行', pin:'釘選提醒' };
-const KTMAP={'2p':'p2',bd:'bd',cp:'cp',pin:'pin'};
+const HINT_LBL={ '2p':'當月再訪', bd:'本月壽星', cp:'同行', nw:'可能是新朋友', pin:'釘選提醒' };
+const KTMAP={'2p':'p2',bd:'bd',cp:'cp',nw:'nw',pin:'pin'};
 const hbub = k => `<span class="hbub h${k}" data-kt="${KTMAP[k]}">${k==='2p'?'2+':HINT_SVG[k]}</span>`;
-const hintKeys = ev => [ev.cp?'cp':null, ev.plan||null, ev.pin?'pin':null].filter(Boolean);   // 同行在前、方案在後
+const hintKeys = ev => [ev.cp?'cp':null, ev.plan||null, ev.nw?'nw':null, ev.pin?'pin':null].filter(Boolean);   // 同行在前、方案在後
 const hintCls = ev => hintKeys(ev).map(k=>'hx-'+k).join(' ');
 const hintTitle = ev => ev.hintWhy?.length ? `\n${ev.hintWhy.join('\n')}（推測，以櫃台確認為準）` : '';
 const hmOf = h => { const m=Math.round(h*60); return `${pad(Math.floor(m/60))}:${pad(m%60)}`; };
@@ -1867,7 +1873,7 @@ async function annotateHints(j, dk){
     numsC.length>1?rest(`records?select=customer_num,companions&customer_num=in.(${numsC.join(',')})&companions=not.is.null&limit=2000`):[],
     numsAll.length?rest(`customer_notes?select=customer_num&pinned=eq.true&customer_num=in.(${numsAll.join(',')})&limit=2000`).catch(()=>[]):[],
   ]);
-  const pinSet=new Set(pins.map(p=>p.customer_num)); bks.forEach(({ev})=>{ if(ev.customerNum&&pinSet.has(ev.customerNum)) ev.pin=true; });
+  const pinSet=new Set(pins.map(p=>p.customer_num)); bks.forEach(({ev})=>{ if(ev.customerNum&&pinSet.has(ev.customerNum)) ev.pin=true; if(!ev.customerNum) ev.nw=true; });
   // 當月2+／本月壽星（互斥，2+ 優先）
   const bday={}; cs.forEach(c=>{ const m=String(c.birthday||'').match(/^\d{4}[\/-](\d{1,2})[\/-](\d{1,2})$/); if(m) bday[c.num]={m:+m[1],d:+m[2]}; });
   const mon=+dk.slice(5,7);
@@ -1903,7 +1909,7 @@ async function annotateHints(j, dk){
 }
 function hintBubbles(ev){ const ks=hintKeys(ev); if(!ks.length) return null; const d=document.createElement('div'); d.className='hbubs'; d.innerHTML=ks.map(hbub).join(''); return d; }
 function hintLegendHtml(){ return `<span>${hbub('2p')}${HINT_LBL['2p']}</span><span>${hbub('bd')}${HINT_LBL.bd}</span><span>${hbub('cp')}${HINT_LBL.cp}</span><span>${hbub('pin')}${HINT_LBL.pin}</span><span style="color:var(--text-hint)">依紀錄推測，以櫃台確認為準</span>`; }
-const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp||ev.pin));
+const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp||ev.nw||ev.pin));
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
