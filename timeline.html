@@ -2048,8 +2048,57 @@ function renderDate(){
 
 /* ── 顧客面板（overlay，預設收合） ── */
 const panel=document.getElementById('panel'), scrim=document.getElementById('scrim');
-function openCustomer(ev,t){ document.getElementById('ctxText').textContent='#'+(ev.customerNum||'—')+' · '+ev.displayName;
-  document.getElementById('pBody').innerHTML='<div class="empty">（mockup：此處為顧客面板）</div>'; panel.classList.add('open'); scrim.classList.add('on'); }
+async function openCustomer(ev,t){
+  if(EMBEDDED){   /* r108：嵌在顧客檔案系統裡時，改由外層開「時間軸側欄」（沿用顧客檔案表頭＋到訪紀錄） */
+    try{ window.parent.postMessage({ type:'spacethai:open-booking', booking:{ num:ev.customerNum||null, name:ev.displayName||'', date:dateKey, start:fmt(ev.s), end:fmt(ev.e), dur:durOf(ev), teacher:t.name, cp:!!ev.cp, plan:ev.plan||null, title:ev.title||'', trainee:!!t.isTrainee, why:ev.hintWhy||[], key:Date.now() } }, location.origin); return; }catch(e){}
+  }
+  const [zh]=t.name.split(' ');
+  const [y,m,d]=dateKey.split('-');
+  document.getElementById('ctxText').textContent=`${m}/${d} ${fmt(ev.s)}–${fmt(ev.e)} · ${zh} · ${durOf(ev)} 分`;
+  const body=document.getElementById('pBody');
+  panel.classList.add('open'); scrim.classList.add('on');
+  if(!ev.customerNum){
+    body.innerHTML=`<div class="anon"><div class="cname">${esc(ev.displayName)}</div>${ev.hintWhy?.length?`<div class="hdesc">${hintKeys(ev).map(k=>`<div>${hbub(k)}<span>${esc(ev.hintWhy.find(w=>w.startsWith(HINT_LBL[k]))||HINT_LBL[k])}</span></div>`).join('')}</div>`:''}<p>行事曆上此筆預約沒有顧客編號，尚未建立顧客檔案。</p></div>`;
+    return;
+  }
+  body.innerHTML=`<div class="empty">載入 #${ev.customerNum}…</div>`;
+  const num=ev.customerNum, myKey=selectedKey;
+  const [cs,recs] = await Promise.all([
+    rest(`customers?select=num,name,display,phone,tags,note,birthday,country&num=eq.${num}&limit=1`),
+    rest(`records?select=date,store,staff_name_legacy,duration,plan,is_draft&customer_num=eq.${num}&is_draft=eq.false&order=date.desc&limit=400`),
+  ]).catch(()=>[[],[]]);
+  const c=cs[0]||null;
+  if(selectedKey!==myKey) return;
+  if(!c){
+    body.innerHTML=`<div class="anon"><div class="cnum">顧客編號 #${num}</div><div class="cname">${esc(ev.displayName)}</div><p>顧客檔案系統尚無此編號的資料。</p></div>`;
+    return;
+  }
+  const rs=recs||[];
+  const freq={}; rs.forEach(r=>{ if(r.staff_name_legacy) freq[r.staff_name_legacy]=(freq[r.staff_name_legacy]||0)+1; });
+  const fav=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  const mmdd=s=>s?s.slice(5).replace('-','/'):'—';
+  body.innerHTML=`
+    <div class="cnum">顧客編號 #${c.num}</div>
+    <div class="cname">${esc(c.name)}</div>
+    ${ev.hintWhy?.length?`<div class="hdesc">${hintKeys(ev).map((k,i)=>`<div>${hbub(k)}<span>${esc(ev.hintWhy.find(w=>w.startsWith(HINT_LBL[k]))||HINT_LBL[k])}</span></div>`).join('')}<small>依紀錄推測，以櫃台確認為準</small></div>`:''}
+    <div class="tags">${(c.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>
+    <dl class="kv">
+      <dt>電話</dt><dd class="mono">${esc(c.phone||'—')}</dd>
+      ${c.display&&c.display!==c.name?`<dt>顯示名</dt><dd>${esc(c.display)}</dd>`:''}
+      ${c.birthday?`<dt>生日</dt><dd class="mono">${esc(c.birthday)}</dd>`:''}
+      ${c.country?`<dt>國籍</dt><dd>${esc(c.country)}</dd>`:''}
+    </dl>
+    <div class="stats">
+      <span><b>${rs.length}</b>來店次數</span>
+      <span><b>${mmdd(rs[0]?.date)}</b>上次來店</span>
+      <span><b>${esc(fav)}</b>常指定</span>
+    </div>
+    ${c.note?`<div class="note">${esc(c.note)}</div>`:''}
+    <h4>最近服務紀錄</h4>
+    ${rs.slice(0,8).map(r=>`<div class="rec"><span class="d">${mmdd(r.date)}</span><span>${esc(r.store||'')} · ${esc(r.staff_name_legacy||'')}</span><span class="p">${r.duration||''} 分</span></div>`).join('')||'<div class="empty" style="padding:16px">尚無紀錄</div>'}
+    <a class="go" id="goFull">開啟完整顧客檔案 →</a>`;
+  document.getElementById('goFull').onclick=()=>openFullProfile(c.num);
+}
 function openFullProfile(num){
   if(EMBEDDED){ window.parent.postMessage({ type:'spacethai:open-customer', num }, location.origin); }
   else { location.href = `./?num=${num}`; }
