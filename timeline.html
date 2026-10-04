@@ -1169,7 +1169,7 @@ header{display:none}
 .cx-strip .d.k-u{color:rgba(255,255,255,.3)}
 .cx-strip .d.plan.k-u{box-shadow:inset 0 0 0 1px currentColor;opacity:.6}
 /* ── v34：電腦版縮回專業尺寸；左上角一體化控制列；時間軸表頭（軸）改深棕底（手機＋電腦） ── */
-:root{--axh:64px;--row-h:58px}
+:root{--axh:68px;--row-h:58px}
 /* 時間軸（小時軸）深色底，與日期區塊同色 */
 .axis .hours{background-color:var(--dk);background-image:linear-gradient(to right,rgba(255,255,255,.22) 1px,transparent 1px);border-bottom:1px solid rgba(255,255,255,.12)}
 .axis .h{font:600 12px var(--sans);color:rgba(255,255,255,.82);bottom:9px}
@@ -1178,7 +1178,7 @@ header{display:none}
 .vaxis .h{color:rgba(255,255,255,.8)}
 /* 電腦版左上角：一體化控制列 */
 .axis .hcorner{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:3px;padding:3px 8px 0;background:var(--dk);border-bottom:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.14)}
-.hgrp{flex:none;display:flex;align-items:center;gap:1px;padding:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:10px}
+.hgrp{flex:none;display:flex;align-items:center;gap:1px;padding:5px 3px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:10px}
 .hgrp .hn{width:22px;height:34px;border:0;background:none;border-radius:7px;color:#fff;font:700 16px/1 var(--sans);padding:0}
 .hgrp .hn:hover{background:rgba(255,255,255,.16)}
 .hcal{gap:0;flex:none;width:28px;height:34px;border:0;padding:0;border-radius:4px;background:#F7F3EF;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.45);text-align:center}
@@ -1186,9 +1186,9 @@ header{display:none}
 .hcal.rd .mo{background:#C0392B}.hcal.rd .dy,.hcal.rd .wk2{color:#C0392B}
 .hcal .dy{display:block;font:800 15px/14px var(--sans);color:#2B211C}
 .hcal .wk2{display:block;font:600 9px/10px 'Noto Sans TC','Manrope',sans-serif;color:#4a403a}
-.hcorner .hn.today{flex:none;height:40px;width:42px;padding:0;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);border-radius:8px;font:700 12px/1 var(--sans);margin:0;color:#fff;cursor:pointer}
+.hcorner .hn.today{flex:none;height:46px;width:42px;padding:0;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);border-radius:8px;font:700 12px/1 var(--sans);margin:0;color:#fff;cursor:pointer}
 .hcorner .hn.today.on{opacity:.45;cursor:default}
-.hcorner .hn.hdd{flex:none;width:30px;height:40px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;padding:0;cursor:pointer}
+.hcorner .hn.hdd{flex:none;width:30px;height:46px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;padding:0;cursor:pointer}
 .hcorner .hn.hdd svg{width:12px;height:7px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .hcorner .hn.hdd.act::after{content:"";position:absolute;right:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:#FF8A00;box-shadow:0 0 0 1.5px var(--dk)}
 .hcorner .hn.hdd:hover,.hcorner .hn.today:not(.on):hover{background:rgba(255,255,255,.18)}
