@@ -52,6 +52,7 @@ table{width:100%;border-collapse:collapse;background:var(--surface);border:1px s
 th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}th{background:var(--surface2);font-weight:600;white-space:nowrap}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:0 0 10px}
 .legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:4px}
+html.embedded header{position:static;padding:10px 16px}html.embedded h1{font-size:15px;margin-bottom:6px}
 @media(max-width:600px){main{padding:12px 10px 60px}.who{font-size:14px}th,td{padding:6px 6px}}
 </style>
 </head>
@@ -78,7 +79,17 @@ th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);ver
 <script>
 const SB_URL='https://lyphciitrhfomquorhfm.supabase.co';
 const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
-const sb=supabase.createClient(SB_URL,SB_ANON);
+// 嵌在顧客檔案系統（「動態」分頁）內時不建立自己的 auth client（兩個 client 同時刷新 refresh token 會互相踢掉登入），
+// 改為讀主系統寫在 localStorage 的 session，過期或沒有時向父頁要（與 timeline.html 相同協定）。
+const EMBEDDED=window.self!==window.top; if(EMBEDDED)document.documentElement.classList.add('embedded');
+const AUTH_KEY='sb-lyphciitrhfomquorhfm-auth-token';
+const sb=EMBEDDED?null:supabase.createClient(SB_URL,SB_ANON);
+function storedToken(){try{const j=JSON.parse(localStorage.getItem(AUTH_KEY)||'null');return j?.access_token||null}catch{return null}}
+function tokenExp(t){try{return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000}catch{return 0}}
+function askParentToken(force){return new Promise(res=>{const id=Math.random().toString(36).slice(2);
+  const h=e=>{if(e.origin===location.origin&&e.data&&e.data.type==='spacethai:token'&&e.data.id===id){window.removeEventListener('message',h);res(e.data.token||null)}};
+  window.addEventListener('message',h);try{window.parent.postMessage({type:'spacethai:get-token',id,force:!!force},location.origin)}catch{res(null)}
+  setTimeout(()=>{window.removeEventListener('message',h);res(null)},8000)})}
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const TPE=8*3600e3, pad=n=>String(n).padStart(2,'0');
 const tpe=iso=>new Date(Date.parse(iso)+TPE);
@@ -89,7 +100,10 @@ const fmtM=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60);
 const TYPE={added:'新增',modified:'修改',removed:'刪除',baseline:'建檔基準'};
 let state={tab:'log',type:'changes',data:null};
 
-async function token(){const {data:{session}}=await sb.auth.getSession();return session?.access_token||null}
+let _forceTok=false;
+async function token(){
+  if(EMBEDDED){const force=_forceTok;_forceTok=false;const t=storedToken();if(!force&&t&&tokenExp(t)-Date.now()>60000)return t;return (await askParentToken(force))||t}
+  const {data:{session}}=await sb.auth.getSession();return session?.access_token||null}
 async function load(){
   const t=await token();
   if(!t){$('#out').innerHTML='<div class="msg">尚未登入。請先在同一個瀏覽器登入<a href="./">顧客檔案系統</a>，再回到這一頁重新整理。</div>';$('#health').innerHTML='<span><span class="dot warn"></span>未登入</span>';return}
@@ -98,6 +112,7 @@ async function load(){
   try{
     const r=await fetch(`${SB_URL}/functions/v1/oa-breaks?${p}`,{headers:{Authorization:`Bearer ${t}`,apikey:SB_ANON}});
     const j=await r.json();
+    if(r.status===401&&EMBEDDED&&!state._retried){state._retried=true;_forceTok=true;return load()} state._retried=false;
     if(!r.ok){$('#out').innerHTML=`<div class="msg">讀取失敗（${r.status}）：${esc(j.error||'')}${r.status===403?'。這個帳號不在員工名單內。':''}</div>`;return}
     state.data=j; renderHealth(j); fillTeachers(j.teachers); state.tab==='log'?renderLog(j.logs):renderStats(j.logs);
   }catch(e){$('#out').innerHTML=`<div class="msg">連線失敗：${esc(e.message)}</div>`}
