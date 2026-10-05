@@ -1266,6 +1266,25 @@ html,body{overscroll-behavior:none}
 
 /* r132: 手機直式版面不可橫向捲動（欄位本來就會縮到塞滿螢幕；橫向捲動會讓表頭蓋過左邊時間軸欄而破格） */
 @media (max-width:700px){ .board{overflow-x:hidden !important;overflow-y:auto;overscroll-behavior-x:none;touch-action:pan-y} .vgrid{overflow-x:clip} }
+/* r134 電腦版：①移除下拉鈕、日曆放大並加上「可點」提示 ②現在時間標籤加粗（手機＋電腦） ③分店列與老師列同高 ④太窄的標籤改豎排 */
+.hcorner .hgrp{gap:2px;padding:5px 4px}
+.hcal{width:44px;height:48px;border-radius:7px;box-shadow:0 1px 2px rgba(0,0,0,.45),0 0 0 1.5px rgba(255,178,74,.75);transition:transform .12s,box-shadow .12s;position:relative;animation:calPulse 2.6s ease-in-out 3}
+.hcal .mo{font:700 10.5px/13px 'Noto Sans TC','Manrope',sans-serif;letter-spacing:.02em}
+.hcal .mo .cr{font-style:normal;font-size:8px;margin-left:3px;opacity:.95;position:relative;top:-1px}
+.hcal .dy{font:800 21px/20px var(--sans)}
+.hcal .wk2{font:700 10px/13px 'Noto Sans TC','Manrope',sans-serif}
+.hcal:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.5),0 0 0 2.5px #FFB24A}
+.hcal:active{transform:translateY(0) scale(.97)}
+.hcal.act::after{content:"";position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#FF8A00;box-shadow:0 0 0 1.5px #fff}
+@keyframes calPulse{0%,100%{box-shadow:0 1px 2px rgba(0,0,0,.45),0 0 0 1.5px rgba(255,178,74,.75)}50%{box-shadow:0 1px 2px rgba(0,0,0,.45),0 0 0 6px rgba(255,178,74,.35)}}
+.hcorner .hn.today{height:48px;width:48px;font-size:13px}
+.hgrp .hn{height:36px}
+.now::before{font-weight:800;font-size:13px;padding:2px 8px;border-radius:5px;letter-spacing:.02em;top:-23px;left:-26px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.vnow::before{font-weight:800;font-size:11px;line-height:17px;padding:0 6px;border-radius:4px;top:-9px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.hband{height:var(--row-h)}
+.buf.vt{display:flex;align-items:center;justify-content:center}
+.buf.vt::after{writing-mode:vertical-rl;text-orientation:upright;font-size:9px;letter-spacing:0;line-height:1}
+.blk.vt{writing-mode:vertical-rl;text-orientation:upright;justify-content:center;padding:3px 0;font-size:10.5px;letter-spacing:0;line-height:1.05;overflow:hidden;text-overflow:clip}
 </style>
 </head>
 <body>
@@ -1812,7 +1831,7 @@ const stampTxt=t=>{ const k=Math.ceil(t.length/2); return t.slice(0,k)+'<br>'+t.
 function bedsBand(n,ttl){ if(n==null) return ''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span>`; }
 function dateCornerHtml(){ const [y,m,d]=dateKey.split('-').map(Number), w=new Date(y,m-1,d).getDay(), sp=SPEC(dateKey), red=holOf(dateKey), tag=[...sp.tags].sort((p,q)=>(p[1]==='off'?0:1)-(q[1]==='off'?0:1))[0], isT=dateKey===todayKey();
   const stamp=sp.bonus?`<span class="stamp k-bonus">特殊獎金日</span>`:(tag?`<span class="stamp k-${tag[1]}">${esc(tag[0])}</span>`:'');
-  return `<span class="hrow"><span class="hgrp"><button class="hn" id="hn_p" aria-label="前一天">‹</button><button class="hcal dblk${red?' rd':''}" aria-label="日期與篩選：點擊調整" title="${m}月${d}日 週${WD[w]}${sp.tags.map(t=>'・'+t[0]).join('')}${sp.bonus?'・特殊獎金日':''}"><span class="mo">${m}月</span><span class="dy">${d}</span><span class="wk2">週${WD[w]}</span></button><button class="hn" id="hn_n" aria-label="後一天">›</button></span><button class="hn today${isT?' on':''}" id="hn_t" aria-label="回到今日">今日</button><button class="hn hdd dblk${filter!=='all'?' act':''}" aria-label="日期與篩選：點擊調整"><svg viewBox="0 0 12 7" aria-hidden="true"><polyline points="1.5,1.5 6,5.5 10.5,1.5"/></svg></button></span><span class="hst">${stamp}</span>`; }
+  return `<span class="hrow"><span class="hgrp"><button class="hn" id="hn_p" aria-label="前一天">‹</button><button class="hcal dblk${red?' rd':''}${filter!=='all'?' act':''}" aria-label="日期與篩選：點擊調整" title="${m}月${d}日 週${WD[w]}${sp.tags.map(t=>'・'+t[0]).join('')}${sp.bonus?'・特殊獎金日':''}"><span class="mo">${m}月<em class="cr">▾</em></span><span class="dy">${d}</span><span class="wk2">週${WD[w]}</span></button><button class="hn" id="hn_n" aria-label="後一天">›</button></span><button class="hn today${isT?' on':''}" id="hn_t" aria-label="回到今日">今日</button></span><span class="hst">${stamp}</span>`; }
 function dateBlockHtml(){ const [y,m,d]=dateKey.split('-').map(Number), w=new Date(y,m-1,d).getDay(), sp=SPEC(dateKey), red=holOf(dateKey), tag=[...sp.tags].sort((p,q)=>(p[1]==='off'?0:1)-(q[1]==='off'?0:1))[0];
   /* 優先序：特殊獎金日 ＞ 放假／連假 ＞ 活動 ＞ 紀念日（節日名稱仍列在彈出面板） */
   const stamp=sp.bonus?`<span class="stamp k-bonus">特殊<br>獎金日</span>`:(tag?`<span class="stamp k-${tag[1]}">${stampTxt(tag[0])}</span>`:'');
@@ -1925,7 +1944,9 @@ const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||
 const board=document.getElementById('board');
 board.addEventListener('scroll',()=>{ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; },{passive:true});   // r132 手機直式不可橫向位移（程式或手勢造成的也歸零）
 function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
-function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; isMobile()?renderVertical():renderHorizontal(); }
+function fitVertTags(){ board.querySelectorAll('.buf').forEach(b=>b.classList.toggle('vt', b.offsetWidth<26));
+  board.querySelectorAll('.blk').forEach(b=>{ b.classList.remove('vt'); if(b.scrollWidth>b.clientWidth+1 && b.textContent.trim().length<=4) b.classList.add('vt'); }); }
+function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; isMobile()?renderVertical():(renderHorizontal(), fitVertTags()); }
 function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
 // 培訓色：老師仍是培訓身分，或預約本身是「培訓新師」方案（轉正過渡期的舊預約）
 const isTrnBk = (t,ev) => t.isTrainee || /培訓/.test(ev.title||'');
