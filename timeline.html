@@ -1265,7 +1265,7 @@ html,body{overscroll-behavior:none}
 .board{overscroll-behavior:contain}
 
 /* r132: 手機直式版面不可橫向捲動（欄位本來就會縮到塞滿螢幕；橫向捲動會讓表頭蓋過左邊時間軸欄而破格） */
-@media (max-width:700px){ .board{overflow-x:hidden !important;overflow-y:auto;overscroll-behavior-x:none;touch-action:pan-y} .vgrid{overflow-x:clip} }
+@media (max-width:700px){ .board:not(.pager){overflow-x:hidden !important;overflow-y:auto;overscroll-behavior-x:none;touch-action:pan-y} .vgrid{overflow-x:clip} }
 /* r135 電腦版：日曆維持原大小，只在月份旁加 ▾；導航區塊與「今日」鈕等高；現在時間標籤加粗；分店列同老師列高；窄標籤豎排 */
 .hrow{align-items:stretch}
 .hgrp{height:46px;box-sizing:border-box}
@@ -1286,6 +1286,13 @@ html,body{overscroll-behavior:none}
 .hcal .mo{font:600 9px/11px 'Noto Sans TC','Manrope',sans-serif;height:11px;overflow:hidden;white-space:nowrap}
 .hcal .dy{font:800 16px/16px var(--sans)}
 .hcal .wk2{font:600 9px/10px 'Noto Sans TC','Manrope',sans-serif;padding-bottom:0}
+/* r138 日期橫向捲動長帶 */
+.board.pager{overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.board.pager::-webkit-scrollbar:horizontal{display:none;height:0}
+.track{display:flex;min-width:100%}
+.pane{flex:0 0 100%;min-width:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
+.pskel{padding:30px 0;text-align:center;color:var(--text-hint);font-size:12px}
+.board.pager .vaxis,.board.pager .vhead.corner,.board.pager .vband.c0,.board.pager .axis .corner,.board.pager .row .who,.board.pager .vband .in,.board.pager .branch-head .in,.board.pager .bband .in{left:auto!important}
 </style>
 </head>
 <body>
@@ -1943,11 +1950,10 @@ const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
-board.addEventListener('scroll',()=>{ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; },{passive:true});   // r132 手機直式不可橫向位移（程式或手勢造成的也歸零）
-function showMsg(html){ board.innerHTML=`<div class="msg">${html}</div>`; }
+function showMsg(html){ board.classList.remove('pager'); board.innerHTML=`<div class="msg">${html}</div>`; }
 function fitVertTags(){ board.querySelectorAll('.buf').forEach(b=>b.classList.toggle('vt', b.offsetWidth<26));
   board.querySelectorAll('.blk').forEach(b=>{ b.classList.remove('vt'); if(b.scrollWidth>b.clientWidth+1 && b.textContent.trim().length<=4) b.classList.add('vt'); }); }
-function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; isMobile()?renderVertical():(renderHorizontal(), fitVertTags()); }
+function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; renderPager(); }
 function visibleBranches(){ return BRANCHES.filter(br=>filter==='all'||br.name===filter); }
 // 培訓色：老師仍是培訓身分，或預約本身是「培訓新師」方案（轉正過渡期的舊預約）
 const isTrnBk = (t,ev) => t.isTrainee || /培訓/.test(ev.title||'');
@@ -1955,7 +1961,7 @@ function bkClass(prefix,t,ev,isToday,NOW){ return [prefix, isTrnBk(t,ev)?'trn':(
 function attachClick(el,ev,t){ el.addEventListener('click',()=>{ if(selectedEl) selectedEl.classList.remove('sel'); selectedEl=el; el.classList.add('sel'); selectedKey=ev.start+t.staffId; openCustomer(ev,t); }); }
 
 /* 橫版 */
-function renderHorizontal(){
+function buildHorizontal(pane){
   // 自適應：讓 11:00–01:00（14 小時）盡量塞進目前寬度；最小 56px/小時（不夠時橫向捲動）
   let nameW = 188;
   const HOUR_W = Math.max(56, Math.floor((board.clientWidth - nameW) / (CLOSE-OPEN))); nameW = Math.max(nameW, board.clientWidth - HOUR_W*(CLOSE-OPEN));
@@ -2007,16 +2013,13 @@ function renderHorizontal(){
       row.append(who,lane); grid.appendChild(row);
     });
   });
-  const keepX=board.scrollLeft, keepY=board.scrollTop, first=!board.querySelector('.grid,.vgrid');
-  board.innerHTML=''; board.appendChild(grid);
-  if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='now'; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); board.appendChild(now); }
-  const fits = nameW+totalW <= board.clientWidth+2;
-  if(first){ if(isToday && !fits) board.scrollLeft=Math.max(0,x(nowH())-220); } else { board.scrollLeft=fits?0:keepX; board.scrollTop=keepY; }
-  updateSrc();
+  pane.appendChild(grid);
+  if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='now'; now.style.left=`calc(var(--name-w) + ${x(NOW)}px)`; now.dataset.t=fmt(NOW); pane.appendChild(now); }
+  return { fits: nameW+totalW <= board.clientWidth+2, x };
 }
 
 /* 直版（手機）：只列「有上班」的老師成欄；排休老師列在最下方一行 */
-function renderVertical(){
+function buildVertical(pane){
   const HOUR_H=64;
   const y = h => (h - OPEN) * HOUR_H;
   const isToday = dateKey===todayKey(), NOW=nowH();
@@ -2080,15 +2083,86 @@ function renderVertical(){
   if(offs.length){ const o=document.createElement('div'); o.className='voff';
     o.innerHTML='<span>今日休</span>'+offs.map(({t})=>{ const zh=t.name.split(' ')[0]; return `<span class="chip off">${avatarHtml(t,zh)}${esc(zh)}</span>`; }).join(''); grid.appendChild(o); }
   if(!cols.length){ const o=document.createElement('div'); o.className='voff'; o.textContent='本日無人上班'; grid.appendChild(o); }
-  const keepY=board.scrollTop, first=!board.querySelector('.grid,.vgrid');
-  board.innerHTML=''; board.appendChild(sum); board.appendChild(grid);  grid.style.setProperty('--vsum-h',sum.offsetHeight+'px'); grid.style.setProperty('--vband-h',(grid.querySelector('.vband:not(.c0)')?.offsetHeight||22)+'px');
-  if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='vnow';
-    // 表頭高度＝第一個 vhead 的實際高度
-    const headH=grid.querySelector('.vhead').offsetHeight+(grid.querySelector('.vband:not(.c0)')?.offsetHeight||0);
-    now.style.top=(headH+y(NOW))+'px'; now.dataset.t=fmt(NOW); grid.style.position='relative'; grid.appendChild(now); }
-  if(first){ if(isToday) board.scrollTop=Math.max(0,y(nowH())-120); } else board.scrollTop=keepY;
-  updateSrc();
+  pane.appendChild(sum); pane.appendChild(grid);
+  pane._after=()=>{ grid.style.setProperty('--vsum-h',sum.offsetHeight+'px'); grid.style.setProperty('--vband-h',(grid.querySelector('.vband:not(.c0)')?.offsetHeight||22)+'px');
+    if(isToday && NOW>=OPEN && NOW<=CLOSE){ const now=document.createElement('div'); now.className='vnow';
+      const headH=(grid.querySelector('.vhead')?.offsetHeight||0)+(grid.querySelector('.vband:not(.c0)')?.offsetHeight||0);
+      now.style.top=(headH+y(NOW))+'px'; now.dataset.t=fmt(NOW); grid.style.position='relative'; grid.appendChild(now); } };
+  return { y };
 }
+
+/* ═══ r138 日期＝真正的橫向捲動：前一天／今天／後一天並排成一條長帶，換日期就是捲動（手指跟手、吸附整天）═══ */
+let pagerAnim=false, pagerPending=0, pagerProg=false, pagerSettleT=null;
+const dkDiff=(a,b)=>{ const f=s=>{ const [y,m,d]=s.split('-').map(Number); return Date.UTC(y,m-1,d); }; return Math.round((f(a)-f(b))/86400000); };
+function cachedData(dk){ if(dk===dateKey && data) return data; const c=dayCache.get(dk); return c?c.d:null; }
+function buildPane(dk,d){
+  const pane=document.createElement('div'); pane.className='pane'; pane.dataset.dk=dk;
+  if(!d){ pane.innerHTML='<div class="pskel">載入中…</div>'; return pane; }
+  const sd=dateKey, sdt=data; dateKey=dk; data=d;
+  try{ const r=isMobile()?buildVertical(pane):buildHorizontal(pane); pane._r=r; pane._fits=r.fits; }
+  finally{ dateKey=sd; data=sdt; }
+  return pane;
+}
+function paneOf(dk){ const tr=board.querySelector('.track'); return tr?[...tr.children].find(p=>p.dataset.dk===dk):null; }
+function renderPager(){
+  const mobile=isMobile(), keepY=board.scrollTop, keepX=board.scrollLeft, first=!board.querySelector('.track');
+  const track=document.createElement('div'); track.className='track';
+  const center=buildPane(dateKey,data);
+  const multi=mobile || center._fits!==false;
+  if(multi){ track.append(buildPane(dkShift(dateKey,-1),cachedData(dkShift(dateKey,-1))), center, buildPane(dkShift(dateKey,1),cachedData(dkShift(dateKey,1)))); }
+  else track.appendChild(center);
+  board.style.scrollSnapType='none'; board.innerHTML=''; board.appendChild(track); board.classList.toggle('pager',multi);
+  [...track.children].forEach(p=>p._after&&p._after());
+  const W=board.clientWidth, r=center._r||{};
+  pagerProg=true;
+  if(multi){ board.scrollLeft=W; }
+  else { if(first){ if(dateKey===todayKey() && !center._fits && r.x) board.scrollLeft=Math.max(0,r.x(nowH())-220); } else board.scrollLeft=center._fits?0:keepX; }
+  if(first){ if(mobile && dateKey===todayKey() && r.y) board.scrollTop=Math.max(0,r.y(nowH())-120); } else board.scrollTop=keepY;
+  setTimeout(()=>{ board.style.scrollSnapType=''; pagerProg=false; },30);
+  if(!mobile) fitVertTags();
+  if(data) updateSrc();
+}
+function refreshPane(dk,d){
+  const tr=board.querySelector('.track'); const old=paneOf(dk); if(!tr||!old) return false;
+  const keepY=board.scrollTop, keepX=board.scrollLeft; const np=buildPane(dk,d); tr.replaceChild(np,old); np._after&&np._after();
+  pagerProg=true; board.scrollLeft=keepX; board.scrollTop=keepY; setTimeout(()=>{ pagerProg=false; },30);
+  if(!isMobile()) fitVertTags(); if(dk===dateKey&&data) updateSrc(); return true;
+}
+function commitDay(dir){
+  const tr=board.querySelector('.track'); if(!tr||tr.children.length!==3) return;
+  const nd=dkShift(dateKey,dir); dateKey=nd; const c=dayCache.get(nd); data=c?c.d:null;
+  closePanel(); closeCapPop(); renderDate(); syncPop();
+  const W=board.clientWidth, far=dkShift(nd,dir);
+  const np=buildPane(far,cachedData(far));
+  board.style.scrollSnapType='none'; pagerProg=true;
+  if(dir>0){ tr.removeChild(tr.firstChild); tr.appendChild(np); } else { tr.removeChild(tr.lastChild); tr.insertBefore(np,tr.firstChild); }
+  np._after&&np._after(); board.scrollLeft=W;
+  if(!cachedData(far)) fetchNeighbour(far);
+  if(!isMobile()) fitVertTags();
+  setTimeout(()=>{ board.style.scrollSnapType=''; pagerProg=false; },50);
+  load();
+  if(pagerPending){ const p=pagerPending; pagerPending=0; setTimeout(()=>pagerGo(p),0); }
+}
+function animateScroll(el,to,ms,done){
+  const from=el.scrollLeft, t0=performance.now(); let fin=false;
+  const end=()=>{ if(fin) return; fin=true; el.scrollLeft=to; done(); };
+  const ease=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  const step=now=>{ if(fin) return; const p=Math.min(1,(now-t0)/ms); el.scrollLeft=from+(to-from)*ease(p); if(p<1) requestAnimationFrame(step); else end(); };
+  requestAnimationFrame(step); setTimeout(end,ms+250);   // 背景分頁 rAF 會停：保底收尾
+}
+function pagerGo(dir){
+  if(pagerAnim){ pagerPending=Math.max(-1,Math.min(1,pagerPending+dir)); return; }
+  const W=board.clientWidth; pagerAnim=true; pagerProg=true; board.style.scrollSnapType='none';
+  animateScroll(board,W*(1+dir),280,()=>{ pagerAnim=false; pagerProg=false; board.style.scrollSnapType=''; commitDay(dir); });
+}
+function settlePager(){
+  if(!board.classList.contains('pager')||pagerProg||pagerAnim) return;
+  const W=board.clientWidth, idx=Math.round(board.scrollLeft/W); if(idx===1) return;
+  commitDay(idx===0?-1:1);
+}
+board.addEventListener('scroll',()=>{ if(!board.classList.contains('pager')){ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; return; }
+  if(pagerProg||pagerAnim) return; clearTimeout(pagerSettleT); pagerSettleT=setTimeout(settlePager,140); },{passive:true});
+board.addEventListener('scrollend',()=>{ clearTimeout(pagerSettleT); settlePager(); });
 function updateSrc(){
   const ft=new Date(data.fetchedAt);
   const src=document.getElementById('src'); src.classList.remove('busy','err');
@@ -2172,15 +2246,16 @@ async function load(){
   const src=document.getElementById('src'); src.classList.add('busy'); src.classList.remove('err');
   document.getElementById('srcText').textContent='行事曆 · 更新中';
   renderDate();
-  const dk=dateKey, userNav=slideDir!==0, dirNow=slideDir;
-  try{ const c=userNav?dayCache.get(dk):null; const d=(c && Date.now()-c.t<45000)?c.d:await loadTimeline(dk);
+  const dk=dateKey;
+  try{ const d=await loadTimeline(dk);
     if(dk!==dateKey) return;                                  // 使用者已經又換日期：丟掉這份過期的回應
-    dayCache.set(dk,{d,t:Date.now()}); data=d; lastOk=Date.now(); renderPpl(); render(); loadMonth(dateKey); tlReady();
-    if(dirNow){ slideDir=0; slideIn(dirNow); } else slideReset();
-    if(userNav||!window._pf){ window._pf=1; setTimeout(()=>prefetchNeighbours(dk),500); } }
+    dayCache.set(dk,{d,t:Date.now()}); data=d; lastOk=Date.now(); renderPpl();
+    if(!refreshPane(dk,d)) render();
+    dimIn(); loadMonth(dateKey); tlReady();
+    if(window._pfFor!==dk){ window._pfFor=dk; setTimeout(()=>prefetchNeighbours(dk),500); } }
   catch(e){
     if(dk!==dateKey) return;
-    tlReady(); slideDir=0; slideReset();
+    tlReady(); dimIn();
     src.classList.remove('busy'); src.classList.add('err');
     if(e.noauth && (window._nar=(window._nar||0)+1)<=3){ document.getElementById('srcText').textContent='確認登入中…'; showMsg('正在確認登入狀態…'); _forceTok=true; setTimeout(load,2500); return; }
     if(e.noauth){ document.getElementById('srcText').textContent='未登入'; showMsg(`請先登入顧客檔案系統。${EMBEDDED?'<br><a href="#" onclick="load();return false">重試</a>':'<br><a href="./">前往登入 →</a>'}`); noauthWait=true; return; }
@@ -2191,16 +2266,20 @@ async function load(){
   }
 }
 const dayCache=new Map();   // dk -> {d,t}：換日期用（45 秒內有效）；定時更新不用
-let slideDir=0;
-function slideOut(dir){ board.style.transition='transform .2s ease-out,opacity .2s ease-out'; board.style.transform='translateX('+(-dir*26)+'px)'; board.style.opacity='.35'; }
-function slideIn(dir){ board.style.transition='none'; board.style.transform='translateX('+(dir*40)+'px)'; board.style.opacity='.35'; void board.offsetWidth;
-  board.style.transition='transform .28s cubic-bezier(.2,.8,.25,1),opacity .28s ease-out'; board.style.transform=''; board.style.opacity=''; setTimeout(()=>{ board.style.transition=''; },320); }
-function slideReset(){ board.style.transition=''; board.style.transform=''; board.style.opacity=''; }
+function dimOut(){ board.style.transition='opacity .15s'; board.style.opacity='.45'; }
+function dimIn(){ if(board.style.opacity){ board.style.transition='opacity .18s'; board.style.opacity=''; setTimeout(()=>{ board.style.transition=''; },220); } }
 const dkShift=(dk,n)=>{ const [y,m,d]=dk.split('-').map(Number); const dt=new Date(y,m-1,d+n); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`; };
-async function prefetchNeighbours(dk){ for(const n of [1,-1]){ const k=dkShift(dk,n); const c=dayCache.get(k); if(c && Date.now()-c.t<45000) continue; if(dk!==dateKey) return;
-  try{ const d=await loadTimeline(k,false); dayCache.set(k,{d,t:Date.now()}); }catch(e){} } }
-function setDate(dk){ const dir=dk>dateKey?1:(dk<dateKey?-1:0); dateKey=dk; closePanel(); closeCapPop(); slideDir=dir;
-  if(dir && board.querySelector('.grid,.vgrid')) slideOut(dir); else board.innerHTML=''; load(); }
+async function fetchNeighbour(k){ try{ const d=await loadTimeline(k,false); dayCache.set(k,{d,t:Date.now()}); const p=paneOf(k); if(p&&p.querySelector('.pskel')) refreshPane(k,d); }catch(e){} }
+async function prefetchNeighbours(dk){ for(const n of [1,-1]){ const k=dkShift(dk,n); const c=dayCache.get(k); if(c && Date.now()-c.t<45000) continue; if(dk!==dateKey) return; await fetchNeighbour(k); } }
+function setDate(dk){
+  if(dk===dateKey) return;
+  const diff=dkDiff(dk,dateKey);
+  if(board.classList.contains('pager') && Math.abs(diff)===1){ pagerGo(diff); return; }   // 相鄰一天：真的捲過去
+  dateKey=dk; closePanel(); closeCapPop(); renderDate(); syncPop();
+  const c=dayCache.get(dk);
+  if(c && Date.now()-c.t<45000){ data=c.d; render(); }        // 有預抓的資料：直接換
+  else if(board.querySelector('.track')) dimOut(); else board.innerHTML='';
+  load(); }
 function shiftDate(n){ const [y,m,d]=dateKey.split('-').map(Number); const dt=new Date(y,m-1,d+n); setDate(`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`); }
 document.getElementById('prev').onclick=()=>shiftDate(-1);
 document.getElementById('next').onclick=()=>shiftDate(1);
