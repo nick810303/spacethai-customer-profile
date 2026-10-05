@@ -1296,8 +1296,6 @@ html,body{overscroll-behavior:none}
 /* r138 日期橫向捲動長帶 */
 .board.pager{overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .board.pager::-webkit-scrollbar:horizontal{display:none;height:0}
-/* r142 手機：換天不再靠原生橫向捲動（太容易誤觸），改由 JS 判斷「明確橫滑」才跟手換天；直向捲動交給瀏覽器 */
-@media (max-width:700px){ .board.pager{touch-action:pan-y;scroll-snap-type:none;overflow-x:hidden} }   /* r143：連原生橫向捲動都關掉，只有程式能橫移 */
 .track{display:flex;min-width:100%}
 .pane{flex:0 0 100%;min-width:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
 .pskel{padding:30px 0;text-align:center;color:var(--text-hint);font-size:12px}
@@ -2117,7 +2115,7 @@ function renderPager(){
   const mobile=isMobile(), keepY=board.scrollTop, keepX=board.scrollLeft, first=!board.querySelector('.track');
   const track=document.createElement('div'); track.className='track';
   const center=buildPane(dateKey,data);
-  const multi=mobile || center._fits!==false;
+  const multi=!mobile && center._fits!==false;   // r144 手機：只放當天一頁，不能左右滑動換天（換天用 ‹ › 或日曆）
   if(multi){ track.append(buildPane(dkShift(dateKey,-1),cachedData(dkShift(dateKey,-1))), center, buildPane(dkShift(dateKey,1),cachedData(dkShift(dateKey,1)))); }
   else track.appendChild(center);
   board.style.scrollSnapType='none'; board.innerHTML=''; board.appendChild(track); board.classList.toggle('pager',multi);
@@ -2174,32 +2172,6 @@ function settlePager(){
 board.addEventListener('scroll',()=>{ if(!board.classList.contains('pager')){ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; return; }
   if(pagerProg||pagerAnim) return; clearTimeout(pagerSettleT); pagerSettleT=setTimeout(settlePager,140); },{passive:true});
 board.addEventListener('scrollend',()=>{ clearTimeout(pagerSettleT); settlePager(); });
-/* r142 手機換天手勢：起手 12px 內判方向，橫向位移要大於直向 2 倍才算換天手勢；放手時拖過 30% 寬或明確甩動才換天，否則彈回當天 */
-(function(){
-  let sx=0, sy=0, lx=0, lt=0, vx=0, mode=-1;   // mode：0 未定、1 橫滑換天中、-1 不處理
-  board.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1 || !isMobile() || !board.classList.contains('pager') || pagerAnim){ mode=-1; return; }
-    const t=e.touches[0]; sx=lx=t.clientX; sy=t.clientY; lt=e.timeStamp; vx=0; mode=0;
-  },{passive:true});
-  board.addEventListener('touchmove',e=>{
-    if(mode<0) return; const t=e.touches[0];
-    if(mode===0){ const dx=Math.abs(t.clientX-sx), dy=Math.abs(t.clientY-sy);
-      if(dy>=10 && !(dx>=24 && dx>dy*2.5)){ mode=-1; return; }   // r143：一有直向位移就鎖成上下捲
-      if(dx<24) return;
-      if(dx>dy*2.5){ mode=1; pagerProg=true; clearTimeout(pagerSettleT); sx=lx=t.clientX; lt=e.timeStamp; } else { mode=-1; return; } }
-    const W=board.clientWidth; board.scrollLeft=W-Math.max(-W,Math.min(W,t.clientX-sx));
-    const dt=e.timeStamp-lt; if(dt>0){ vx=(t.clientX-lx)/dt; lx=t.clientX; lt=e.timeStamp; }
-    if(e.cancelable) e.preventDefault();
-  },{passive:false});
-  const end=cancel=>()=>{
-    if(mode!==1){ mode=-1; return; } mode=-1;
-    const W=board.clientWidth, off=board.scrollLeft-W;   // 正＝往後一天
-    let dir=0; if(!cancel && (Math.abs(off)>W*.35 || (Math.abs(vx)>.6 && Math.abs(off)>W*.15 && Math.sign(-vx)===Math.sign(off)))) dir=off>0?1:-1;   // r143 門檻調高
-    pagerAnim=true;
-    animateScroll(board,W*(1+dir),200,()=>{ pagerAnim=false; pagerProg=false; if(dir) commitDay(dir); });
-  };
-  board.addEventListener('touchend',end(false)); board.addEventListener('touchcancel',end(true));
-})();
 function updateSrc(){
   const ft=new Date(data.fetchedAt);
   const src=document.getElementById('src'); src.classList.remove('busy','err');
