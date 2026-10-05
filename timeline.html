@@ -1286,6 +1286,13 @@ html,body{overscroll-behavior:none}
 .hcal .mo{font:600 9px/11px 'Noto Sans TC','Manrope',sans-serif;height:11px;overflow:hidden;white-space:nowrap}
 .hcal .dy{font:800 16px/16px var(--sans)}
 .hcal .wk2{font:600 9px/10px 'Noto Sans TC','Manrope',sans-serif;padding-bottom:0}
+/* r141 電腦版左上角：控制列水平垂直置中、四邊留白一致（11px）；老師欄寬＝日曆組＋今日鈕＋留白；據點名／老師大頭照左緣對齊控制列 */
+.axis .hcorner{align-items:stretch;justify-content:center;gap:3px;padding:1px 10px 0 11px}
+.hcorner .hrow{width:100%}
+.hcorner .hn.today{flex:1 1 auto;min-width:68px;padding:0 6px}
+.hst:empty{display:none}
+.hst .stamp{width:100%}
+.hband .in,.row .who{padding-left:11px}
 /* r138 日期橫向捲動長帶 */
 .board.pager{overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .board.pager::-webkit-scrollbar:horizontal{display:none;height:0}
@@ -1963,7 +1970,7 @@ function attachClick(el,ev,t){ el.addEventListener('click',()=>{ if(selectedEl) 
 /* 橫版 */
 function buildHorizontal(pane){
   // 自適應：讓 11:00–01:00（14 小時）盡量塞進目前寬度；最小 56px/小時（不夠時橫向捲動）
-  let nameW = 188;
+  let nameW = 178;   // r141：11 留白＋82 日曆組＋6 間距＋68 今日鈕＋11 留白
   const HOUR_W = Math.max(56, Math.floor((board.clientWidth - nameW) / (CLOSE-OPEN))); nameW = Math.max(nameW, board.clientWidth - HOUR_W*(CLOSE-OPEN));
   document.documentElement.style.setProperty('--name-w', nameW+'px'); document.documentElement.style.setProperty('--hour-w', HOUR_W+'px');
   const compact = HOUR_W < 80;   // 窄：預約條只留編號＋姓名一行
