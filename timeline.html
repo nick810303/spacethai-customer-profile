@@ -1274,7 +1274,7 @@ html,body{overscroll-behavior:none}
 .hcal .mo .cr{font-style:normal;font-size:7px;margin-left:1px;opacity:.95;position:relative;top:-.5px}
 .hcal.act::after{content:"";position:absolute;right:2px;top:2px;width:6px;height:6px;border-radius:50%;background:#FF8A00;box-shadow:0 0 0 1px #fff}
 .now::before{font-weight:800;font-size:13px;padding:2px 8px;border-radius:5px;letter-spacing:.02em;top:-23px;left:-26px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
-.vnow::before{font-weight:800;font-size:11px;line-height:17px;padding:0 6px;border-radius:4px;top:-9px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.vnow::before{left:1px;top:-8px;width:calc(var(--axis-w) - 2px);box-sizing:border-box;padding:0;text-align:center;font:800 8.5px/16px var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.3px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.4)}   /* r136 手機：標籤縮進時間軸欄寬度內，不壓到預約 */
 .hband{height:var(--row-h)}
 .buf.vt{display:flex;align-items:center;justify-content:center}
 .buf.vt::after{writing-mode:vertical-rl;text-orientation:upright;font-size:9px;letter-spacing:0;line-height:1}
