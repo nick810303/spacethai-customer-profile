@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>休息區塊監看</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--brand:#AE6C56;--brand-dark:#91563E;--brand-light:#F8F2EE;--green:#2a9d5c;--red:#D94F4F;--amber:#C98A1B;--text:#111;--muted:#777;--hint:#aaa;--border:#e8e8e8;--surface:#fff;--surface2:#f7f7f7;--book:#5a5d63;--sans:'Manrope','PingFang TC','Noto Sans TC',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface2);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:5}
+h1{font-size:17px;margin:0 0 8px;font-weight:700}
+.health{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);align-items:center}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--hint);margin-right:5px;vertical-align:middle}
+.dot.ok{background:var(--green)}.dot.warn{background:var(--amber)}.dot.bad{background:var(--red)}
+.health b{color:var(--text);font-weight:600}
+main{max-width:920px;margin:0 auto;padding:14px 16px 60px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+select,input[type=date],button{font:inherit;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 10px;color:var(--text)}
+button{cursor:pointer}button:hover{border-color:var(--brand)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;user-select:none}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.tab{padding:8px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;font-weight:600}
+.tab.on{color:var(--brand-dark);border-color:var(--brand)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.row1{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.badge{font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff}
+.b-added{background:var(--green)}.b-modified{background:var(--amber)}.b-removed{background:var(--red)}.b-baseline{background:#9aa0a6}
+.who{font-weight:700;font-size:15px}.when{font-variant-numeric:tabular-nums;font-weight:600}
+.meta{color:var(--muted);font-size:12.5px}
+.ctx{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.ctx span{background:var(--brand-light);color:var(--brand-dark);border-radius:6px;padding:2px 8px;font-size:12.5px}
+.ctx span.warn{background:#fdecec;color:var(--red)}
+.tl{position:relative;height:34px;background:var(--surface2);border-radius:6px;margin-top:10px;overflow:hidden}
+.tl .shift{position:absolute;top:0;bottom:0;background:#fff;border-left:1px dashed #ccc;border-right:1px dashed #ccc}
+.tl .ev{position:absolute;top:5px;bottom:5px;border-radius:4px;min-width:2px}
+.ev.booking{background:var(--book)}.ev.break{background:var(--brand)}.ev.block{background:repeating-linear-gradient(45deg,#ddd,#ddd 4px,#eee 4px,#eee 8px)}
+.ev.target{outline:2.5px solid #111;outline-offset:1px;z-index:2}
+.ev.ghost{background:transparent;outline:2px dashed var(--red);outline-offset:0;z-index:2}
+.ticks{position:relative;height:16px;font-size:10.5px;color:var(--hint)}
+.ticks span{position:absolute;transform:translateX(-50%)}
+details{margin-top:6px}summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+.list{margin:6px 0 0;padding:0;list-style:none;font-size:13px;font-variant-numeric:tabular-nums}
+.list li{padding:2px 0;border-bottom:1px dotted var(--border)}.list li.t{font-weight:700;color:var(--brand-dark)}
+.empty,.msg{color:var(--muted);text-align:center;padding:40px 10px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}th{background:var(--surface2);font-weight:600;white-space:nowrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:0 0 10px}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:4px}
+@media(max-width:600px){main{padding:12px 10px 60px}.who{font-size:14px}th,td{padding:6px 6px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>休息區塊監看 <span class="meta" style="font-weight:400">BB／BBE／BBN／BBB</span></h1>
+  <div class="health" id="health"><span><span class="dot"></span>載入中…</span></div>
+</header>
+<main>
+  <div class="tabs"><div class="tab on" data-tab="log">異動紀錄</div><div class="tab" data-tab="stats">各老師統計</div></div>
+  <div class="filters">
+    <select id="fTeacher"><option value="">全部老師</option></select>
+    <div class="chips" id="fType">
+      <span class="chip on" data-v="changes">只看異動</span><span class="chip" data-v="">全部（含建檔基準）</span>
+      <span class="chip" data-v="added">新增</span><span class="chip" data-v="modified">修改</span><span class="chip" data-v="removed">刪除</span>
+    </div>
+    <input type="date" id="fFrom" title="休息區塊日期（起）"><input type="date" id="fTo" title="休息區塊日期（迄）">
+    <button id="refresh">重新整理</button>
+    <label class="meta"><input type="checkbox" id="auto" checked> 每 10 秒自動更新</label>
+  </div>
+  <div class="legend" id="legend"><span><i style="background:var(--book)"></i>預約</span><span><i style="background:var(--brand)"></i>休息區塊</span><span><i style="background:repeating-linear-gradient(45deg,#ddd,#ddd 4px,#eee 4px,#eee 8px)"></i>其他占用</span><span><i style="background:#fff;outline:2.5px solid #111"></i>這筆異動的區塊</span><span><i style="background:#fff;outline:2px dashed var(--red)"></i>已刪除／修改前的位置</span><span><i style="background:#fff;border:1px dashed #ccc"></i>班表範圍</span></div>
+  <div id="out"><div class="msg">載入中…</div></div>
+</main>
+<script>
+const SB_URL='https://lyphciitrhfomquorhfm.supabase.co';
+const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
+const sb=supabase.createClient(SB_URL,SB_ANON);
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TPE=8*3600e3, pad=n=>String(n).padStart(2,'0');
+const tpe=iso=>new Date(Date.parse(iso)+TPE);
+const hm=iso=>{const d=tpe(iso);return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())};
+const md=iso=>{const d=tpe(iso);return (d.getUTCMonth()+1)+'/'+d.getUTCDate()+' '+pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds())};
+const mins=s=>{const [h,m]=s.split(':').map(Number);return h*60+m};
+const fmtM=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60);
+const TYPE={added:'新增',modified:'修改',removed:'刪除',baseline:'建檔基準'};
+let state={tab:'log',type:'changes',data:null};
+
+async function token(){const {data:{session}}=await sb.auth.getSession();return session?.access_token||null}
+async function load(){
+  const t=await token();
+  if(!t){$('#out').innerHTML='<div class="msg">尚未登入。請先在同一個瀏覽器登入<a href="./">顧客檔案系統</a>，再回到這一頁重新整理。</div>';$('#health').innerHTML='<span><span class="dot warn"></span>未登入</span>';return}
+  const p=new URLSearchParams({limit:state.tab==='stats'?'1000':'300'});
+  if(state.tab==='log'){ if($('#fTeacher').value)p.set('teacher',$('#fTeacher').value); if(state.type)p.set('type',state.type); if($('#fFrom').value)p.set('from',$('#fFrom').value); if($('#fTo').value)p.set('to',$('#fTo').value); }
+  try{
+    const r=await fetch(`${SB_URL}/functions/v1/oa-breaks?${p}`,{headers:{Authorization:`Bearer ${t}`,apikey:SB_ANON}});
+    const j=await r.json();
+    if(!r.ok){$('#out').innerHTML=`<div class="msg">讀取失敗（${r.status}）：${esc(j.error||'')}${r.status===403?'。這個帳號不在員工名單內。':''}</div>`;return}
+    state.data=j; renderHealth(j); fillTeachers(j.teachers); state.tab==='log'?renderLog(j.logs):renderStats(j.logs);
+  }catch(e){$('#out').innerHTML=`<div class="msg">連線失敗：${esc(e.message)}</div>`}
+}
+function renderHealth(j){
+  const h=j.health||{}, last=h.last_run_at?Date.parse(h.last_run_at):0, age=last?Math.round((Date.parse(j.now)-last)/1000):null;
+  const cls=!h.active?'bad':(age===null||age>90?'bad':(age>35||h.failed_last_hour>0?'warn':'ok'));
+  const txt=!h.active?'排程已停用':(age===null?'還沒有執行紀錄':(age>90?`已 ${Math.round(age/60)} 分鐘沒有執行`:'運作中'));
+  let body='';try{const b=JSON.parse(h.last_http?.body||'{}');body=b.ok?`上次比對：看到 ${b.breaksSeen} 個區塊，新增 ${b.added}／修改 ${b.modified}／刪除 ${b.removed}${(b.calendarFailed||[]).length?`，<b style="color:var(--red)">${b.calendarFailed.length} 本行事曆讀取失敗</b>`:''}`:`上次回應異常：${esc(h.last_http?.body||'')}`}catch{}
+  $('#health').innerHTML=`<span><span class="dot ${cls}"></span><b>${txt}</b></span>
+   <span>排程 <b>${esc(h.schedule||'-')}</b></span><span>最近一次 <b>${age===null?'-':age+' 秒前'}</b></span>
+   <span>近 10 分鐘執行 <b>${h.runs_last_10min??'-'}</b> 次</span><span>近 1 小時失敗 <b>${h.failed_last_hour??'-'}</b> 次</span>
+   <span>追蹤中區塊 <b>${h.blocks_tracked??'-'}</b></span><span>最近一筆異動 <b>${h.last_change_at?md(h.last_change_at):'尚無'}</b></span><span>${body}</span>`;
+}
+function fillTeachers(ts){const s=$('#fTeacher'); if(s.options.length>1)return; for(const t of ts||[]){const o=document.createElement('option');o.value=t.name;o.textContent=`${t.name}（${t.branch}）`;s.appendChild(o)}}
+function timeline(l){
+  const evs=(l.day_timeline||[]).filter(e=>!e.allDay);
+  const bs=mins(hm(l.start_at)), be0=mins(hm(l.end_at)), be=be0<bs?be0+1440:be0;
+  let lo=bs, hi=be;
+  const items=evs.map(e=>{let s=mins(e.start),en=mins(e.end); if(en<s)en+=1440; lo=Math.min(lo,s); hi=Math.max(hi,en); return {...e,s,en}});
+  const sh=l.shift&&l.shift.toMin?l.shift:null; if(sh){lo=Math.min(lo,sh.fromMin);hi=Math.max(hi,sh.toMin)}
+  lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60; if(hi-lo<360)hi=lo+360;
+  const x=m=>((m-lo)/(hi-lo)*100).toFixed(2)+'%', w=(a,b)=>((b-a)/(hi-lo)*100).toFixed(2)+'%';
+  let h='<div class="tl">'; if(sh)h+=`<div class="shift" style="left:${x(sh.fromMin)};width:${w(sh.fromMin,sh.toMin)}" title="班表 ${fmtM(sh.fromMin)}～最晚開始 ${fmtM(sh.toMin-120)}"></div>`;
+  for(const e of items){const isT=e.kind==='break'&&e.s===bs&&e.en===be; h+=`<div class="ev ${e.kind}${isT?' target':''}" style="left:${x(e.s)};width:${w(e.s,e.en)}" title="${esc(e.start+'-'+e.end+' '+e.title)}"></div>`}
+  if(l.change_type==='removed')h+=`<div class="ev ghost" style="left:${x(bs)};width:${w(bs,be)}" title="已刪除 ${hm(l.start_at)}-${hm(l.end_at)}"></div>`;
+  if(l.change_type==='modified'&&l.prev_start_at){const ps=mins(hm(l.prev_start_at));let pe=mins(hm(l.prev_end_at));if(pe<ps)pe+=1440;h+=`<div class="ev ghost" style="left:${x(ps)};width:${w(ps,pe)}" title="修改前 ${hm(l.prev_start_at)}-${hm(l.prev_end_at)}"></div>`}
+  h+='</div><div class="ticks">'; for(let m=lo;m<=hi;m+=60)h+=`<span style="left:${x(m)}">${pad(Math.floor(m/60)%24)}</span>`; h+='</div>';
+  const list=items.sort((a,b)=>a.s-b.s).map(e=>`<li class="${e.kind==='break'&&e.s===bs?'t':''}">${e.start}–${e.end}　${e.kind==='booking'?'預約':e.kind==='break'?'休息':'占用'}　${esc(e.title)}</li>`).join('');
+  return h+`<details><summary>當下這一天的完整時間軸（${items.length} 筆）${sh?`・班表 ${fmtM(sh.fromMin)}～最晚開始 ${fmtM(sh.toMin-120)}`:'・當天無班表資料'}</summary><ul class="list">${list||'<li>（沒有事件）</li>'}</ul></details>`;
+}
+function ctx(c){ if(!c)return''; const a=[];
+  if(c.prev_booking_end!=null)a.push(`<span>前一筆預約 ${c.prev_booking_end} 結束，隔 ${c.gap_before_min} 分</span>`); else a.push('<span>當天前面沒有預約</span>');
+  if(c.next_booking_start!=null)a.push(`<span>下一筆預約 ${c.next_booking_start} 開始，隔 ${c.gap_after_min} 分</span>`); else a.push('<span>後面沒有預約</span>');
+  a.push(`<span>休息前連續接客 ${c.consecutive_bookings_before} 位（${c.consecutive_work_min_before} 分）</span>`,`<span>當天預約 ${c.bookings_that_day} 筆</span>`);
+  if(c.overlaps_booking)a.push('<span class="warn">與預約重疊</span>'); return `<div class="ctx">${a.join('')}</div>`}
+function renderLog(logs){
+  $('#legend').style.display='';
+  if(!logs.length){$('#out').innerHTML='<div class="empty">沒有符合條件的紀錄。<br>排程每 10 秒比對一次；有人新增、修改或刪除休息區塊後，同步到 Google 行事曆就會出現在這裡。</div>';return}
+  $('#out').innerHTML=logs.map(l=>`<div class="card">
+    <div class="row1"><span class="badge b-${l.change_type}">${TYPE[l.change_type]||l.change_type}</span><span class="who">${esc(l.teacher)}</span><span class="meta">${esc(l.branch||'')}</span>
+      <span class="when">${esc(l.work_date)}　${hm(l.start_at)}–${hm(l.end_at)}（${l.minutes} 分）</span><span class="meta">${esc(l.title||'')}</span></div>
+    <div class="meta">偵測時間 ${md(l.detected_at)}${l.change_type==='modified'&&l.prev_start_at?`　・　修改前 ${hm(l.prev_start_at)}–${hm(l.prev_end_at)} ${esc(l.prev_title||'')}`:''}</div>
+    ${ctx(l.context)}${timeline(l)}</div>`).join('');
+}
+function renderStats(logs){
+  $('#legend').style.display='none';
+  const by={}; for(const l of logs){ if(l.change_type==='removed'||l.change_type==='modified')continue; (by[l.teacher]=by[l.teacher]||[]).push(l) }
+  const dist=(a)=>{const m={};a.forEach(v=>m[v]=(m[v]||0)+1);return Object.entries(m).sort((x,y)=>y[1]-x[1]).slice(0,4).map(([k,v])=>`${k}（${v}）`).join('、')||'-'};
+  const rows=Object.entries(by).sort((a,b)=>b[1].length-a[1].length).map(([t,rs])=>{
+    const c=rs.map(r=>r.context||{}), ms=rs.map(r=>r.minutes).sort((a,b)=>a-b), med=ms[Math.floor(ms.length/2)];
+    const tag=dist(rs.map(r=>((r.title||'').match(/BB[ENB]?/i)||['?'])[0].toUpperCase()));
+    return `<tr><td><b>${esc(t)}</b></td><td>${rs.length}</td><td>${new Set(rs.map(r=>r.work_date)).size}</td><td>中位 ${med} 分<br><span class="meta">${dist(ms)}</span></td>
+      <td>${dist(c.filter(x=>x.gap_before_min!=null).map(x=>x.gap_before_min+' 分'))}<br><span class="meta">前面沒預約：${c.filter(x=>x.prev_booking_end==null).length} 次</span></td>
+      <td>${dist(c.map(x=>x.consecutive_bookings_before+' 位'))}</td><td>${dist(rs.map(r=>hm(r.start_at).slice(0,2)+' 時'))}</td><td>${tag}</td></tr>`}).join('');
+  $('#out').innerHTML=rows?`<div class="meta" style="margin-bottom:8px">以「建檔基準＋新增」的區塊計算，括號內是次數。樣本少的老師還看不出規律。</div><div style="overflow-x:auto"><table><thead><tr><th>老師</th><th>筆數</th><th>天數</th><th>長度</th><th>與前一筆預約的間隔</th><th>休息前連續接客</th><th>開始時段</th><th>標記</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty">還沒有資料</div>';
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));state.tab=t.dataset.tab;document.querySelector('.filters').style.display=state.tab==='log'?'':'none';load()});
+document.querySelectorAll('#fType .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#fType .chip').forEach(x=>x.classList.toggle('on',x===c));state.type=c.dataset.v;load()});
+['#fTeacher','#fFrom','#fTo'].forEach(s=>$(s).onchange=load); $('#refresh').onclick=load;
+setInterval(()=>{ if($('#auto').checked && !document.hidden && !document.querySelector('details[open]')) load() },10000);
+load();
+</script>
+</body>
+</html>
