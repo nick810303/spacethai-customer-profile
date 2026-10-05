@@ -1983,7 +1983,7 @@ function buildHorizontal(pane){
     const head=document.createElement('div'); head.className='branch-head';
     const used=bedsNow(all,isToday,NOW);
     const _st=capState(br.name), _nm=_st?CXN[capKind(_st)][0]:''; let _ch=capHtml(br.name,true); _ch=_ch.replace(/<\/span>\s*$/,`<span class="ctt">${_nm}</span></span>`);
-    head.innerHTML=`<div class="hband" style="--bc:${br.hex}"><span class="in"><b>${br.name}</b><i class="cnt">${cnt}</i>${bedsBand(used,true)}${_ch}</span></div>`;
+    head.innerHTML=`<div class="hband" style="--bc:${br.hex}"><span class="in"><b>${br.name}</b><i class="cnt">${cnt}</i>${_ch}${bedsBand(used,true)}</span></div>`;
     grid.appendChild(head);
     list.forEach(t=>{
       const [zh,en]=t.name.split(' ');
