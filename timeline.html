@@ -1296,6 +1296,11 @@ html,body{overscroll-behavior:none}
 /* r138 日期橫向捲動長帶 */
 .board.pager{overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .board.pager::-webkit-scrollbar:horizontal{display:none;height:0}
+/* r146 手機換天手勢的提示泡泡：拖動時出現在要去的那一側，拖夠了變實心「放開換到」 */
+.swh{position:fixed;top:50%;z-index:60;display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#fff;color:var(--brand);border:1.5px solid var(--brand-bdr);box-shadow:0 4px 14px rgba(0,0,0,.16);font:700 13px var(--sans);transform:translateY(-50%);pointer-events:none;white-space:nowrap;opacity:calc(.4 + var(--p,0)*.6)}
+.swh.r{right:10px}.swh.l{left:10px}
+.swh b{font-size:11px;font-weight:600;opacity:.75}
+.swh.go{background:var(--brand);color:#fff;border-color:var(--brand)}.swh.go b{opacity:.9}
 .track{display:flex;min-width:100%}
 .pane{flex:0 0 100%;min-width:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
 .pskel{padding:30px 0;text-align:center;color:var(--text-hint);font-size:12px}
@@ -2172,6 +2177,46 @@ function settlePager(){
 board.addEventListener('scroll',()=>{ if(!board.classList.contains('pager')){ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; return; }
   if(pagerProg||pagerAnim) return; clearTimeout(pagerSettleT); pagerSettleT=setTimeout(settlePager,140); },{passive:true});
 board.addEventListener('scrollend',()=>{ clearTimeout(pagerSettleT); settlePager(); });
+/* r146 手機換天手勢（手機只放當天一頁，畫面本身不能左右捲）：要「明確地」橫拖才換天
+   ① 離螢幕左右邊緣 24px 內起手不算（讓給瀏覽器的返回手勢） ② 還在慣性捲動時起手不算
+   ③ 手指移動 14px 時判方向：橫向要是直向的 2 倍以上，否則整段都當上下捲 ④ 拖動中上下偏超過 48px 就取消
+   ⑤ 放手時要拖過 max(130px, 38% 寬) 才換天，甩得再快也不算；旁邊泡泡會顯示「繼續拉／放開換到 10/9」 */
+(function(){
+  const EDGE=24, LOCK=14, RATIO=2, DRIFT=48;
+  let sx=0, sy=0, mode=-1, lastScroll=0, hint=null, eatClick=0;
+  const need=()=>Math.max(130, board.clientWidth*.38);
+  const lbl=dir=>{ const [y,m,d]=dkShift(dateKey,dir).split('-').map(Number); return `${m}/${d} 週${WD[new Date(y,m-1,d).getDay()]}`; };
+  board.addEventListener('scroll',()=>{ lastScroll=performance.now(); },{passive:true});
+  function showHint(dir,p){ if(!hint){ hint=document.createElement('div'); document.body.appendChild(hint); }
+    hint.className='swh '+(dir>0?'r':'l')+(p>=1?' go':''); hint.style.setProperty('--p',Math.min(1,p));
+    const w=`<b>${p>=1?'放開換到':'繼續拉'}</b>`;
+    hint.innerHTML=dir>0?`${w}<span>${lbl(1)} ›</span>`:`<span>‹ ${lbl(-1)}</span>${w}`; }
+  function reset(){ const t=board.querySelector('.track'); if(t){ t.style.transition='transform .2s ease'; t.style.transform=''; setTimeout(()=>{ t.style.transition=''; },220); } if(hint){ hint.remove(); hint=null; } }
+  board.addEventListener('touchstart',e=>{
+    mode=-1; if(e.touches.length!==1 || !isMobile() || board.classList.contains('pager')) return;
+    const t=e.touches[0];
+    if(t.clientX<EDGE || t.clientX>window.innerWidth-EDGE) return;
+    if(performance.now()-lastScroll<120) return;
+    sx=t.clientX; sy=t.clientY; mode=0;
+  },{passive:true});
+  board.addEventListener('touchmove',e=>{
+    if(mode<0) return;
+    if(e.touches.length!==1){ if(mode===1) reset(); mode=-1; return; }
+    const t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(mode===0){ if(Math.hypot(dx,dy)<LOCK) return; if(Math.abs(dx)>=Math.abs(dy)*RATIO) mode=1; else { mode=-1; return; } }
+    if(Math.abs(dy)>DRIFT){ reset(); mode=-1; return; }
+    if(e.cancelable) e.preventDefault();
+    const tr=board.querySelector('.track'); if(tr) tr.style.transform=`translateX(${dx*.45}px)`;
+    showHint(dx<0?1:-1, Math.abs(dx)/need());
+  },{passive:false});
+  board.addEventListener('touchend',e=>{
+    if(mode!==1){ mode=-1; return; } mode=-1; eatClick=performance.now(); reset();
+    const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)>=need() && Math.abs(dy)<=DRIFT) shiftDate(dx<0?1:-1);
+  });
+  board.addEventListener('touchcancel',()=>{ if(mode===1) reset(); mode=-1; });
+  board.addEventListener('click',e=>{ if(performance.now()-eatClick<400){ e.stopPropagation(); e.preventDefault(); } },true);   // 拖完放手不要誤點到預約卡
+})();
 function updateSrc(){
   const ft=new Date(data.fetchedAt);
   const src=document.getElementById('src'); src.classList.remove('busy','err');
