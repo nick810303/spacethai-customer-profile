@@ -1296,11 +1296,32 @@ html,body{overscroll-behavior:none}
 /* r138 日期橫向捲動長帶 */
 .board.pager{overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .board.pager::-webkit-scrollbar:horizontal{display:none;height:0}
-/* r146 手機換天手勢的提示泡泡：拖動時出現在要去的那一側，拖夠了變實心「放開換到」 */
-.swh{position:fixed;top:50%;z-index:60;display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#fff;color:var(--brand);border:1.5px solid var(--brand-bdr);box-shadow:0 4px 14px rgba(0,0,0,.16);font:700 13px var(--sans);transform:translateY(-50%);pointer-events:none;white-space:nowrap;opacity:calc(.4 + var(--p,0)*.6)}
-.swh.r{right:10px}.swh.l{left:10px}
-.swh b{font-size:11px;font-weight:600;opacity:.75}
-.swh.go{background:var(--brand);color:#fff;border-color:var(--brand)}.swh.go b{opacity:.9}
+/* r147 手機：前後天預先排在當天兩側（絕對定位、被 .track 的 overflow-x:clip 裁掉，畫面本身仍不能左右捲），只有換天手勢能帶進來 */
+.board.mpager .track{position:relative;overflow-x:clip}
+.board.mpager .pane:first-child,.board.mpager .pane:last-child{position:absolute;top:0;width:100%}
+.board.mpager .pane:first-child{left:-100%}.board.mpager .pane:last-child{left:100%}
+.pane.mp-in{box-shadow:0 0 22px rgba(43,33,28,.22)}
+/* r147 黏在兩天交界上的日期標籤：從邊緣冒出、拉快會被拉長、拉夠了「啵」一下變實心 */
+.mpp{position:absolute;z-index:30;width:max-content;pointer-events:none;will-change:transform,opacity}
+.mpp.r{left:0}.mpp.l{left:100%}
+.mpp .mps{transition:transform .14s ease-out;transform-origin:50% 50%}
+.mpp .mpi{display:flex;align-items:center;gap:6px;padding:10px 14px 10px 17px;border-radius:999px;background:#fff;color:var(--brand);border:1.5px solid var(--brand-bdr);box-shadow:0 6px 18px rgba(43,33,28,.2);font:700 15px var(--sans);white-space:nowrap;transition:background .18s,color .18s,border-color .18s,box-shadow .18s}
+.mpp.l .mpi{padding:10px 17px 10px 14px}
+.mpp .mpi em{font-style:normal;font-size:11px;font-weight:600;max-width:0;overflow:hidden;opacity:0;transition:max-width .24s cubic-bezier(.34,1.56,.64,1),opacity .18s}
+.mpp .mpi span{font-size:12px;font-weight:600;opacity:.72}
+.mpp .mpi i{font-style:normal;font-size:19px;line-height:1;display:inline-block}
+.mpp.l .mpi i{order:-1}
+.mpp.go .mpi{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 8px 22px rgba(174,108,86,.45)}
+.mpp.go .mpi em{max-width:64px;opacity:.92}
+.mpp.go .mpi i{animation:mppNudge .7s ease-in-out infinite}
+.mpp.l.go .mpi i{animation-name:mppNudgeL}
+.mpp.pop .mpi{animation:mppPop .42s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mppPop{0%{transform:scale(1)}35%{transform:scale(1.2)}70%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes mppNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+@keyframes mppNudgeL{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
+.mpp.ok{transition:opacity .28s .12s;opacity:0!important}
+.mpp.bye{transition:opacity .2s;opacity:0!important}
+.mpp.bye .mps{transition:transform .22s cubic-bezier(.5,0,.75,0);transform:scale(.35)!important}
 .track{display:flex;min-width:100%}
 .pane{flex:0 0 100%;min-width:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
 .pskel{padding:30px 0;text-align:center;color:var(--text-hint);font-size:12px}
@@ -1962,7 +1983,7 @@ const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
-function showMsg(html){ board.classList.remove('pager'); board.innerHTML=`<div class="msg">${html}</div>`; }
+function showMsg(html){ board.classList.remove('pager','mpager'); board.innerHTML=`<div class="msg">${html}</div>`; }
 function fitVertTags(){ board.querySelectorAll('.buf').forEach(b=>b.classList.toggle('vt', b.offsetWidth<26));
   board.querySelectorAll('.blk').forEach(b=>{ b.classList.remove('vt'); if(b.scrollWidth>b.clientWidth+1 && b.textContent.trim().length<=4) b.classList.add('vt'); }); }
 function render(){ syncPop(); const hl=document.getElementById('hintLegend'); if(hl) hl.innerHTML=anyHints()?hintLegendHtml():''; renderPager(); }
@@ -2120,10 +2141,10 @@ function renderPager(){
   const mobile=isMobile(), keepY=board.scrollTop, keepX=board.scrollLeft, first=!board.querySelector('.track');
   const track=document.createElement('div'); track.className='track';
   const center=buildPane(dateKey,data);
-  const multi=!mobile && center._fits!==false;   // r144 手機：只放當天一頁，不能左右滑動換天（換天用 ‹ › 或日曆）
-  if(multi){ track.append(buildPane(dkShift(dateKey,-1),cachedData(dkShift(dateKey,-1))), center, buildPane(dkShift(dateKey,1),cachedData(dkShift(dateKey,1)))); }
+  const multi=!mobile && center._fits!==false, mp=mobile;   // r147 手機：前後天也排好放在兩側（不能捲，只有換天手勢能帶進來）
+  if(multi||mp){ track.append(buildPane(dkShift(dateKey,-1),cachedData(dkShift(dateKey,-1))), center, buildPane(dkShift(dateKey,1),cachedData(dkShift(dateKey,1)))); }
   else track.appendChild(center);
-  board.style.scrollSnapType='none'; board.innerHTML=''; board.appendChild(track); board.classList.toggle('pager',multi);
+  board.style.scrollSnapType='none'; board.innerHTML=''; board.appendChild(track); board.classList.toggle('pager',multi); board.classList.toggle('mpager',mp);
   [...track.children].forEach(p=>p._after&&p._after());
   const W=board.clientWidth, r=center._r||{};
   pagerProg=true;
@@ -2136,7 +2157,7 @@ function renderPager(){
 }
 function refreshPane(dk,d){
   const tr=board.querySelector('.track'); const old=paneOf(dk); if(!tr||!old) return false;
-  const keepY=board.scrollTop, keepX=board.scrollLeft; const np=buildPane(dk,d); tr.replaceChild(np,old); np._after&&np._after();
+  const keepY=board.scrollTop, keepX=board.scrollLeft; const np=buildPane(dk,d); np.style.cssText=old.style.cssText; if(old.classList.contains('mp-in')) np.classList.add('mp-in'); const pp=old.querySelector(':scope > .mpp'); if(pp) np.appendChild(pp); tr.replaceChild(np,old); np._after&&np._after();   // r147：拖動中換掉頁面也保留位移與標籤
   pagerProg=true; board.scrollLeft=keepX; board.scrollTop=keepY; setTimeout(()=>{ pagerProg=false; },30);
   if(!isMobile()) fitVertTags(); if(dk===dateKey&&data) updateSrc(); return true;
 }
@@ -2177,44 +2198,66 @@ function settlePager(){
 board.addEventListener('scroll',()=>{ if(!board.classList.contains('pager')){ if(window.innerWidth<=700 && board.scrollLeft!==0) board.scrollLeft=0; return; }
   if(pagerProg||pagerAnim) return; clearTimeout(pagerSettleT); pagerSettleT=setTimeout(settlePager,140); },{passive:true});
 board.addEventListener('scrollend',()=>{ clearTimeout(pagerSettleT); settlePager(); });
-/* r146 手機換天手勢（手機只放當天一頁，畫面本身不能左右捲）：要「明確地」橫拖才換天
-   ① 離螢幕左右邊緣 24px 內起手不算（讓給瀏覽器的返回手勢） ② 還在慣性捲動時起手不算
-   ③ 手指移動 14px 時判方向：橫向要是直向的 2 倍以上，否則整段都當上下捲 ④ 拖動中上下偏超過 48px 就取消
-   ⑤ 放手時要拖過 max(130px, 38% 寬) 才換天，甩得再快也不算；旁邊泡泡會顯示「繼續拉／放開換到 10/9」 */
+/* r147 手機換天：前後天已排在兩側，只有「明確橫拖」才帶動三頁一起移動（判斷規則同 r146，不放寬）
+   ① 離螢幕左右邊緣 24px 內起手不算 ② 還在慣性捲動時起手不算 ③ 手指移動 14px 時橫向要是直向的 2 倍以上，否則整段都當上下捲
+   ④ 拖動中上下偏超過 48px 就取消 ⑤ 放手時要拖過 max(130px, 38% 寬) 才換天，甩得再快也不算
+   拖動時頁面 1:1 跟手、日期標籤黏在兩天交界上；‹ › 按鈕也走同一套滑動 */
+let mpBusy=false;
+function mpPanes(){ const tr=board.querySelector('.track'); return board.classList.contains('mpager')&&tr&&tr.children.length===3?[...tr.children]:null; }
+function mpSet(dx,ms,ease){ const ps=mpPanes(); if(!ps) return; ps.forEach(p=>{ p.style.transition=ms?`transform ${ms}ms ${ease||'cubic-bezier(.22,.9,.3,1)'}`:'none'; p.style.transform=dx?`translateX(${dx}px)`:''; }); }
+function mpClear(){ board.querySelectorAll('.track > .pane').forEach(p=>{ p.style.transition=''; p.style.transform=''; p.classList.remove('mp-in'); }); }
+function mpSlide(dir,ms){   // dir：1＝往後一天、-1＝往前一天、0＝彈回當天
+  if(!mpPanes()) return false; mpBusy=true;
+  mpSet(-dir*board.clientWidth, ms, dir?'cubic-bezier(.22,.9,.3,1)':'cubic-bezier(.34,1.32,.64,1)');
+  setTimeout(()=>{ mpBusy=false; if(dir) commitDay(dir); mpClear(); }, ms+30);   // commitDay 換好 DOM 後同一格清掉位移，畫面不會閃
+  return true; }
 (function(){
   const EDGE=24, LOCK=14, RATIO=2, DRIFT=48;
-  let sx=0, sy=0, mode=-1, lastScroll=0, hint=null, eatClick=0;
+  let sx=0, sy=0, lx=0, lt=0, v=0, mode=-1, dir=0, lastScroll=0, eatClick=0, pill=null, go=false;
   const need=()=>Math.max(130, board.clientWidth*.38);
-  const lbl=dir=>{ const [y,m,d]=dkShift(dateKey,dir).split('-').map(Number); return `${m}/${d} 週${WD[new Date(y,m-1,d).getDay()]}`; };
+  const lbl=d=>{ const [y,m,dd]=dkShift(dateKey,d).split('-').map(Number); return [`${m}/${dd}`,`週${WD[new Date(y,m-1,dd).getDay()]}`]; };
   board.addEventListener('scroll',()=>{ lastScroll=performance.now(); },{passive:true});
-  function showHint(dir,p){ if(!hint){ hint=document.createElement('div'); document.body.appendChild(hint); }
-    hint.className='swh '+(dir>0?'r':'l')+(p>=1?' go':''); hint.style.setProperty('--p',Math.min(1,p));
-    const w=`<b>${p>=1?'放開換到':'繼續拉'}</b>`;
-    hint.innerHTML=dir>0?`${w}<span>${lbl(1)} ›</span>`:`<span>‹ ${lbl(-1)}</span>${w}`; }
-  function reset(){ const t=board.querySelector('.track'); if(t){ t.style.transition='transform .2s ease'; t.style.transform=''; setTimeout(()=>{ t.style.transition=''; },220); } if(hint){ hint.remove(); hint=null; } }
+  function host(){ const ps=mpPanes(); return ps?(dir>0?ps[2]:ps[0]):null; }
+  function mkPill(){ const h=host(); if(!h) return; const [md,wk]=lbl(dir);
+    board.querySelectorAll('.mp-in').forEach(x=>x.classList.remove('mp-in'));
+    if(!pill){ pill=document.createElement('div'); }
+    go=false; pill.className='mpp '+(dir>0?'r':'l');
+    pill.innerHTML=`<div class="mps"><div class="mpi"><em>放開換到</em><b>${md}</b><span>${wk}</span><i>${dir>0?'›':'‹'}</i></div></div>`;
+    pill.style.top=(board.scrollTop+board.clientHeight*.5)+'px'; h.appendChild(pill); h.classList.add('mp-in'); }
+  function placePill(x){ if(!pill) return; const h=host(); if(h&&pill.parentNode!==h){ h.appendChild(pill); h.classList.add('mp-in'); }
+    const a=Math.abs(x), half=(pill.offsetWidth||120)/2+10, off=dir>0?Math.min(0,a-half):Math.max(0,half-a), p=a/need();
+    pill.style.transform=`translate(calc(-50% + ${off}px),-50%)`; pill.style.opacity=Math.min(1,a/36);
+    const k=.72+.28*Math.min(1,p*1.25), st=Math.min(.3,Math.abs(v)*.12);   // 拉得快會被拉長（黏）
+    pill.firstChild.style.transform=`scale(${k*(1+st)},${k/(1+st*.6)})`;
+    const g=p>=1; if(g!==go){ go=g; pill.classList.toggle('go',g); pill.classList.remove('pop'); void pill.offsetWidth; if(g){ pill.classList.add('pop'); try{ navigator.vibrate&&navigator.vibrate(8); }catch(e){} } } }
+  function dropPill(ok){ const p=pill; pill=null; go=false; if(!p) return; p.firstChild.style.transform=''; p.classList.add(ok?'ok':'bye'); setTimeout(()=>p.remove(),420); }
+  function cancel(){ if(mode===1){ dropPill(false); mpSlide(0,300); } mode=-1; }
   board.addEventListener('touchstart',e=>{
-    mode=-1; if(e.touches.length!==1 || !isMobile() || board.classList.contains('pager')) return;
+    mode=-1; if(e.touches.length!==1 || mpBusy || !mpPanes()) return;
     const t=e.touches[0];
     if(t.clientX<EDGE || t.clientX>window.innerWidth-EDGE) return;
     if(performance.now()-lastScroll<120) return;
-    sx=t.clientX; sy=t.clientY; mode=0;
+    sx=lx=t.clientX; sy=t.clientY; lt=e.timeStamp; v=0; mode=0;
   },{passive:true});
   board.addEventListener('touchmove',e=>{
     if(mode<0) return;
-    if(e.touches.length!==1){ if(mode===1) reset(); mode=-1; return; }
+    if(e.touches.length!==1){ cancel(); return; }
     const t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-    if(mode===0){ if(Math.hypot(dx,dy)<LOCK) return; if(Math.abs(dx)>=Math.abs(dy)*RATIO) mode=1; else { mode=-1; return; } }
-    if(Math.abs(dy)>DRIFT){ reset(); mode=-1; return; }
+    if(mode===0){ if(Math.hypot(dx,dy)<LOCK) return; if(Math.abs(dx)>=Math.abs(dy)*RATIO){ mode=1; dir=dx<0?1:-1; mkPill(); } else { mode=-1; return; } }
+    if(Math.abs(dy)>DRIFT){ cancel(); return; }
     if(e.cancelable) e.preventDefault();
-    const tr=board.querySelector('.track'); if(tr) tr.style.transform=`translateX(${dx*.45}px)`;
-    showHint(dx<0?1:-1, Math.abs(dx)/need());
+    const nd=dx<0?1:-1; if(nd!==dir && Math.abs(dx)>6){ dir=nd; mkPill(); }
+    const W=board.clientWidth, x=Math.max(-W*.94,Math.min(W*.94,dx));
+    const dt=e.timeStamp-lt; if(dt>0){ v=v*.6+((t.clientX-lx)/dt)*.4; lx=t.clientX; lt=e.timeStamp; }
+    mpSet(x,0); placePill(x);
   },{passive:false});
   board.addEventListener('touchend',e=>{
-    if(mode!==1){ mode=-1; return; } mode=-1; eatClick=performance.now(); reset();
+    if(mode!==1){ mode=-1; return; } mode=-1; eatClick=performance.now();
     const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-    if(Math.abs(dx)>=need() && Math.abs(dy)<=DRIFT) shiftDate(dx<0?1:-1);
+    if(Math.abs(dx)>=need() && Math.abs(dy)<=DRIFT){ dropPill(true); mpSlide(dx<0?1:-1,250); }
+    else { dropPill(false); mpSlide(0,320); }
   });
-  board.addEventListener('touchcancel',()=>{ if(mode===1) reset(); mode=-1; });
+  board.addEventListener('touchcancel',cancel);
   board.addEventListener('click',e=>{ if(performance.now()-eatClick<400){ e.stopPropagation(); e.preventDefault(); } },true);   // 拖完放手不要誤點到預約卡
 })();
 function updateSrc(){
@@ -2328,6 +2371,7 @@ async function prefetchNeighbours(dk){ for(const n of [1,-1]){ const k=dkShift(d
 function setDate(dk){
   if(dk===dateKey) return;
   const diff=dkDiff(dk,dateKey);
+  if(Math.abs(diff)===1 && board.classList.contains('mpager')){ if(mpBusy) return; if(mpSlide(diff,300)) return; }   // r147 手機：‹ › 也用滑動換天
   if(board.classList.contains('pager') && Math.abs(diff)===1){ pagerGo(diff); return; }   // 相鄰一天：真的捲過去
   dateKey=dk; closePanel(); closeCapPop(); renderDate(); syncPop();
   const c=dayCache.get(dk);
