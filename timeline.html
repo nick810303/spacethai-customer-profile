@@ -1845,7 +1845,14 @@ capxEl.addEventListener('click',e=>{ if(e.target.closest('.kx-tx')){ closeCapPop
 document.body.classList.add('tv1','fw2');
 const HOLNAME={};   // 節日名稱（取自 holidays 表；當日資料另帶 capacity.holidayName）
 function holNameOf(dk){ if(data&&data.date===dk&&data.capacity&&data.capacity.holidayName) return data.capacity.holidayName; return HOLNAME[dk]||null; }
-function SPEC(dk){ const n=holNameOf(dk); return {tags:n?[[n,'off']]:[]}; }
+/* r148 特殊獎金日（老師當天額外加給）：新增日期就往這裡加一行；與國定假日同名時不重複列名稱 */
+const BONUS_DAYS={
+  '2026-12-25':'聖誕節', '2026-12-31':'跨年',
+  '2027-02-14':'西洋情人節', '2027-04-04':'兒童節', '2027-08-08':'七夕情人節',
+  '2027-10-30':'同志遊行週末', '2027-10-31':'同志遊行週末',
+  '2027-12-25':'聖誕節', '2027-12-31':'跨年'
+};
+function SPEC(dk){ const n=holNameOf(dk), bn=BONUS_DAYS[dk]; const tags=n?[[n,'off']]:[]; if(bn && bn!==n) tags.push([bn,'event']); return {tags, bonus:!!bn}; }
 const holOf=dk=>{ if(data&&data.date===dk&&data.capacity) return !!data.capacity.isHoliday; const [y,m,d]=dk.split('-').map(Number), w=new Date(y,m-1,d).getDay(); return w===0||w===6||!!HOLNAME[dk]; };
 const stampTxt=t=>{ const k=Math.ceil(t.length/2); return t.slice(0,k)+'<br>'+t.slice(k); };
 function bedsBand(n,ttl){ if(n==null) return ''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span>`; }
