@@ -1847,6 +1847,7 @@ const HOLNAME={};   // 節日名稱（取自 holidays 表；當日資料另帶 c
 function holNameOf(dk){ if(data&&data.date===dk&&data.capacity&&data.capacity.holidayName) return data.capacity.holidayName; return HOLNAME[dk]||null; }
 /* r148 特殊獎金日（老師當天額外加給）：新增日期就往這裡加一行；與國定假日同名時不重複列名稱 */
 const BONUS_DAYS={
+  '2026-10-31':'同志遊行週末', '2026-11-01':'同志遊行週末',   // r149 補上今年的同志遊行週末
   '2026-12-25':'聖誕節', '2026-12-31':'跨年',
   '2027-02-14':'西洋情人節', '2027-04-04':'兒童節', '2027-08-08':'七夕情人節',
   '2027-10-30':'同志遊行週末', '2027-10-31':'同志遊行週末',
