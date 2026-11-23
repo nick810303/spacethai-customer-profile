@@ -1979,7 +1979,7 @@ async function annotateHints(j, dk){
         const r=g.find(x=>same(x)&&String(x.start_time).slice(0,5)===hm)||g.find(same)||(g.length===1&&cnt[k]===1?g[0]:null);   // 同行（同一位客人兩位老師）只標在對的那位老師
         if(r&&has.has(r.id)) ev.sv=true; }); } }
   }catch(e){ console.warn('sv', e); }
-  try{ if(numsAll.length){ const tf=await rest(`survey_responses?select=customer_num,temp_feel&customer_num=in.(${numsAll.join(',')})&temp_feel=not.is.null&limit=5000`);
+  try{ if(numsAll.length&&dk===todayKey()){ const tf=await rest(`survey_responses?select=customer_num,temp_feel&customer_num=in.(${numsAll.join(',')})&temp_feel=not.is.null&limit=5000`);
     const ag={}; tf.forEach(x=>{ const a=(ag[x.customer_num] ||= {n:0,c:0,h:0}); a.n++; if(/冷/.test(x.temp_feel)) a.c++; else if(/熱/.test(x.temp_feel)) a.h++; });
     bks.forEach(({ev})=>{ const a=ag[ev.customerNum]; if(!a) return; if(a.c>=2&&a.c*3>=a.n){ ev.tc=true; ev.tf=a; } else if(a.h>=2&&a.h*3>=a.n){ ev.th=true; ev.tf=a; } }); }
   }catch(e){ console.warn('temp', e); }
