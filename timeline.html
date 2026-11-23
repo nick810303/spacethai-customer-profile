@@ -638,6 +638,9 @@ body.fw3{--fwt:800;--fwn:800;--fwm:600;--fwb:600;--fwh:700;--fwz:600}
 .vband .cap .pic{position:absolute;left:0;top:0;margin:0;transform:scale(.85);transform-origin:0 0}
 @container band (max-width:130px){ .vband .bd3{display:none} .vband .bd3.bdx{display:inline-flex} }
 @container band (max-width:92px){ .vband .bd3.bdx{display:none} }
+/* 直向表頭放不下時先藏溫度計（Nick 11/24：手機 5 欄時把量能圖示擠出去）*/
+@container band (max-width:250px){ .vband .bd3:not(.bdx) .bth{display:none} }
+@container band (max-width:168px){ .vband .bd3:not(.bdx){display:none} }
 /* 老師預約數紅圈：不被相鄰格／上方色塊蓋住（z-index 已由程式依欄序遞減），密集時收進格內避免右緣被切 */
 .vhead{overflow:visible}
 .vgrid.dense .vhead .av{width:18px;height:18px}
