@@ -1940,12 +1940,14 @@ async function annotateHints(j, dk){
     bks.forEach(({ev,t})=>{ if(udSet.has(String(ev.start).slice(0,10)+'|'+String(t.name||'').split(' ')[0]+'|'+String(ev.start).slice(11,16))) ev.ud=true; });
   }catch(e){ console.warn('ud', e); }
   try{ if(numsAll.length){ const nx=new Date(Date.parse(dk+'T00:00:00Z')+864e5).toISOString().slice(0,10);
-    const rc=await rest(`records?select=id,customer_num,date,start_time&date=in.(${dk},${nx})&customer_num=in.(${numsAll.join(',')})&is_draft=eq.false&limit=2000`);
+    const rc=await rest(`records?select=id,customer_num,date,start_time,staff_name_legacy&date=in.(${dk},${nx})&customer_num=in.(${numsAll.join(',')})&is_draft=eq.false&limit=2000`);
     if(rc.length){ const svs=await rest(`survey_responses?select=record_id&record_id=in.(${rc.map(r=>r.id).join(',')})&limit=2000`);
       const has=new Set(svs.map(x=>x.record_id)), by={};
       rc.forEach(r=>{ (by[r.customer_num+'|'+r.date] ||= []).push(r); });
-      bks.forEach(({ev})=>{ const g=by[ev.customerNum+'|'+String(ev.start).slice(0,10)]; if(!g) return;
-        const r=g.length===1?g[0]:g.find(x=>String(x.start_time).slice(0,5)===String(ev.start).slice(11,16));
+      const cnt={}; bks.forEach(({ev})=>{ const k=ev.customerNum+'|'+String(ev.start).slice(0,10); cnt[k]=(cnt[k]||0)+1; });
+      bks.forEach(({ev,t})=>{ const k=ev.customerNum+'|'+String(ev.start).slice(0,10), g=by[k]; if(!g) return;
+        const tn=String(t.name||'').split(' ')[0], hm=String(ev.start).slice(11,16), same=x=>String(x.staff_name_legacy||'').trim().split(' ')[0]===tn;
+        const r=g.find(x=>same(x)&&String(x.start_time).slice(0,5)===hm)||g.find(same)||(g.length===1&&cnt[k]===1?g[0]:null);   // 同行（同一位客人兩位老師）只標在對的那位老師
         if(r&&has.has(r.id)) ev.sv=true; }); } }
   }catch(e){ console.warn('sv', e); }
   const pinSet=new Set(pins.map(p=>p.customer_num)); bks.forEach(({ev})=>{ if(ev.customerNum&&pinSet.has(ev.customerNum)) ev.pin=true; if(!ev.customerNum) ev.nw=true; });
