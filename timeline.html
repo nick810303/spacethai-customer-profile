@@ -204,9 +204,8 @@
   .bd3 .bth{color:#fff;margin-left:3px}
   .bd .bth{color:#8a7a70;margin-left:1px}.bd .bth svg{width:14px;height:14px;display:block}
   .bd.bdx{gap:3px;padding:0 7px}.bd.bdx .bdb{display:inline-flex;color:#8a7a70}.bd.bdx .bdb svg{width:12px;height:12px;display:block}
-  .bd3.bdx{padding:3px 6px 3px 7px;gap:0;border-radius:999px;background:rgba(255,255,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}.bd3.bdx .bth{margin-left:-1px}
-  .vband .bd3.bdx{padding:2px 5px 2px 6px}
-  .bd.bdx{gap:0;padding:0 6px}.bd.bdx .bth{margin-left:-1px}
+  .bd3.bdx{padding-left:0}.bd3.bdx .bth{margin-left:0}
+  .bd.bdx{padding:0 7px}.bd.bdx .bth{margin-left:0}
   .bth{position:relative}.bth::after,.bd3.bdx::after{content:"";position:absolute;inset:-8px}
   .vband .bd3 .bth{width:13px;height:13px}.vband .bd3.bdx span{width:12px;height:12px}.vband .bd3.bdx .bth{width:13px;height:13px}
   .legend .hbub,.hleg .hbub{min-width:16px;height:16px;line-height:16px;font-size:10px;padding:0 3px;box-shadow:none}
@@ -1694,7 +1693,7 @@ document.addEventListener('click',e=>{
 });
 const TH_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.8 3.7a2.2 2.2 0 0 1 4.4 0v7.2a4.2 4.2 0 1 1-4.4 0z"/><circle cx="10" cy="14.3" r="1.7" fill="currentColor" stroke="none"/><path d="M10 6.2v7"/></svg>';
 function bedsHtml(used,br){
-  if(used==null) return br?`<span class="bd bdx" data-kt="bt:${br}"><span class="bdb">${BED_SVG}</span><span class="bth">${TH_SVG}</span></span>`:'';
+  if(used==null) return br?`<span class="bd bdx" data-kt="bt:${br}"><span class="bth">${TH_SVG}</span></span>`:'';
   const n=Math.min(5,used);
   return `<span class="bd" data-kt="bed"><span class="lv"></span><span class="ql"><span>實時</span><span>床位</span></span><i class="sep"></i><span class="row5">${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span>${br?`<span class="bth" data-kt="bt:${br}">${TH_SVG}</span>`:''}</span>`;
 }
@@ -1895,7 +1894,7 @@ const BONUS_DAYS={
 function SPEC(dk){ const n=holNameOf(dk), bn=BONUS_DAYS[dk]; const tags=n?[[n,'off']]:[]; if(bn && bn!==n) tags.push([bn,'event']); return {tags, bonus:!!bn}; }
 const holOf=dk=>{ if(data&&data.date===dk&&data.capacity) return !!data.capacity.isHoliday; const [y,m,d]=dk.split('-').map(Number), w=new Date(y,m-1,d).getDay(); return w===0||w===6||!!HOLNAME[dk]; };
 const stampTxt=t=>{ const k=Math.ceil(t.length/2); return t.slice(0,k)+'<br>'+t.slice(k); };
-function bedsBand(n,ttl,br){ if(n==null) return br?`<span class="bd3 bdx" data-kt="bt:${br}"><span class="on">${BED_SVG}</span><span class="on bth">${TH_SVG}</span></span>`:''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}${br?`<span class="on bth" data-kt="bt:${br}">${TH_SVG}</span>`:''}</span>`; }
+function bedsBand(n,ttl,br){ if(n==null) return br?`<span class="bd3 bdx" data-kt="bt:${br}"><span class="on bth">${TH_SVG}</span></span>`:''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}${br?`<span class="on bth" data-kt="bt:${br}">${TH_SVG}</span>`:''}</span>`; }
 function dateCornerHtml(){ const [y,m,d]=dateKey.split('-').map(Number), w=new Date(y,m-1,d).getDay(), sp=SPEC(dateKey), red=holOf(dateKey), tag=[...sp.tags].sort((p,q)=>(p[1]==='off'?0:1)-(q[1]==='off'?0:1))[0], isT=dateKey===todayKey();
   const stamp=sp.bonus?`<span class="stamp k-bonus">特殊獎金日</span>`:(tag?`<span class="stamp k-${tag[1]}">${esc(tag[0])}</span>`:'');
   return `<span class="hrow"><span class="hgrp"><button class="hn" id="hn_p" aria-label="前一天">‹</button><button class="hcal dblk${red?' rd':''}${filter!=='all'?' act':''}" aria-label="日期與篩選：點擊調整" title="${m}月${d}日 週${WD[w]}${sp.tags.map(t=>'・'+t[0]).join('')}${sp.bonus?'・特殊獎金日':''}"><span class="mo">${m}月<em class="cr">▾</em></span><span class="dy">${d}</span><span class="wk2">週${WD[w]}</span></button><button class="hn" id="hn_n" aria-label="後一天">›</button></span><button class="hn today${isT?' on':''}" id="hn_t" aria-label="回到今日">${isT?'今日':'返回今日'}</button></span><span class="hst">${stamp}</span>`; }
