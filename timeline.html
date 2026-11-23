@@ -199,7 +199,7 @@
   .vcol .hbubs{flex-direction:column;right:-6px}
   .hbub{min-width:19px;height:19px;border-radius:10px;color:#fff;font:700 11px/19px var(--sans);display:inline-flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--surface);flex:none}
   .hbub svg{width:12px;height:12px;display:block}
-  .hbub.h2p{background:var(--h2p)} .hbub.hbd{background:var(--hbd)} .hbub.hcp{background:var(--hcp)} .hbub.hud{background:#566579}
+  .hbub.h2p{background:var(--h2p)} .hbub.hbd{background:var(--hbd)} .hbub.hcp{background:var(--hcp)} .hbub.hud{background:#566579} .hbub.hsv{background:#4C8A6A}
   .legend .hbub,.hleg .hbub{min-width:16px;height:16px;line-height:16px;font-size:10px;padding:0 3px;box-shadow:none}
   .legend .hbub svg,.hleg .hbub svg{width:10px;height:10px}
   .hleg{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-muted);white-space:nowrap}
@@ -1718,6 +1718,7 @@ const KXTIP={
  cp:{c:'#1C7ED6',t:'同行',p:'1 人預約，卻同時約了多位老師。系統判斷可能是多人同行。',s:['現場務必先確認是否多人同行','請盡量分辨：誰是預約者、誰是同行第二人','盡量請每位客人都留下電話號碼']},
  nw:{c:'#7B5EA7',t:'可能是新朋友',p:'這筆預約沒有顧客編號，系統判斷可能是新朋友。',s:['接待時，先確認這位客人有沒有來過（少數可能是早期客人，沒有完整歸檔）','結帳時，請盡量在客人手機的 LINE 官方帳號，送出這位客人新編的顧客編號']},
  pin:{c:'#E0A010',t:'釘選提醒',p:'同事針對這位客人釘選的重要資訊或警訊，會顯示在顧客檔案頂部。',s:['接待前先看完釘選內容','想讓所有同事都看到的新資訊：每日上傳寫小本本時，打開「釘選」']},
+ sv:{c:'#4C8A6A',t:'有填問卷',p:'這筆預約，客人填了滿意度問卷。點這筆預約，在右側到訪紀錄把那一次展開就能看內容。',s:[]},
  ud:{c:'#566579',t:'不指定老師',p:'這筆預約，客人沒有指定老師。',s:['接待時請記得自我介紹，讓顧客記得你，就會常常來找你喲！']},
  p2:{c:'#E8590C',t:'當月再訪',p:'系統判讀：這位客人「當月第二次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認']},
  bd:{c:'#D6336C',t:'本月壽星',p:'系統判斷：這位客人是壽星，且「當月首次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認','確實核實生日','確實核實優惠券']},
@@ -1901,17 +1902,18 @@ async function loadTimeline(dk, retry=true){
    本月壽星：同上條件但本月還沒做過 120 分，且生日在本月（資料：沒做過→用壽星 165 筆；做過→用 2+）。兩者互斥
    同行   ：同分店、同開始時間、不同老師，且 ①同編號／同名字（同帳號）或 ②過去紀錄互為同行（records.companions） */
 const HINT_SVG={
+  sv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9zM8.5 13l2.5 2.5 4.5-5"/></svg>',
   ud:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3.2c2 0 3.3 1 4.3 2.8l2 3.4c1 1.8 2.3 2.8 4.3 2.8H20.5"/><path d="M3 17h3.2c1.4 0 2.4-.5 3.2-1.4M14 8.4c.8-.9 1.8-1.4 3.3-1.4h3.2"/><path d="M18 4.2 20.8 7 18 9.8M18 14.2 20.8 17 18 19.8"/></svg>',
   nw:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10" cy="8" r="3.4"/><path d="M3.5 20c0-3.4 2.9-5.8 6.5-5.8"/><path d="M18 13v7M14.5 16.5h7"/></svg>',
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l-1 6 3.2 3.2H6.8L10 9z"/><path d="M12 12.5V21"/></svg>',
   cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.2 2.4-5.5 5.5-5.5s5.5 2.3 5.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.4.3 4 2.2 4 5"/></svg>',
   bd:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16v-7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M4 15.5c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M12 11V8"/><path d="M12 3.5c.9 1 .9 2.2 0 3-.9-.8-.9-2 0-3z"/></svg>',
 };
-const HINT_LBL={ ud:'不指定老師', '2p':'當月再訪', bd:'本月壽星', cp:'同行', nw:'可能是新朋友', pin:'釘選提醒' };
-const KTMAP={ud:'ud','2p':'p2',bd:'bd',cp:'cp',nw:'nw',pin:'pin'};
+const HINT_LBL={ sv:'有填問卷', ud:'不指定老師', '2p':'當月再訪', bd:'本月壽星', cp:'同行', nw:'可能是新朋友', pin:'釘選提醒' };
+const KTMAP={sv:'sv',ud:'ud','2p':'p2',bd:'bd',cp:'cp',nw:'nw',pin:'pin'};
 const hbub = k => `<span class="hbub h${k}" data-kt="${KTMAP[k]}">${k==='2p'?'2+':HINT_SVG[k]}</span>`;
-const hintKeys = ev => [ev.cp?'cp':null, ev.ud?'ud':null, ev.plan||null, ev.nw?'nw':null, ev.pin?'pin':null].filter(Boolean);   // 同行在前、方案在後
-const hintCls = ev => hintKeys(ev).filter(k=>k!=='ud').map(k=>'hx-'+k).join(' ');
+const hintKeys = ev => [ev.cp?'cp':null, ev.ud?'ud':null, ev.plan||null, ev.nw?'nw':null, ev.pin?'pin':null, ev.sv?'sv':null].filter(Boolean);   // 同行在前、方案在後
+const hintCls = ev => hintKeys(ev).filter(k=>k!=='ud'&&k!=='sv').map(k=>'hx-'+k).join(' ');
 const hintTitle = ev => ev.hintWhy?.length ? `\n${ev.hintWhy.join('\n')}（推測，以櫃台確認為準）` : '';
 const hmOf = h => { const m=Math.round(h*60); return `${pad(Math.floor(m/60))}:${pad(m%60)}`; };
 const mdOf = d => d.slice(5).replace('-','/');
@@ -1937,6 +1939,15 @@ async function annotateHints(j, dk){
     const udSet=new Set(uds.map(u=>u.booking_date+'|'+u.staff+'|'+String(u.start_time).slice(0,5)));
     bks.forEach(({ev,t})=>{ if(udSet.has(String(ev.start).slice(0,10)+'|'+String(t.name||'').split(' ')[0]+'|'+String(ev.start).slice(11,16))) ev.ud=true; });
   }catch(e){ console.warn('ud', e); }
+  try{ if(numsAll.length){ const nx=new Date(Date.parse(dk+'T00:00:00Z')+864e5).toISOString().slice(0,10);
+    const rc=await rest(`records?select=id,customer_num,date,start_time&date=in.(${dk},${nx})&customer_num=in.(${numsAll.join(',')})&is_draft=eq.false&limit=2000`);
+    if(rc.length){ const svs=await rest(`survey_responses?select=record_id&record_id=in.(${rc.map(r=>r.id).join(',')})&limit=2000`);
+      const has=new Set(svs.map(x=>x.record_id)), by={};
+      rc.forEach(r=>{ (by[r.customer_num+'|'+r.date] ||= []).push(r); });
+      bks.forEach(({ev})=>{ const g=by[ev.customerNum+'|'+String(ev.start).slice(0,10)]; if(!g) return;
+        const r=g.length===1?g[0]:g.find(x=>String(x.start_time).slice(0,5)===String(ev.start).slice(11,16));
+        if(r&&has.has(r.id)) ev.sv=true; }); } }
+  }catch(e){ console.warn('sv', e); }
   const pinSet=new Set(pins.map(p=>p.customer_num)); bks.forEach(({ev})=>{ if(ev.customerNum&&pinSet.has(ev.customerNum)) ev.pin=true; if(!ev.customerNum) ev.nw=true; });
   // 當月2+／本月壽星（互斥，2+ 優先）
   const bday={}; cs.forEach(c=>{ const m=String(c.birthday||'').match(/^\d{4}[\/-](\d{1,2})[\/-](\d{1,2})$/); if(m) bday[c.num]={m:+m[1],d:+m[2]}; });
@@ -1972,8 +1983,8 @@ async function annotateHints(j, dk){
   });
 }
 function hintBubbles(ev){ const ks=hintKeys(ev); if(!ks.length) return null; const d=document.createElement('div'); d.className='hbubs'; d.innerHTML=ks.map(hbub).join(''); return d; }
-function hintLegendHtml(){ return `<span>${hbub('2p')}${HINT_LBL['2p']}</span><span>${hbub('bd')}${HINT_LBL.bd}</span><span>${hbub('cp')}${HINT_LBL.cp}</span><span>${hbub('ud')}${HINT_LBL.ud}</span><span>${hbub('pin')}${HINT_LBL.pin}</span><span style="color:var(--text-hint)">依紀錄推測，以櫃台確認為準</span>`; }
-const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp||ev.nw||ev.pin||ev.ud));
+function hintLegendHtml(){ return `<span>${hbub('2p')}${HINT_LBL['2p']}</span><span>${hbub('bd')}${HINT_LBL.bd}</span><span>${hbub('cp')}${HINT_LBL.cp}</span><span>${hbub('ud')}${HINT_LBL.ud}</span><span>${hbub('sv')}${HINT_LBL.sv}</span><span>${hbub('pin')}${HINT_LBL.pin}</span><span style="color:var(--text-hint)">依紀錄推測，以櫃台確認為準</span>`; }
+const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp||ev.nw||ev.pin||ev.ud||ev.sv));
 
 /* ── 渲染 ── */
 const board=document.getElementById('board');
