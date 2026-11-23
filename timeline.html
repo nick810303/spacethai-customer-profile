@@ -200,7 +200,13 @@
   .hbub{min-width:19px;height:19px;border-radius:10px;color:#fff;font:700 11px/19px var(--sans);display:inline-flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--surface);flex:none}
   .hbub svg{width:12px;height:12px;display:block}
   .hbub.h2p{background:var(--h2p)} .hbub.hbd{background:var(--hbd)} .hbub.hcp{background:var(--hcp)} .hbub.hud{background:#566579} .hbub.hsv{background:#4C8A6A} .hbub.htc{background:#5B8FC4} .hbub.hth{background:#DD8A4E}
-  .btk{cursor:pointer;border-bottom:1.5px dashed rgba(255,255,255,.7);padding-bottom:1px}
+  .bth{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .bd3 .bth{color:#fff;margin-left:3px}
+  .bd .bth{color:#8a7a70;margin-left:1px}.bd .bth svg{width:14px;height:14px;display:block}
+  .bd.bdx{gap:3px;padding:0 7px}.bd.bdx .bdb{display:inline-flex;color:#8a7a70}.bd.bdx .bdb svg{width:12px;height:12px;display:block}
+  .bd3.bdx{padding-left:0}
+  .bth{position:relative}.bth::after,.bd3.bdx::after{content:"";position:absolute;inset:-8px}
+  .vband .bd3 .bth{width:13px;height:13px}.vband .bd3.bdx span{width:12px;height:12px}.vband .bd3.bdx .bth{width:13px;height:13px}
   .legend .hbub,.hleg .hbub{min-width:16px;height:16px;line-height:16px;font-size:10px;padding:0 3px;box-shadow:none}
   .legend .hbub svg,.hleg .hbub svg{width:10px;height:10px}
   .hleg{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-muted);white-space:nowrap}
@@ -629,7 +635,8 @@ body.fw3{--fwt:800;--fwn:800;--fwm:600;--fwb:600;--fwh:700;--fwz:600}
 .vband .cap{width:22px;height:22px;flex:none;padding:0;gap:0;position:relative;cursor:pointer}
 .vband .cap .pill{position:relative;display:block;width:22px;height:22px;padding:0;gap:0}
 .vband .cap .pic{position:absolute;left:0;top:0;margin:0;transform:scale(.85);transform-origin:0 0}
-@container band (max-width:130px){ .vband .bd3{display:none} }
+@container band (max-width:130px){ .vband .bd3{display:none} .vband .bd3.bdx{display:inline-flex} }
+@container band (max-width:92px){ .vband .bd3.bdx{display:none} }
 /* 老師預約數紅圈：不被相鄰格／上方色塊蓋住（z-index 已由程式依欄序遞減），密集時收進格內避免右緣被切 */
 .vhead{overflow:visible}
 .vgrid.dense .vhead .av{width:18px;height:18px}
@@ -1434,7 +1441,7 @@ function pxArt(rows,pal){const W=rows[0].length;let s='';
 const hexMix=(hex,a,to)=>{const n=parseInt(hex.slice(1),16),f=v=>Math.round(v+(to-v)*a);return '#'+[n>>16,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,'0')).join('');};
 const PIN=["..kkkkk..",".kLPPPPk.","kLPPwPPPk","kPPwwwPPk","kPPPwPPPk","kPPPPPPDk",".kPPPPDk.",".kPPPPDk.","..kPPDk..","...kDk...","....k....","..sssss.."];
 const pinSvg=(hex,mini)=>pxArt(mini?PIN.slice(0,11):PIN,{k:'#2B211C',P:hex,L:hexMix(hex,.45,255),D:hexMix(hex,.3,0),w:'#fff',s:'#D8CFC8'});
-const nameplate=(br,cnt,mini)=>`<span class="bwrap"><span class="np" style="--bc:${br.hex}"><span class="ic">${pinSvg(br.hex,mini)}</span><span class="nm" data-kt="bt:${br.name}" style="cursor:pointer">${br.name}</span></span>${cnt?`<span class="badge" title="今日預約總數">${cnt}</span>`:''}</span>`;
+const nameplate=(br,cnt,mini)=>`<span class="bwrap"><span class="np" style="--bc:${br.hex}"><span class="ic">${pinSvg(br.hex,mini)}</span><span class="nm">${br.name}</span></span>${cnt?`<span class="badge" title="今日預約總數">${cnt}</span>`:''}</span>`;
 // 目前此刻（含 15 分緩衝）該分店被占用的床數 = 正在服務中的預約數（只有「今天」才算）
 function bedsNow(list,isToday,NOW){
   if(!isToday) return null;
@@ -1683,10 +1690,11 @@ document.addEventListener('click',e=>{
   if(el){ e.stopPropagation(); if(capPopBr===el.dataset.br) closeCapPop(); else openCapPop(el); return; }
   if(!e.target.closest('#capPop,#capx,#kxtip')) closeCapPop();
 });
-function bedsHtml(used){
-  if(used==null) return '';
+const TH_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.8 3.7a2.2 2.2 0 0 1 4.4 0v7.2a4.2 4.2 0 1 1-4.4 0z"/><circle cx="10" cy="14.3" r="1.7" fill="currentColor" stroke="none"/><path d="M10 6.2v7"/></svg>';
+function bedsHtml(used,br){
+  if(used==null) return br?`<span class="bd bdx" data-kt="bt:${br}"><span class="bdb">${BED_SVG}</span><span class="bth">${TH_SVG}</span></span>`:'';
   const n=Math.min(5,used);
-  return `<span class="bd" data-kt="bed"><span class="lv"></span><span class="ql"><span>實時</span><span>床位</span></span><i class="sep"></i><span class="row5">${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span></span>`;
+  return `<span class="bd" data-kt="bed"><span class="lv"></span><span class="ql"><span>實時</span><span>床位</span></span><i class="sep"></i><span class="row5">${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span>${br?`<span class="bth" data-kt="bt:${br}">${TH_SVG}</span>`:''}</span>`;
 }
 // 分店內排序：今天有上班的在前，休的在後（保持原順序）
 const dutyFirst = list => [...list.filter(t=>t.shift), ...list.filter(t=>!t.shift)];
@@ -1885,7 +1893,7 @@ const BONUS_DAYS={
 function SPEC(dk){ const n=holNameOf(dk), bn=BONUS_DAYS[dk]; const tags=n?[[n,'off']]:[]; if(bn && bn!==n) tags.push([bn,'event']); return {tags, bonus:!!bn}; }
 const holOf=dk=>{ if(data&&data.date===dk&&data.capacity) return !!data.capacity.isHoliday; const [y,m,d]=dk.split('-').map(Number), w=new Date(y,m-1,d).getDay(); return w===0||w===6||!!HOLNAME[dk]; };
 const stampTxt=t=>{ const k=Math.ceil(t.length/2); return t.slice(0,k)+'<br>'+t.slice(k); };
-function bedsBand(n,ttl){ if(n==null) return ''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}</span>`; }
+function bedsBand(n,ttl,br){ if(n==null) return br?`<span class="bd3 bdx" data-kt="bt:${br}"><span class="on">${BED_SVG}</span><span class="on bth">${TH_SVG}</span></span>`:''; n=Math.min(5,n); return `<span class="bd3" data-kt="bed"><i class="lv"></i>${ttl?'<em class="bt">實時床位</em>':''}${Array.from({length:5},(_,i)=>`<span class="${i<n?'on':'off'}">${BED_SVG}</span>`).join('')}${br?`<span class="on bth" data-kt="bt:${br}">${TH_SVG}</span>`:''}</span>`; }
 function dateCornerHtml(){ const [y,m,d]=dateKey.split('-').map(Number), w=new Date(y,m-1,d).getDay(), sp=SPEC(dateKey), red=holOf(dateKey), tag=[...sp.tags].sort((p,q)=>(p[1]==='off'?0:1)-(q[1]==='off'?0:1))[0], isT=dateKey===todayKey();
   const stamp=sp.bonus?`<span class="stamp k-bonus">特殊獎金日</span>`:(tag?`<span class="stamp k-${tag[1]}">${esc(tag[0])}</span>`:'');
   return `<span class="hrow"><span class="hgrp"><button class="hn" id="hn_p" aria-label="前一天">‹</button><button class="hcal dblk${red?' rd':''}${filter!=='all'?' act':''}" aria-label="日期與篩選：點擊調整" title="${m}月${d}日 週${WD[w]}${sp.tags.map(t=>'・'+t[0]).join('')}${sp.bonus?'・特殊獎金日':''}"><span class="mo">${m}月<em class="cr">▾</em></span><span class="dy">${d}</span><span class="wk2">週${WD[w]}</span></button><button class="hn" id="hn_n" aria-label="後一天">›</button></span><button class="hn today${isT?' on':''}" id="hn_t" aria-label="回到今日">${isT?'今日':'返回今日'}</button></span><span class="hst">${stamp}</span>`; }
@@ -1979,9 +1987,9 @@ async function annotateHints(j, dk){
         const r=g.find(x=>same(x)&&String(x.start_time).slice(0,5)===hm)||g.find(same)||(g.length===1&&cnt[k]===1?g[0]:null);   // 同行（同一位客人兩位老師）只標在對的那位老師
         if(r&&has.has(r.id)) ev.sv=true; }); } }
   }catch(e){ console.warn('sv', e); }
-  try{ if(numsAll.length&&dk===todayKey()){ const tf=await rest(`survey_responses?select=customer_num,temp_feel&customer_num=in.(${numsAll.join(',')})&temp_feel=not.is.null&limit=5000`);
+  try{ if(numsAll.length&&dk===todayKey()){ const tf=await rest(`survey_responses?select=customer_num,temp_feel&customer_num=in.(${numsAll.join(',')})&temp_feel=not.is.null&filled_at=gte.${new Date(Date.now()-365*864e5).toISOString().slice(0,10)}&limit=5000`);   // 只看近一年
     const ag={}; tf.forEach(x=>{ const a=(ag[x.customer_num] ||= {n:0,c:0,h:0}); a.n++; if(/冷/.test(x.temp_feel)) a.c++; else if(/熱/.test(x.temp_feel)) a.h++; });
-    bks.forEach(({ev})=>{ const a=ag[ev.customerNum]; if(!a) return; if(a.c>=2&&a.c*3>=a.n){ ev.tc=true; ev.tf=a; } else if(a.h>=2&&a.h*3>=a.n){ ev.th=true; ev.tf=a; } }); }
+    bks.forEach(({ev})=>{ const a=ag[ev.customerNum]; if(!a) return; if(a.c>=2&&a.c*2>=a.n){ ev.tc=true; ev.tf=a; } else if(a.h>=2&&a.h*2>=a.n){ ev.th=true; ev.tf=a; } }); }
   }catch(e){ console.warn('temp', e); }
   const pinSet=new Set(pins.map(p=>p.customer_num)); bks.forEach(({ev})=>{ if(ev.customerNum&&pinSet.has(ev.customerNum)) ev.pin=true; if(!ev.customerNum) ev.nw=true; });
   // 當月2+／本月壽星（互斥，2+ 優先）
@@ -2056,7 +2064,7 @@ function buildHorizontal(pane){
     const head=document.createElement('div'); head.className='branch-head';
     const used=bedsNow(all,isToday,NOW);
     const _st=capState(br.name), _nm=_st?CXN[capKind(_st)][0]:''; let _ch=capHtml(br.name,true); _ch=_ch.replace(/<\/span>\s*$/,`<span class="ctt">${_nm}</span></span>`);
-    head.innerHTML=`<div class="hband" style="--bc:${br.hex}"><span class="in"><b class="btk" data-kt="bt:${br.name}">${br.name}</b><i class="cnt">${cnt}</i>${_ch}${bedsBand(used,true)}</span></div>`;
+    head.innerHTML=`<div class="hband" style="--bc:${br.hex}"><span class="in"><b>${br.name}</b><i class="cnt">${cnt}</i>${_ch}${bedsBand(used,true,br.name)}</span></div>`;
     grid.appendChild(head);
     list.forEach(t=>{
       const [zh,en]=t.name.split(' ');
@@ -2108,7 +2116,7 @@ function buildVertical(pane){
   const sum=document.createElement('div'); sum.className='vsum';
   sum.innerHTML=''; const _unused=()=>visibleBranches().map(br=>{ const list=data.teachers.filter(t=>t.branch===br.name);
     const c=list.reduce((n,t)=>n+bookingCount(t),0);
-    return `<span class="b">${nameplate(br,c,true)}${bedsHtml(bedsNow(list,isToday,NOW))}${capHtml(br.name,true)}</span>`; }).join('')
+    return `<span class="b">${nameplate(br,c,true)}${bedsHtml(bedsNow(list,isToday,NOW),br.name)}${capHtml(br.name,true)}</span>`; }).join('')
     + (anyHints()?`<span class="hleg">${hintLegendHtml()}</span>`:'');
   // 表頭
   const groups=[]; cols.forEach(({br})=>{ const g=groups[groups.length-1]; if(g&&g.br===br) g.n++; else groups.push({br,n:1}); });
@@ -2116,7 +2124,7 @@ function buildVertical(pane){
   groups.forEach((g,gi)=>{ const cnt=data.teachers.filter(t=>t.branch===g.br.name).reduce((n,t)=>n+bookingCount(t),0);
     const b=document.createElement('div'); b.className='vband'; b.style.gridColumn='span '+g.n; b.style.setProperty('--bc',g.br.hex);
     const bl=data.teachers.filter(t=>t.branch===g.br.name); const used=bedsNow(bl,isToday,NOW);
-    b.innerHTML=`<span class="in"><span class="r1"><b class="btk" data-kt="bt:${g.br.name}">${g.br.name}</b><i class="cnt">${cnt}</i>${bedsBand(g.n>=2?used:null)}${capHtml(g.br.name,true)}</span></span>`; grid.appendChild(b); });
+    b.innerHTML=`<span class="in"><span class="r1"><b>${g.br.name}</b><i class="cnt">${cnt}</i>${bedsBand(g.n>=2?used:null,false,g.br.name)}${capHtml(g.br.name,true)}</span></span>`; grid.appendChild(b); });
   
   cols.forEach(({t,br,first})=>{
     const [zh]=t.name.split(' ');
