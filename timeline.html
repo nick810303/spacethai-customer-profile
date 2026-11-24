@@ -1064,6 +1064,11 @@ button.hx-pin.hx-cp.hx-bd{outline:2.5px solid var(--hbd);box-shadow:0 0 0 2.5px 
 /* ── v31：醒目黃色橫幅搬到「今日量能」底下；點金幣＝小泡泡顯示日期 ── */
 .cx-bn{margin-top:8px;background:#FFD34D;color:#4A3000;border-radius:8px;padding:6px 9px;font:700 10.5px/1.45 'Noto Sans TC','Manrope',sans-serif;letter-spacing:.01em;text-wrap:balance;box-shadow:inset 0 0 0 1px rgba(120,80,0,.2)}
 .coins .mdl2[data-kt]{cursor:pointer}
+.hbubs .hbub{position:relative}
+.hbubs .hbub::after{content:"";position:absolute;inset:-6px -1.5px}
+.hbubs .hbub:first-child::after{left:-6px}.hbubs .hbub:last-child::after{right:-6px}
+.vcol .hbubs .hbub::after{inset:-1.5px -6px -1.5px -12px}
+.vcol .hbubs .hbub:first-child::after{top:-9px;left:-12px}.vcol .hbubs .hbub:last-child::after{bottom:-11px;right:-6px}
 #kxtip.svp{width:346px;box-sizing:border-box;padding:9px 12px 10px;z-index:4000}
 #kxtip.svp h5{margin:-9px -12px 8px;padding:7px 36px 7px 12px;font-size:13px}
 #kxtip.svp h5 small{font-weight:500;font-size:11px;color:#8a7a70}
