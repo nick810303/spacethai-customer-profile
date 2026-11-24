@@ -1064,6 +1064,34 @@ button.hx-pin.hx-cp.hx-bd{outline:2.5px solid var(--hbd);box-shadow:0 0 0 2.5px 
 /* ── v31：醒目黃色橫幅搬到「今日量能」底下；點金幣＝小泡泡顯示日期 ── */
 .cx-bn{margin-top:8px;background:#FFD34D;color:#4A3000;border-radius:8px;padding:6px 9px;font:700 10.5px/1.45 'Noto Sans TC','Manrope',sans-serif;letter-spacing:.01em;text-wrap:balance;box-shadow:inset 0 0 0 1px rgba(120,80,0,.2)}
 .coins .mdl2[data-kt]{cursor:pointer}
+#kxtip.svp{width:346px;box-sizing:border-box;padding:9px 12px 10px;z-index:4000}
+#kxtip.svp h5{margin:-9px -12px 8px;padding:7px 36px 7px 12px;font-size:13px}
+#kxtip.svp h5 small{font-weight:500;font-size:11px;color:#8a7a70}
+#kxtip.svp .kx-tx{width:22px;height:22px;line-height:22px;top:5px;right:6px}
+#kxtip .svd{display:grid;grid-template-columns:46px 1fr;gap:4px 8px;align-items:center;font:500 11.5px/1.5 Manrope,'Noto Sans TC',sans-serif;color:#2C2520}
+#kxtip .svd>i{font:500 10.5px Manrope,'Noto Sans TC',sans-serif;font-style:normal;color:#A08577;white-space:nowrap}
+#kxtip .svd>i.top{align-self:start;line-height:1.7}
+#kxtip .svd .tpr{display:flex;align-items:center;gap:6px}
+#kxtip .svd .tw{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;color:#fff;flex:none}
+#kxtip .svd .tw.tc{background:#5B8FC4}#kxtip .svd .tw.th{background:#DD8A4E}
+#kxtip .svd .tw svg{width:11px;height:11px}
+#kxtip .svd .tx{font-weight:700;margin-left:-2px}
+#kxtip .svd .tx.ok{font-weight:500;color:#6F625A;margin-left:0}
+#kxtip .svd .svb{display:inline-flex;align-items:center;gap:3px;font:700 10.5px/16px Manrope,'Noto Sans TC',sans-serif;color:#6F625A;background:#EFE9E4;border-radius:5px;padding:0 6px}
+#kxtip .svd .svb svg{width:10px;height:10px}
+#kxtip .svd .tri{display:grid;grid-template-columns:80px 80px auto;gap:0 6px;justify-content:start;min-width:0}
+#kxtip .svd .tri>span{display:flex;align-items:center;gap:3px;white-space:nowrap;min-width:0}
+#kxtip .svd .tri small{font:500 10.5px Manrope,'Noto Sans TC',sans-serif;color:#6F625A}
+#kxtip .svd .st{font:700 10.5px/1 Manrope,sans-serif;color:#E0A010}
+#kxtip .svd .st b{font-weight:700;color:#E8E0D9}
+#kxtip .svd .st.low{color:#B3261E}
+#kxtip .svd .mt{display:inline-flex;align-items:center;gap:1px}
+#kxtip .svd .mt s{width:3px;height:10px;border-radius:1px;background:#EBE3DC;text-decoration:none}
+#kxtip .svd .mt s.on{background:#7A5645}
+#kxtip .svd .mn{font:800 11.5px Manrope,sans-serif;color:#7A5645}
+#kxtip .svd .sep{grid-column:1/-1;height:1px;background:#EFE7E1;margin:2px 0}
+#kxtip .svd .cmt{white-space:pre-wrap;overflow-wrap:anywhere}
+#kxtip .svd .ft{color:#A08577;font-size:10.5px}
 #kxtip.bt{width:244px;box-sizing:border-box;padding:9px 11px;z-index:4000}
 #kxtip.bt h5{margin:-9px -11px 7px;padding:7px 36px 7px 11px;font-size:13px}
 #kxtip.bt h5 small{font-weight:500;font-size:11px;color:#8a7a70}
@@ -1748,7 +1776,7 @@ const KXTIP={
  pin:{c:'#E0A010',t:'釘選提醒',p:'同事針對這位客人釘選的重要資訊或警訊，會顯示在顧客檔案頂部。',s:['接待前先看完釘選內容','想讓所有同事都看到的新資訊：每日上傳寫小本本時，打開「釘選」']},
  tc:{c:'#5B8FC4',t:'常覺得冷',p:'這位客人在問卷裡多次表示環境偏冷。',s:['記得幫客人蓋好毯子，包好腳掌','安排有電毯的床位，並詢問是否需要開啟','避開冷氣風口的床位']},
  th:{c:'#DD8A4E',t:'常覺得熱',p:'這位客人在問卷裡多次表示環境偏熱。',s:['評估安排有壁扇或循環扇的床位','安排冷氣出風強的位置','蓋毯子前先詢問是否需要']},
- sv:{c:'#4C8A6A',t:'有填問卷',p:'這筆預約，客人填了滿意度問卷。點這筆預約，在右側到訪紀錄把那一次展開就能看內容。',s:[]},
+ sv:{c:'#4C8A6A',t:'有填問卷',p:'這筆預約，客人填了滿意度問卷。點預約上的這個圖示，就能直接看這一次的問卷內容。',s:[]},
  ud:{c:'#566579',t:'不指定老師',p:'這筆預約，客人沒有指定老師。',s:['接待時請記得自我介紹，讓顧客記得你，就會常常來找你喲！']},
  p2:{c:'#E8590C',t:'當月再訪',p:'系統判讀：這位客人「當月第二次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認']},
  bd:{c:'#D6336C',t:'本月壽星',p:'系統判斷：這位客人是壽星，且「當月首次」預約「120 min」。（培訓新師方案不顯示）',s:['結帳時請再次確認','確實核實生日','確實核實優惠券']},
@@ -1768,9 +1796,24 @@ function kxBtHtml(rows,store){const ord=store==='中山'?['A','B','C','D','E']:[
  beds.forEach(b=>{const r=m[b],v=[r.vcold,r.cold,r.ok,r.hot,r.vhot].map(x=>+x||0),n=v.reduce((a,x)=>a+x,0)||1,c=Math.round((v[0]+v[1])/n*100),t=Math.round((v[3]+v[4])/n*100);
   h+='<div class="btr"><b>'+b+'</b><span class="btb">'+v.map((x,i)=>'<i style="width:'+(x/n*100)+'%;background:'+col[i]+'"></i>').join('')+'</span><em class="'+(c>=13?'c':'')+'">'+c+'%</em><em class="'+(t>=4?'h':'')+'">'+t+'%</em><em class="n">'+n+'</em></div>'});
  return h+'<div class="btg"><span><i style="background:#2F5F94"></i>非常冷</span><span><i style="background:#5B8FC4"></i>有點冷</span><span><i style="background:#C9BFB7"></i>適中</span><span><i style="background:#DD8A4E"></i>偏熱</span></div><div class="btf">2026/5 起有記錄床位的問卷，每天更新。數字變色＝比例偏高。</div>'}
-function kxTipShow(el){ const k=el.getAttribute('data-kt'); let d=KXTIP[k]; if(!d&&k&&k.startsWith('bt:')){ const br=k.slice(3); if(!kxBtD&&!kxBtP){ kxBtP=rest('rpc/bed_temp_stats').then(r=>{ kxBtD=r||[]; if(kxTipCur===el) kxTipShow(el); }).catch(e=>{ kxBtP=null; console.warn('bt',e); }); } d={c:br==='中山'?'#B84E2C':'#2F5E4A',t:'床位溫度統計<small>'+esc(br)+'</small>',html:kxBtHtml(kxBtD,br),p:'',s:[],bt:true}; } if(!d&&k&&k.startsWith('d:')){ const [dt,st]=k.slice(2).split('|'); const [yy,mm,dd]=dt.split('-').map(Number); d={c:'#E8960A',t:`${mm}/${dd} 週${WD[new Date(yy,mm-1,dd).getDay()]}`,p:st==='got'?'黃金天（已達成）':'黃金天（計畫中，以實際績效為準）',s:[],mini:true}; } if(!d) return; kxTipEl.style.setProperty('--tc',d.c);
+function kxSvHtml(x){ const s=x.s, st=(l,n)=>`<span><small>${l}</small>${n==null?'<small>沒填</small>':`<span class="st${n<=3?' low':''}">${'★'.repeat(n)}<b>${'★'.repeat(5-n)}</b></span>`}</span>`;
+  const mt=(l,n)=>n==null?'<span></span>':`<span><small>${l}</small><span class="mt">${Array.from({length:10},(_,i)=>`<s${i<n?' class="on"':''}></s>`).join('')}</span><span class="mn">${n}</span></span>`;
+  const tw=/冷/.test(s.temp_feel||'')?'tc':/熱/.test(s.temp_feel||'')?'th':null, hasL=s.press_level!=null||s.stretch_level!=null;
+  const sc=String(s.service_comment||'').trim(), cm=String(s.comment||'').trim();
+  let ft='—'; if(s.filled_at){ const f=new Date(Date.parse(s.filled_at)+288e5), p=n=>String(n).padStart(2,'0'); ft=`${f.getUTCFullYear()}/${f.getUTCMonth()+1}/${f.getUTCDate()} ${p(f.getUTCHours())}:${p(f.getUTCMinutes())}`;
+    const m=String(x.date||'').match(/^(\d+)-(\d+)-(\d+)/); if(m){ const g=Math.round((Date.UTC(f.getUTCFullYear(),f.getUTCMonth(),f.getUTCDate())-Date.UTC(+m[1],m[2]-1,+m[3]))/864e5); ft+=g===0?'（當天）':g===1?'（到店隔天）':g>1?`（到店 ${g} 天後）`:''; } }
+  const tr=String(s.teacher_raw||'').trim(); if(tr&&x.tn&&!tr.endsWith(x.tn)) ft+=' · 客人填的老師：'+esc(tr);
+  return '<div class="svd">'
+   +(s.temp_feel?`<i>環境溫度</i><span class="tpr">${tw?`<span class="tw ${tw}">${HINT_SVG[tw]}</span>`:''}<span class="tx${tw?'':' ok'}">${esc(s.temp_feel)}</span>${x.bed?`<span class="svb">${BED_SVG}${esc(x.bed)}</span>`:''}</span>`:'')
+   +`<i>滿意度</i><span class="tri">${st('力道',s.press_sat)}${st('伸展',s.stretch_sat)}${st('痠痛點',s.point_sat)}</span>`
+   +(hasL?`<i>體感強度</i><span class="tri">${mt('力道',s.press_level)}${mt('伸展',s.stretch_level)}<span></span></span>`:'')
+   +(sc||cm?'<div class="sep"></div>':'')
+   +(sc?`<i class="top">服務感受</i><span class="cmt">${esc(sc)}</span>`:'')
+   +(cm?`<i class="top">其他留言</i><span class="cmt">${esc(cm)}</span>`:'')
+   +`<div class="sep"></div><i>填寫時間</i><span class="ft">${ft}</span></div>`; }
+function kxTipShow(el){ const k=el.getAttribute('data-kt'); let d=KXTIP[k]; if(!d&&k&&k.startsWith('sv:')){ const x=kxSvD[k.slice(3)]; if(x) d={c:'#4C8A6A',t:'滿意度問卷<small>'+esc((x.num?'#'+x.num+' ':'')+x.name+(x.tn?' · '+x.tn+'老師':''))+'</small>',html:kxSvHtml(x),p:'',s:[],svp:true}; else d=KXTIP.sv; } if(!d&&k&&k.startsWith('bt:')){ const br=k.slice(3); if(!kxBtD&&!kxBtP){ kxBtP=rest('rpc/bed_temp_stats').then(r=>{ kxBtD=r||[]; if(kxTipCur===el) kxTipShow(el); }).catch(e=>{ kxBtP=null; console.warn('bt',e); }); } d={c:br==='中山'?'#B84E2C':'#2F5E4A',t:'床位溫度統計<small>'+esc(br)+'</small>',html:kxBtHtml(kxBtD,br),p:'',s:[],bt:true}; } if(!d&&k&&k.startsWith('d:')){ const [dt,st]=k.slice(2).split('|'); const [yy,mm,dd]=dt.split('-').map(Number); d={c:'#E8960A',t:`${mm}/${dd} 週${WD[new Date(yy,mm-1,dd).getDay()]}`,p:st==='got'?'黃金天（已達成）':'黃金天（計畫中，以實際績效為準）',s:[],mini:true}; } if(!d) return; kxTipEl.style.setProperty('--tc',d.c);
   kxTipEl.innerHTML='<button class="kx-tx" aria-label="關閉">✕</button><h5><span class="tdot"></span>'+d.t+'</h5>'+(d.html||'')+(d.p?'<div class="lead">'+d.p+'</div>':'')+(d.s.length?'<div class="sh2">請這樣做</div><div class="stp">'+d.s.map((x,i)=>'<div><em>'+(i+1)+'</em><span>'+x+'</span></div>').join('')+'</div>':'')+(d.n?'<div class="nb">'+d.n+'</div>':'');
-  kxTipEl.classList.toggle('mini',!!d.mini); kxTipEl.classList.toggle('bt',!!d.bt); kxTipEl.style.zoom=''; kxTipEl.style.display='block'; kxTipCur=el; clearTimeout(kxTipEl._t); if(d.mini) kxTipEl._t=setTimeout(()=>{ if(kxTipCur===el) kxTipHide(); },3200); if(d.after) d.after(kxTipEl); const r=el.getBoundingClientRect(),w=kxTipEl.offsetWidth,h=kxTipEl.offsetHeight,W=innerWidth,H=innerHeight; let z=1; if(h>H-16)z=(H-16)/h; if(w>W-16)z=Math.min(z,(W-16)/w); if(z<1)kxTipEl.style.zoom=z;
+  kxTipEl.classList.toggle('mini',!!d.mini); kxTipEl.classList.toggle('bt',!!d.bt); kxTipEl.classList.toggle('svp',!!d.svp); kxTipEl.style.zoom=''; kxTipEl.style.display='block'; kxTipCur=el; clearTimeout(kxTipEl._t); if(d.mini) kxTipEl._t=setTimeout(()=>{ if(kxTipCur===el) kxTipHide(); },3200); if(d.after) d.after(kxTipEl); const r=el.getBoundingClientRect(),w=kxTipEl.offsetWidth,h=kxTipEl.offsetHeight,W=innerWidth,H=innerHeight; let z=1; if(h>H-16)z=(H-16)/h; if(w>W-16)z=Math.min(z,(W-16)/w); if(z<1)kxTipEl.style.zoom=z;
   const w2=w*z,h2=h*z; let x=Math.max(8,Math.min(W-w2-8,r.left)),y=r.bottom+8; if(y+h2>H-8){ const up=r.top-h2-8; y=up>=8?up:Math.max(8,H-h2-8); } kxTipEl.style.left=x/z+'px'; kxTipEl.style.top=y/z+'px'; }
 kxTipEl.addEventListener('click',e=>{ if(e.target.closest('.kx-tx')) kxTipHide(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') kxTipHide(); });
@@ -1952,7 +1995,8 @@ const HINT_SVG={
 };
 const HINT_LBL={ tc:'常覺得冷', th:'常覺得熱', sv:'有填問卷', ud:'不指定老師', '2p':'當月再訪', bd:'本月壽星', cp:'同行', nw:'可能是新朋友', pin:'釘選提醒' };
 const KTMAP={tc:'tc',th:'th',sv:'sv',ud:'ud','2p':'p2',bd:'bd',cp:'cp',nw:'nw',pin:'pin'};
-const hbub = k => `<span class="hbub h${k}" data-kt="${KTMAP[k]}">${k==='2p'?'2+':HINT_SVG[k]}</span>`;
+const kxSvD={};
+const hbub = (k,ev) => `<span class="hbub h${k}" data-kt="${k==='sv'&&ev&&ev.sv&&ev.sv!==true?'sv:'+ev.sv:KTMAP[k]}">${k==='2p'?'2+':HINT_SVG[k]}</span>`;
 const hintKeys = ev => [ev.cp?'cp':null, ev.ud?'ud':null, ev.plan||null, ev.nw?'nw':null, ev.pin?'pin':null, ev.tc?'tc':null, ev.th?'th':null, ev.sv?'sv':null].filter(Boolean);   // 同行在前、方案在後
 const hintCls = ev => hintKeys(ev).filter(k=>k!=='ud'&&k!=='sv'&&k!=='tc'&&k!=='th').map(k=>'hx-'+k).join(' ');
 const hintTitle = ev => ev.hintWhy?.length ? `\n${ev.hintWhy.join('\n')}（推測，以櫃台確認為準）` : '';
@@ -1981,15 +2025,15 @@ async function annotateHints(j, dk){
     bks.forEach(({ev,t})=>{ if(udSet.has(String(ev.start).slice(0,10)+'|'+String(t.name||'').split(' ')[0]+'|'+String(ev.start).slice(11,16))) ev.ud=true; });
   }catch(e){ console.warn('ud', e); }
   try{ if(numsAll.length){ const nx=new Date(Date.parse(dk+'T00:00:00Z')+864e5).toISOString().slice(0,10);
-    const rc=await rest(`records?select=id,customer_num,date,start_time,staff_name_legacy&date=in.(${dk},${nx})&customer_num=in.(${numsAll.join(',')})&is_draft=eq.false&limit=2000`);
-    if(rc.length){ const svs=await rest(`survey_responses?select=record_id&record_id=in.(${rc.map(r=>r.id).join(',')})&limit=2000`);
-      const has=new Set(svs.map(x=>x.record_id)), by={};
+    const rc=await rest(`records?select=id,customer_num,date,start_time,staff_name_legacy,bed&date=in.(${dk},${nx})&customer_num=in.(${numsAll.join(',')})&is_draft=eq.false&limit=2000`);
+    if(rc.length){ const svs=await rest(`survey_responses?select=record_id,filled_at,teacher_raw,temp_feel,press_level,press_sat,stretch_level,stretch_sat,point_sat,service_comment,comment&record_id=in.(${rc.map(r=>r.id).join(',')})&order=filled_at.asc&limit=2000`);
+      const has=new Map(svs.map(x=>[x.record_id,x])), by={};
       rc.forEach(r=>{ (by[r.customer_num+'|'+r.date] ||= []).push(r); });
       const cnt={}; bks.forEach(({ev})=>{ const k=ev.customerNum+'|'+String(ev.start).slice(0,10); cnt[k]=(cnt[k]||0)+1; });
       bks.forEach(({ev,t})=>{ const k=ev.customerNum+'|'+String(ev.start).slice(0,10), g=by[k]; if(!g) return;
         const tn=String(t.name||'').split(' ')[0], hm=String(ev.start).slice(11,16), same=x=>String(x.staff_name_legacy||'').trim().split(' ')[0]===tn;
         const r=g.find(x=>same(x)&&String(x.start_time).slice(0,5)===hm)||g.find(same)||(g.length===1&&cnt[k]===1?g[0]:null);   // 同行（同一位客人兩位老師）只標在對的那位老師
-        if(r&&has.has(r.id)) ev.sv=true; }); } }
+        if(r&&has.has(r.id)){ ev.sv=r.id; kxSvD[r.id]={s:has.get(r.id),bed:r.bed||'',date:r.date,num:ev.customerNum,name:ev.displayName||'',tn}; } }); } }
   }catch(e){ console.warn('sv', e); }
   try{ if(numsAll.length&&dk===todayKey()){ const tf=await rest(`survey_responses?select=customer_num,temp_feel&customer_num=in.(${numsAll.join(',')})&temp_feel=not.is.null&filled_at=gte.${new Date(Date.now()-365*864e5).toISOString().slice(0,10)}&limit=5000`);   // 只看近一年
     const ag={}; tf.forEach(x=>{ const a=(ag[x.customer_num] ||= {n:0,c:0,h:0}); a.n++; if(/冷/.test(x.temp_feel)) a.c++; else if(/熱/.test(x.temp_feel)) a.h++; });
@@ -2029,7 +2073,7 @@ async function annotateHints(j, dk){
     }));
   });
 }
-function hintBubbles(ev){ const ks=hintKeys(ev); if(!ks.length) return null; const d=document.createElement('div'); d.className='hbubs'; d.innerHTML=ks.map(hbub).join(''); return d; }
+function hintBubbles(ev){ const ks=hintKeys(ev); if(!ks.length) return null; const d=document.createElement('div'); d.className='hbubs'; d.innerHTML=ks.map(k=>hbub(k,ev)).join(''); return d; }
 function hintLegendHtml(){ return `<span>${hbub('2p')}${HINT_LBL['2p']}</span><span>${hbub('bd')}${HINT_LBL.bd}</span><span>${hbub('cp')}${HINT_LBL.cp}</span><span>${hbub('ud')}${HINT_LBL.ud}</span><span>${hbub('tc')}${HINT_LBL.tc}</span><span>${hbub('th')}${HINT_LBL.th}</span><span>${hbub('sv')}${HINT_LBL.sv}</span><span>${hbub('pin')}${HINT_LBL.pin}</span><span style="color:var(--text-hint)">依紀錄推測，以櫃台確認為準</span>`; }
 const anyHints = () => data && data.teachers.some(t=>t.events.some(ev=>ev.plan||ev.cp||ev.nw||ev.pin||ev.ud||ev.sv||ev.tc||ev.th));
 
